@@ -1,0 +1,328 @@
+@charset "utf-8";
+
+/* ----- RESET ----- */
+    html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td,article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, hr{margin: 0;padding: 0;border: 0;font-size: 100%;font: inherit;vertical-align: baseline;}article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}body{line-height: 1;}ol, ul{list-style: none;}blockquote, q {quotes: none;}blockquote:before, blockquote:after, q:before, q:after {content: '';content: none;}table {border-collapse: collapse; border-spacing: 0;}
+
+/* ----- FONTES IMPORTADAS ----- */
+	@font-face {
+	    font-family: 'bold';
+	    src: url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_bd-webfont.eot');
+	    src: url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_bd-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_bd-webfont.woff') format('woff'),
+	         url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_bd-webfont.ttf') format('truetype'),
+	         url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_bd-webfont.svg#bold') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+	@font-face {
+	    font-family: 'regular';
+	    src: url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_rg-webfont.eot');
+	    src: url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_rg-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_rg-webfont.woff') format('woff'),
+	         url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_rg-webfont.ttf') format('truetype'),
+	         url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_rg-webfont.svg#regular') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+	@font-face {
+	    font-family: 'italic';
+	    src: url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_it-webfont.eot');
+	    src: url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_it-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_it-webfont.woff') format('woff'),
+	         url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_it-webfont.ttf') format('truetype'),
+	         url('http://localhost/ec_delta/sistema/admin/views/default/css/font/aller_it-webfont.svg#italic') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+/* ----- PADRÃ•ES GERAIS----- */
+
+	/* Universal */
+
+	 *{
+	 	-webkit-box-sizing: border-box;
+	 	-moz-box-sizing: border-box;
+	 	box-sizing: border-box;
+	 }
+
+	/* Cores */
+		@c-black: #242424;
+		@c-white: #fff;
+		@bg-site: #f6f2e2;
+
+		@c-red: #ff4a4a;
+		@c-orange: #f4711e;
+		@c-green: #7ab317;
+
+		@c-gray-1: #8b8c7e;
+		@c-gray-2: #efefef;
+		@c-gray-3: #c2c2c2;
+		@c-gray-4: #515151;
+		
+		@c-menu: #a6a07d;
+
+	/* Grid */
+
+		/* t -> tamanho // n -> nÃºmero */
+		@t-totalgrid: 940px;
+		
+		@t-margingrid: 20px;
+		@n-colunasgrid: 12;
+		@t-coluna: (@t-totalgrid - ((@n-colunasgrid - 1) * @t-margingrid)) / @n-colunasgrid;
+
+		.colunagrid(@n-colunas: 1){
+			width: ((@t-coluna * @n-colunas) + ((@n-colunas - 1) * @t-margingrid));
+			float: left;
+			display: block;
+		}
+
+
+
+	/* Outros */
+
+		.border-radius (@radius: 4px){
+			-webkit-border-radius: @radius;
+			-moz-border-radius: @radius;
+			border-radius: @radius;
+		}
+
+		.transition (@duracao: 0.2s, @elementos: all, @movimento: linear){
+			transition: @arguments;
+			-moz-transition: @arguments;
+			-webkit-transition: @arguments;
+			-o-transition: @arguments;
+		}
+
+		.transform (@arguments){
+			transform: @arguments;
+			-moz-transform: @arguments;
+			-webkit-transform: @arguments;
+			-o-transform: @arguments;
+		}
+
+
+		.box-shadow (@shadow: 1px 1px 6px rgba(0,0,0,0.11)){
+			box-shadow: @arguments;
+			-webkit-box-shadow: @arguments;
+			-moz-box-shadow: @arguments;
+		}
+
+		.box-orient (@alinhamento: horizontal){
+			display: -webkit-box;
+  			-webkit-box-orient: @alinhamento;
+
+  			display: -moz-box;
+  			-moz-box-orient: @alinhamento;
+
+  			display: box;
+  			box-orient: @alinhamento;
+
+		}
+
+		.box-flex (@flex: 1){
+			-webkit-box-flex: @flex;
+  			-moz-box-flex: @flex;
+  			box-flex: @flex;
+		}
+
+/* PADRÃ•ES DO SITE */
+	body,html {height: 100%;}
+	body{background: @bg-site; font:14px 'regular';color:@c-gray-1;}
+	#all-site{width: 100%;margin:0px auto; min-height: 100%; position: relative;}
+
+	/* PadrÃµes */
+	.clear{clear:both;}
+	.fleft{float: left;}
+	.fright{float: right;}
+
+
+/* Estilos */
+
+	/* Grid */
+		.grid{width: @t-totalgrid;}
+		.grid-margin-r{margin-right: @t-margingrid;}
+		.grid-margin-l{margin-left: @t-margingrid;}
+		.grid1{.colunagrid;}
+		.grid2{.colunagrid(2);}
+		.grid3{.colunagrid(3);}
+		.grid4{.colunagrid(4);}
+		.grid5{.colunagrid(5);}
+		.grid6{.colunagrid(6);}
+		.grid7{.colunagrid(7);}
+		.grid8{.colunagrid(8);}
+		.grid9{.colunagrid(9);}
+		.grid10{.colunagrid(10);}
+		.grid11{.colunagrid(11);}
+		.grid12{.colunagrid(12);}
+		.centro {display: block; margin: 0 auto; float:none;}
+		.fleft{float: left;}
+		.fright{float: right;}
+	/* Elementos Textuais */
+
+		/* Nativos */
+			h1{font:24px 'bold'; color:@c-orange;}
+			h2{font:18px 'bold'; color:@c-orange;}
+			h3{font:16px 'regular'; color:@c-orange;}
+			strong{font-family: 'bold';}
+			hr{width: 100%;height: 1px; background: @c-gray-1;}
+			p{line-height: 22px;}
+
+		/* Icones de TÃ­tulo */
+			.icon-h1{background: @c-orange url(http://localhost/ec_delta/sistema/admin/views/default/css/images/icone-menu.png);width: 30px;height: 30px;.border-radius(26px);float: left;margin: -2px 12px auto auto;}
+
+		/* Cores Texto */
+			.color-red{color:@c-red;}
+			.color-orange{color:@c-orange;}
+			.color-dark{color:@c-gray-1;}
+
+		/* Fontes */
+			.font-italic{font-family: 'italic';}
+
+		/* Enfases */
+			.enfase (@cor){
+				background: @cor;color:@c-white;display: inline;padding: 4px 16px;.border-radius;font: 14px 'italic';
+			}
+			em{font-family: 'italic';}
+			em.orange{.enfase (@c-orange);}
+			em.green{.enfase (@c-green);}
+
+		/* Caminho de PÃ£o */
+			.brandcamb a{color: @c-gray-1; text-decoration: none;}
+			.brandcamb a:hover{text-decoration: underline;}
+			.brandcamb em{color: @c-orange}
+
+	/* BotÃµes */
+		.bt-vm{background: #7ab317;color:#fff;display: inline;padding: 8px 16px;.border-radius;font: 14px 'bold';}
+		.bt-vp{background: #7ab317;color:#fff;display: inline;padding: 4px 12px;.border-radius;font: 14px 'regular'; border:none; cursor: pointer;}
+		
+		.bt-lm{background: @c-orange;color:#fff;display: inline;padding: 8px 16px;.border-radius;font: 14px 'bold'; border:none; cursor: pointer;}
+		.bt-lp{background: @c-orange;color:#fff;display: inline;padding: 4px 12px;.border-radius;font: 14px 'regular'; border: none; cursor: pointer;}
+
+	/* Boxes */
+		.box-back{background: white;.border-radius;padding:10px;.box-shadow;}
+
+		.border-radius{.border-radius(3px);}
+
+		span.img{.border-radius;border:#aaa481 1px solid;display:table; padding: 4px 4px 0px 4px;}
+		span.img img{.border-radius(2px);}
+
+	/* Tabela */
+		table{width: 100%;font-family: 'bold';}
+		table tr{border-bottom: 1px dashed #dcd8c8;margin:10px 10px 10px 10px;.transition}
+		table tr.title{border-bottom: none; background: @c-orange;color:white;.border-radius;}
+		table td{padding: 8px; vertical-align: middle;}
+		table tr.title:first-child td:first-child{.border-radius(4px 0 0 4px);}
+		table tr.title:first-child td:last-child{.border-radius(0 4px 4px 0);}
+		table tr:hover{background-color: rgba(252, 201, 97, 0.37);}
+		table tr:hover td:first-child{.border-radius(4px 0 0 4px);}
+		table tr:hover td:last-child{.border-radius(0 4px 4px 0);}
+		table tr.title:hover{background-color: @c-orange;}
+
+		table tr.erro{background: #f9d7d0;}
+
+	/* FormulÃ¡rios */
+
+		input,select,.input{background: #efefef;.border-radius;border:solid 1px #c2c2c2;height: 30px;outline: none;font: 16px 'regular';padding: 0px 6px;}
+		textarea{background: #efefef;.border-radius;border:solid 1px #c2c2c2;height:200px;outline: none;font: 16px 'regular';padding: 0px 6px;max-width: 908px;}
+		textarea{background: #efefef;.border-radius;height:200px;outline: none;font: 16px 'regular';padding: 0px 6px;width: 908px;max-width: 908px;}
+		input[type=submit] {.border-radius; background: @c-paleta-3; box-shadow: inset 0 0  3px @c-gray-2; color: @c-white;border:solid 1px @c-paleta-2; cursor:pointer;}
+
+/* Linha Topo */
+	#linha-topo{width:100%;height:6px;display: -webkit-box;-webkit-box-orient: horizontal;display: -moz-box;-moz-box-orient: horizontal;display: box;box-orient: horizontal;}
+	#linha-topo .barra{-webkit-box-flex: 1;-moz-box-flex: 1;box-flex: 1;background: #8b8c7e;}
+	#linha-topo .barra.dois{background: #a6a07d;}
+	#linha-topo .barra.tres{background: #c0b990;}
+	#linha-topo .barra.quatro{background: #dad3bc;}
+	#linha-topo .barra.cinco{background: #f2ebd2;}
+
+/* Menu */
+	/* v -> velocidade // n -> nÃºmero // t -> tamanho  */
+	<?php $n = 4; ?>
+	@n-iconesmenu: <?php echo $n ?>;
+	@t-iconemenu: @t-totalgrid / @n-iconesmenu;
+	@altura: 88px;
+	@borda-sobe: 8px;
+	@v-transicao: 0.12s;
+
+
+
+	/*nav ul{width: @t-totalgrid;overflow: hidden;.border-radius;background: @c-white;.box-shadow;}
+	nav a{text-transform: uppercase;color:@c-menu;font: 14px 'bold';}
+	nav a:hover{color:@c-gray-1;};
+	nav hr{width: 1px;height: @altura;float: left;background: #f6f0dc;}
+	nav li{float: left;width: @t-iconemenu;height:@altura;.box-orient(vertical);position: relative;}
+	nav div{.box-flex(1);display: block;line-height: @altura;vertical-align: middle;text-align: center;.transition(@v-transicao);position: relative;}
+	nav span.borda{.box-flex(0);display: block;.transition(@v-transicao);background: @c-orange;}
+	nav li:hover span.borda{height: @borda-sobe;}
+	nav li:hover div{line-height: @altura - (@borda-sobe + 5);}
+*/
+	nav#menu {clear: both;}
+	nav#menu > ul{width: @t-totalgrid;.border-radius;background: @c-white;.box-shadow;}
+	nav > ul > li {float:left; display: block; width: @t-iconemenu; text-align: center; height:@altura; line-height:@altura; border-bottom:@c-orange solid 0; position: relative; font: 14px 'bold'; line-height: @altura; text-transform: uppercase; background: #fff;}
+	nav > ul > li:after {content:""; float:left; width: 1px; height: @altura ;background: #f6f0dc;display: block; position: absolute;top:0;right:0;}
+	nav > ul > li, nav > ul > li > a {.transition(@v-transicao)}
+	nav > ul > li > a { float:left; width:100%; color:@c-menu;float:left;clear:both;}
+	nav > ul > li > a [class *= 'icon'] {width:20px; height:20px; margin:0px 5px 0 0;}
+	nav > ul > li > a [class *= 'icon']:before {font-size:20px; margin-top:3px;}
+	nav > ul > li:hover {border-bottom: @c-orange solid @borda-sobe;}
+	nav > ul > li.submenu:hover {border-bottom: none;}
+	nav > ul > li:hover > a {margin-top: @borda-sobe * -1; color: @c-gray-1;}
+	nav > ul > li.submenu:hover > a {margin-top: 0; color: @c-gray-1;}
+	nav > ul > li:first-child {.border-radius(0 0 0 5px);}
+	nav > ul > li:last-child {.border-radius(0 0 5px 0); clear:right;}
+<?php if( $n % 2 != 0) { ?>
+	nav > ul > li:last-child {width: @t-iconemenu;}
+<?php } ?>
+	nav > ul > li:last-child:after {display: none;}
+	nav li ul {position: absolute;top:100%; .colunagrid(5.5); opacity: 0; padding:20px 20px 0; background: @c-white; .border-radius(0 0 3px 3px); display: none; .transition();}
+	nav li ul li {background: @c-white;.colunagrid(2.5); height:30px; margin:0px 5px 20px;}
+	nav li ul li a {.colunagrid(2.5);  display: inline;height: 30px; line-height: 30px; color: @c-gray-1; margin:0;.border-radius(3px)}
+	
+	nav li ul li:nth-child(even) {float:right;}
+	nav li:hover ul {opacity: 1; display: block;}
+	nav li ul li:hover a {background: @c-green;  color: @c-white; cursor: pointer;}
+	
+	nav > ul > li:last-child ul {right:0;}
+	nav span.icon{width: 24px;height: 24px;background: url(http://localhost/ec_delta/sistema/admin/views/default/css/images/icone-menu.png);display: inline-block;}
+	nav span.txt{display: inline-block;padding: 0px 5px 5px 5px;vertical-align: 6px;}
+
+	/* Ajustar Icones */
+		nav span.inicio{background-position: -0px 0px;}
+		nav span.clientes{background-position: -26px 0px;}
+		nav span.pedidos{background-position: -52px 0px;}
+		nav span.produtos{background-position: -78px 0px;}
+		nav span.banners{background-position: -104px 0px;}
+		nav span.noticias{background-position: -130px 0px;}
+		nav span.categorias{background-position: -156px -2px;}
+		nav span.conteudo{background-position: -182px -2px;}
+
+		nav a:hover span.inicio{background-position: 0px -26px;}
+		nav a:hover span.clientes{background-position: -26px -26px;}
+		nav a:hover span.pedidos{background-position: -52px -26px;}
+		nav a:hover span.produtos{background-position: -78px -26px;}
+		nav a:hover span.banners{background-position: -104px -26px;}
+		nav a:hover span.noticias{background-position: -130px -26px;}
+		nav a:hover span.categorias{background-position: -156px -28px;}
+		nav a:hover span.conteudo{background-position: -182px -28px;}
+
+	
+	
+
+/* PaginaÃ§Ã£o */
+
+	.paginacao{background: white;.border-radius;padding:0px 10px;box-shadow: 0px 0px 5px rgba(0,0,0,0.11);width: 190px;margin: 0px auto;}
+	.paginacao a{color: @c-gray-4;font: 16px 'bold';text-decoration: none;margin: auto 2px auto 2px;display: inline-block;padding: 5px;position: relative;}
+	.paginacao span{font: 16px 'bold';color: @c-gray-4;}
+	.paginacao a:hover{color:@c-orange;}
+	.paginacao a.active{color:@c-orange;}
+	.paginacao a.active span{width: 100%;height: 4px;background:@c-orange;display: inline-block;position: absolute;.border-radius(3px 3px 0 0);bottom: 0px;left: 0px;}
+
+	.avatar {margin-top:20px; .grid4; float:right;}
+	.avatar .info {margin-left:10px;}
+	.avatar p {font-size:15px;margin-top:10px;}
+	.avatar span.italic {margin-top:5px; float:left;}
+	.avatar span.italic a{color: @c-gray-1;}
+	.avatar span.italic a:after{content:'/'; margin: 0 5px;}
+	.avatar span.italic a:last-child:after {content:none;}

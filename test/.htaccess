@@ -1,0 +1,4 @@
+
+RewriteEngine on
+
+RewriteRule ^regex/(.+)/?$ regex.php?route=$1

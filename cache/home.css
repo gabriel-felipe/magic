@@ -1,0 +1,12 @@
+#dashboard {.grid12; margin-top:30px; clear: both;}
+#dashboard > .grid4 {height:300px;}
+.mask {overflow: hidden; height:210px;.border-radius(5px)}
+.style-italic {font-style: italic;}
+#dashboard h2,#dashboard h1 {font-size:18px; color: @c-gray-1; margin:12px 0; font-family: 'regular'; .style-italic;}
+#dashboard > .grid4 a.bt-lp { text-align: center; font-family: 'italic'; display: block; .centro;}
+#dashboard > .grid4 a.bt-lp.max {width: 100%;}
+#dashboard > .grid4.suporte {text-align: center;}
+#dashboard > .grid4.suporte .icon {height:120px; background: url(http://localhost/ec_delta/sistema/admin/views/default/css/images/icon-suporte.png) no-repeat center; margin-top:5px;}
+#dashboard > .grid4.suporte a.bt-lp {.grid3; margin:10px 0;}
+#dashboard > .grid4.suporte h2 {margin: 15px 0 0px;}
+#dashboard > .grid4.suporte span {font-style: italic;}

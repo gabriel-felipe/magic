@@ -1,0 +1,2 @@
+body {background: #f00;}
+body@eq(min width 700) {background: #0f0;}
