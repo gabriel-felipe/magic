@@ -23,15 +23,16 @@
 		}
 	}
 	 //Se tiver namespace definido na url
+	require_once('init.php');	
 	$registry = new registry;
 	if(is_file(path_scope."/init.php")){
 		require_once(path_scope."/init.php");
 	}
-	require_once('init.php');	
+	
 	$url->set_ns(ns);
 
 	
-	
+
 	$registry->set('url',$url);
 	$magicHtml = new magicHtml;
 	$registry->set('html',$magicHtml);
