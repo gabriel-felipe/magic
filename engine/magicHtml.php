@@ -1,6 +1,8 @@
 <?php
+
 require_once(path_engine_library."/phpbrowsercap.php");
 use phpbrowscap\Browscap;
+
 	class MagicHTML {
 		//Conteúdo html
 		protected $content;
@@ -35,7 +37,7 @@ use phpbrowscap\Browscap;
 		protected $base_css = base_css;
 		protected $path_css = path_css;
 		protected $base_js = base_js;
-
+		protected $engine_path_css = path_engine_css;
 
 		public function __construct(){
 			$this->css_inline = array();
@@ -60,18 +62,19 @@ use phpbrowscap\Browscap;
 				die("Check path_cache variable");
 			}
 			if(!is_dir($this->path_css)){
-				die("Check path_css variable");
+				die("Check path_css variable(\"".$this->path_css."\")");
 			}
-			$this->add_js_linked(base_js_engine."/jquery-1.9.1.js",true,false,0);
+			$this->add_css_linked("common.css",'all',1,1);
+			$this->add_js_linked(base_js_engine."/jquery-1.9.1.js",true,true,0);
 			$this->add_js_linked(base_js_engine."/elquery.js",true,false,0);
 			$browser = new Browscap($this->path_cache);
 			$this->browser = $browser->getBrowser();
 			unset($browser);
 		}
 		//Funções gerenciamento de links de css
-		public function add_css_linked($link, $media="all", $is_local=true){
+		public function add_css_linked($link, $media="all", $is_local=true,$systemcss=0){
 
-			$this->css_linked[$link] =  array("link"=>$link, "media"=>$media, "is_local"=>$is_local);
+			$this->css_linked[$link] =  array("link"=>$link, "media"=>$media, "is_local"=>$is_local,"systemcss"=>$systemcss);
 		}
 		public function drop_css_linked($link){
 			if(isset($this->page->css_linked[$link])){
@@ -89,7 +92,7 @@ use phpbrowscap\Browscap;
 					if(!isset($this->css_inline[$obj])){
 						$this->css_inline[$obj] = $style; 	
 					} else {
-						$this->css_inline[$obj] = $this->css_inline[$obj]." ".$style; 
+						$this->css_inline[$obj] = $this->css_inline[$obj]." ".$style;
 					}
 					
 				}
@@ -143,6 +146,7 @@ use phpbrowscap\Browscap;
 		}
 		//Funções retorno de css e js
 		public function get_css_links(){
+			global $breakpoints, $gridColumns;
 			if(count($this->css_linked) > 0){
 			/*global $path_css;
 			$css_links = array();
@@ -168,7 +172,7 @@ use phpbrowscap\Browscap;
 			$content = "";
 			foreach($css_all as $link => $css){
 				if($css['is_local']){
-					$file = $this->path_css."/".$link;
+					$file = ($css['systemcss']) ? $this->engine_path_css."/".$link : $this->path_css."/".$link;
 					$mod = filectime($file);
 					$timeMod = ($timeMod < $mod) ? $mod : $timeMod;
 					$name .= "-".str_replace(".css","",$link);
@@ -198,7 +202,7 @@ use phpbrowscap\Browscap;
 				$equery = array();
 				foreach($css_all as $link => $css){
 					if($css['is_local']){
-						$file = $this->path_css."/".$link;
+						$file = ($css['systemcss']) ? $this->engine_path_css."/".$link : $this->path_css."/".$link;
 					}
 					else {
 						$file = $link;
@@ -228,7 +232,9 @@ use phpbrowscap\Browscap;
 						}
 
 					}
-					file_put_contents(str_replace($this->path_css,$this->path_cache,$file), $css);
+					$basename = basename($file);
+
+					file_put_contents($this->path_cache."/".$basename, $css);
 					$file = str_replace($this->path_css,$this->path_cache,$file);
 					ob_start();
 					include $file;
@@ -357,6 +363,7 @@ $css_inline
 		}
 		
 		protected function get_content() {
+			
 			return $this->content;
 		}
 		public function set_content($content) {

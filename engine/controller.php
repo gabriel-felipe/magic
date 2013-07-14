@@ -56,6 +56,7 @@
 			$this->children[] = $children;
 		}
 		protected function get_content() {
+			global $breakpoints, $gridColumns;
 			foreach ($this->children as $child) {
 				$name = explode("/",$child);
 				$name = end($name);
