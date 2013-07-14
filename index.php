@@ -19,22 +19,19 @@
 		if(data::post('ns','url')){
 			$namespace = data::post('ns','url');	
 		} else {
-			$namespace = "public";
+			$namespace = "public"; // DEFAULT NS;
 		}
-	} //Se tiver namespace definido na url
-
-	if($namespace == 'admin'){
-		$theme = "default";
-		$route = 'common/login';
-	} else {
-		$theme = "default";
-		$route = 'common/home';
 	}
-
+	 //Se tiver namespace definido na url
+	$registry = new registry;
+	if(is_file(path_scope."/init.php")){
+		require_once(path_scope."/init.php");
+	}
 	require_once('init.php');	
 	$url->set_ns(ns);
 
-	$registry = new registry;
+	
+	
 	$registry->set('url',$url);
 	$magicHtml = new magicHtml;
 	$registry->set('html',$magicHtml);
@@ -47,12 +44,6 @@
 	if(array_key_exists("route", $_POST)){
 		$route = $_POST['route'];
 	}
-	// if($namespace == 'admin'){
-	// 	$loader->library('login');
-	// 	$login = new login($registry);
-	// 	$registry->set("login",$login);
-	// }
-	
 
 	require_once('engine/library/phpbrowsercap.php');
 
