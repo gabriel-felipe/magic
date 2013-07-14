@@ -168,7 +168,7 @@ use phpbrowscap\Browscap;
 			$timeMod = 0;
 			$css_links = array();
 			$css_all = $this->css_linked;
-			$name = "";
+			$name = ns;
 			$content = "";
 			foreach($css_all as $link => $css){
 				if($css['is_local']){

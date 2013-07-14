@@ -6,26 +6,12 @@
 			'route' => array('regex'=>'/^[A-z0-9\/_-]+$/')
 		);
 		private $urls = array();
-		private $shortcuts = array(
-			'admin'                => array('route'=>'common_login','ns'=>'admin'),
-			''                     => array('route'=>'common_home'),
-			'contato'              => array('route'=>'common_contato'),
-			'perguntas_frequentes' => array('route'=>'common_perguntas'),
-			'area-atuacao/[url]'   => array('route'=>'common_area',"url"=>'?'),
-			'advogados'            => array('route'=>'common_advogados'),
-			'enviado'              => array('route'=>'common_contato_enviado')
-		);
+		private $shortcuts = array();
 		public function __construct(){
 			$this->urls = array(
-				"admin/common-suporte" => array(
-				'format' => 'custom',
-				'params' => array('custom'=>'teste'),
-				'default_params' => array('route'=>'common-suporte', 'ns'=>'admin')
-				),
 				array(
 				'format' => 'ns',
-				'params' => array('ns'=>array('admin')),
-				'default_params' => array('route'=>'common-login')
+				'default_params' => array('route'=>'x'),
 				),
 				array(
 				'format' => 'route',
@@ -33,7 +19,6 @@
 				),
 				array(
 				'format' => 'ns/route',
-				'params' => array('id'=>array('regex'=>'/^[0-9]+$/'))
 				),
 				array(
 				'format' => 'id/route',
@@ -41,19 +26,13 @@
 				'default_params' => array('ns'=>$this->ns)
 				),
 				array(
-				'format' => 'route/url',
-				'params' => array('url'=>array('regex'=>'/^.+$/')),
-				'default_params' => array('ns'=>$this->ns)
-				),
-				array(
 				'format' => 'ns/route/id?',
 				'params' => array('id'=>array('regex'=>'/^[0-9]+$/')),
 				),
-				array(
-				'format' => 'ns/route/area',
-				'params' => array('area'=>array('regex'=>'/^[A-z0-9\/_-\s]+$/')),
-				)
 			);
+		}
+		public function add_shortcut($route,$params){
+			$this->shortcuts[$route] = $params;
 		}
 		public function set_ns($ns){
 			$this->ns = $ns;

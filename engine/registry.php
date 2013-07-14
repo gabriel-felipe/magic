@@ -13,5 +13,9 @@ final class Registry {
 	public function has($key) {
     	return isset($this->data[$key]);
   	}
+ 	   public function __get($key) {
+			return $this->get($key);
+	}
+
 }
 ?>
