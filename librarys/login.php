@@ -5,17 +5,17 @@ session_start();
 require_once(path_models."/pessoas.php");
 class login {
 	// DEFININDO VARIÁVEIS
-	private $table = "admin";
-	private $usernameField = "username";
-	private $passField = "password";
-	private $primaryField = "admin_id";
-	private $saltField = "salt";
-	private $groupField = "grupo_usuarios_id";
-	private $userpass, $db;
+	protected $table = "admin";
+	protected $usernameField = "username";
+	protected $passField = "password";
+	protected $primaryField = "admin_id";
+	protected $saltField = "salt";
+	protected $groupField = "grupo_usuarios_id";
+	protected $userpass, $db;
 	public $username, $id;
-	private $userInfo = array();
+	protected $userInfo = array();
 	public $msgErro = "Login ou Senha inválidos";
-	private $registry;
+	protected $registry;
 
 	// DEFINIR AS INFORMAÇÕES DA CLASSE
 	function __construct($registry) {
@@ -25,17 +25,15 @@ class login {
 	
 	// FAZENDO LOGIN DO USUARIO
 	function login($login,$pass) {
-		
+
 		$this->userpass = $pass;
 		$this->username = $login;
-
 		// Verifica se o usuário existe
 		$query = $this->db->query("SELECT * FROM ".$this->table." WHERE ".$this->usernameField." = :user LIMIT 0,1", array(":user"=>$this->username));
 		$campos = $query[1];
 		$info = (isset($query[0][0])) ? $query[0][0] : array();
 		// Se o usuário existir
-		if($campos){
-			
+		if($campos){	
 			//Se a senha estiver incorreta
 			if(crypt($this->userpass,$info['salt']) != $info[$this->passField]){
 			$this->msgErro = "A senha está errada / ".crypt($this->userpass,$info['salt']);
@@ -44,23 +42,26 @@ class login {
 			// Se a senha estiver correta
 			}else{
 				session_regenerate_id(true);
-				// Coloca as informações em sessões
-				
-				// $_SESSION['user_group'] = $info[$this->groupField];
-				unset($info[$this->passField]);
 				$this->userpass = "";
+				unset($info[$this->passField]);
 				$this->userInfo = $info;
-
-				$_SESSION['pessoa_id'] = $info['pessoa_id'];
-				$this->registry_token(/*$info[$this->groupField]*/);
+				if(isset($info['pessoa_id'])){
+					$_SESSION['pessoa_id'] = $info['pessoa_id'];
+				}
+				$_SESSION['user_info'] = $info;
+				// Coloca as informações em sessões
+				if($this->groupField){
+					$_SESSION['user_group'] = $info[$this->groupField];
+					$this->registry_token($info[$this->groupField]);
+				} else {
+					$this->registry_token();
+				}
 				unset($info);
-				// Se for necessário redirecionar
 				return true;
 			}
 		}
 		// Se o usuário não existir
 		else {
-			
 			$this->msgErro = "O usuário não existe!";
 			$this->falhaLogin();
 			return false;
@@ -85,10 +86,14 @@ class login {
 		$token = md5($rand.$ip.$browser);
 		$token_life = 60*60*8;
 		$expirou = (time() - data::session('token_touch', 'int') > $token_life) ? true : false;
-		// $grupo = ($userGroup == data::session('user_group','special_chars') or $userGroup == "") ? true : false;
+		if($this->groupField){
+			$grupo = ($userGroup == data::session('user_group','special_chars') or $userGroup == "") ? true : false;
+		} else {
+			$grupo = true;
+		}
 
-		if(isset($_SESSION['token']) and $token == $_SESSION['token'] and !$expirou /*and $grupo*/){
-			if($_SESSION['pessoas_id']){
+		if(isset($_SESSION['token']) and $token == $_SESSION['token'] and !$expirou and $grupo){
+			if(isset($_SESSION['pessoa_id'])){
 				$pessoa = new pessoa;
 				$pessoa->find($_SESSION['pessoas_id']);
 				$info = $pessoa->info();
@@ -101,10 +106,10 @@ class login {
 			if (!isset($_SESSION['token']) or $token != $_SESSION['token']){
 				$this->msgErro = "Por favor faça o login";
 			}
-			// elseif (!$grupo){
+			elseif (!$grupo){
 
-			// 	$this->msgErro = "Seu grupo não possui esse nível de permissão $userGroup -".$_SESSION['user_group'];
-			// } 
+			 	$this->msgErro = "Seu grupo não possui esse nível de permissão $userGroup -".$_SESSION['user_group'];
+			} 
 			elseif ($expirou){
 				
 				$this->msgErro = "Sua sessão expirou";

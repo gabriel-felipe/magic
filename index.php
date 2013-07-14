@@ -6,7 +6,9 @@
 	require_once('librarys/data-cleaner.php');
 	require_once('engine/url.php');
 	$url = new url;
+
 	$url_amigavel = data::get('url','url');
+	$url->analyze($url_amigavel);
 	if(preg_match('/^([a-z-]+)\/?$/', $url_amigavel,$match)){
 		if(is_dir($url_amigavel)){
 			if(!data::get('ns','url')){
@@ -23,6 +25,8 @@
 			$namespace = data::post('ns','url');	
 		}
 	}
+	
+
 	require_once('init.php');
 	$registry = new registry;
 	$magicHtml = new magicHtml;
@@ -31,6 +35,7 @@
 		require_once(path_scope."/init.php");
 	}
 	$url->set_ns(ns);
+
 	if($url_amigavel){
 		$url->analyze($url_amigavel);
 	} else {
@@ -46,6 +51,7 @@
 	if(array_key_exists("route", $_POST)){
 		$route = $_POST['route'];
 	}
+
 	require_once('engine/library/phpbrowsercap.php');
 	use phpbrowscap\Browscap;
 	$browser = new Browscap(path_cache);
