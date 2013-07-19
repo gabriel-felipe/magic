@@ -73,8 +73,8 @@
 	/* Grid Fluido*/
 		/* t -> tamanho // n -> nÃºmero */
 		@t-totalgrid: 100%;
-		@t-margingrid: 2%;
-		@n-colunasgrid: <?php echo $gridColumns;?>;
+		@t-margingrid: <?php echo $gridMargin;?>;
+		@n-colunasgrid: <?php echo $gridColumns?>;
 		@t-coluna: (@t-totalgrid - ((@n-colunasgrid - 1) * @t-margingrid)) / @n-colunasgrid;
 
 		.fluid-column-grid(@n-colunas: 1){
@@ -159,8 +159,19 @@
 				.<?php echo $label?>margin-v{.margin-t;.margin-b; }
 				.<?php echo $label?>margin-h{.margin-l;.margin-r; }
 				.<?php echo $label?>margin  {.margin-v; .margin-h; }
+				
 				<?php
+				echo ".".$label."grid{.fluid-column-grid($gridColumns);}";
 				for($i=1;$i<=$gridColumns;$i++){
+					if($gridColumns % $i == 0){
+						$div = $gridColumns/$i;
+						$col = $gridColumns/$div;
+						
+						echo ".$label"."container-$div-col > div {.".$label."grid$col; .".$label."margin-l;}";
+						echo ".$label"."container-$div-col > div {.".$label."grid$col; .".$label."margin-l;}";
+						echo ".$label"."container-$div-col > div:nth-child(".$div."n + 1) {margin-left:0;}";
+						
+					}
 					echo ".".$label."grid$i{.fluid-column-grid($i);}";
 				}
 				$c++;
@@ -171,7 +182,7 @@
 
 		
 	/* PadrÃµes */
-	.clear{clear:both;}
+	.clear{clear:both; float:none;}
 	.fleft{float: left;}
 	.fright{float: right;}
 

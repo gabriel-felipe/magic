@@ -21,7 +21,7 @@ final class Action {
 		
 		foreach ($parts as $part) { 
 			$path .= $part;
-			
+
 			if (is_dir(path_scope . '/controller/' . $path)) {
 				$path .= '/';
 				
@@ -130,6 +130,8 @@ final class Action {
 				$this->js_inline = $controller->js_inline;
 				return $return;
 			} else {
+				echo "FILE {$this->file} <br /> CLASS {$this->class} <br /> METHOD {$this->method} <br />";
+				
 				throw new Exception("Error Processing Action(route: \"{$this->route}\"), Pls Check.", 1);
 				
 			}

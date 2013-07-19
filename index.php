@@ -8,6 +8,7 @@
 	$url = new url;
 
 	$url_amigavel = data::get('url','url');
+	
 	$url->analyze($url_amigavel);
 	if(preg_match('/^([a-z-]+)\/?$/', $url_amigavel,$match)){
 		if(is_dir($url_amigavel)){

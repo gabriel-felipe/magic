@@ -2,7 +2,7 @@
 	final class url {
 		public $ns = "";
 		private $params = array(
-			'ns' => array('admin','public'),
+			'ns' => array('admin','public','sysadmin','empresa','wireframe'),
 			'route' => array('regex'=>'/^[A-z0-9\/_-]+$/')
 		);
 		private $urls = array();
@@ -41,6 +41,7 @@
 		}
 		private $final_url = array();
 		function analyze($url){
+
 			$url = trim($url,"/");
 			$parts = $this->decompose($url); //Get array with pieces
 			foreach($this->shortcuts as $k=>$sc){
@@ -234,6 +235,7 @@
 		}
 
 		private function sanitize_final_url(){
+			
 			$this->final_url['route'] = str_replace('_','/',$this->final_url['route']);
 			foreach($this->final_url['params'] as $p=>$v){
 					$_GET[$p] = $v;

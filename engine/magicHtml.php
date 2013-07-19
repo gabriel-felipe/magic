@@ -146,7 +146,7 @@ use phpbrowscap\Browscap;
 		}
 		//Funções retorno de css e js
 		public function get_css_links(){
-			global $breakpoints, $gridColumns;
+			global $breakpoints, $gridColumns,$gridMargin;
 			if(count($this->css_linked) > 0){
 			/*global $path_css;
 			$css_links = array();
