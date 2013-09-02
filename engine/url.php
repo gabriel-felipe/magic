@@ -2,8 +2,8 @@
 	final class url {
 		public $ns = "";
 		private $params = array(
-			'ns' => array('admin','public','sysadmin','empresa','wireframe'),
-			'route' => array('regex'=>'/^[A-z0-9\/_-]+$/')
+			'ns' => array('admin'),
+			'route' => array('regex'=>'/^[A-z0-9\/%_-]+$/')
 		);
 		private $urls = array();
 		private $shortcuts = array();
@@ -44,9 +44,11 @@
 
 			$url = trim($url,"/");
 			$parts = $this->decompose($url); //Get array with pieces
+			
 			foreach($this->shortcuts as $k=>$sc){
 				$tmp = $sc;
 				$url_c = $this->decompose($k);
+
 				$match = true;
 				foreach($parts as $kp => $part){
 					if(array_key_exists($kp, $url_c)){
@@ -60,6 +62,7 @@
 							
 							$part = str_replace($str_anterior,"",$part);
 							$part = str_replace($str_f,"",$part);
+
 							$url_c[$kp] = $part;
 							$tmp[$matches[1]] = $part;
 						}
@@ -75,7 +78,11 @@
 					}
 				}
 				if($match){
-					
+					if(array_key_exists("defaults", $sc) and is_array($sc['defaults'])){
+						foreach($sc['defaults'] as $key=>$val)
+							$_GET[$key] = $val;
+						
+					}
 					$this->reset_final_url($tmp);
 					$this->sanitize_final_url();
 					return true;
@@ -135,7 +142,7 @@
 				$link = array_search($tmp_parts_shortcut, $this->shortcuts);
 				foreach($parts as $k=>$pass){
 					if(!array_key_exists($k, $this->params)){
-						$link = str_replace("[$k]",$pass,$link);
+						$link = str_replace("[$k]",urlencode($pass),$link);
 					}
 				}
 				return $link;
@@ -190,8 +197,6 @@
 					}
 					$final_url = trim($final_url,'/');
 					$match = true;
-				} else {
-					
 				}
 				if($match){
 					break;
@@ -200,7 +205,20 @@
 			if($final_url){
 				return $final_url;
 			} else {
-				trigger_error("Erro ao gerar url ".print_r($tmp_parts,true), E_USER_ERROR);
+
+				if(isset($parts['route']) and isset($parts['ns'])){
+
+					$url = $this->compose(array('route'=>$parts['route'],'ns'=>$parts['ns']));
+					unset($parts['route'],$parts['ns']);
+					foreach($parts as &$part)
+						$part = urlencode($part);
+					$query_string = http_build_query($parts);
+					$url .= "?".$query_string;
+					return $url;
+				} else {
+
+					trigger_error("Erro ao gerar url ".print_r($tmp_parts,true), E_USER_ERROR);
+				}
 			}
 
 		}
@@ -235,10 +253,23 @@
 		}
 
 		private function sanitize_final_url(){
+
+			$find_query_str = preg_match("/^[^?]+\?(.+)$/" , $_SERVER['REQUEST_URI'],$query_str);
 			
+			if($find_query_str){
+				$tmp = array();
+				parse_str(rtrim($query_str[1],'/'),$tmp);
+				foreach($tmp as &$t)
+					$t = urldecode($t);
+
+				$_GET = array_merge($_GET,$tmp);
+
+			}
+
 			$this->final_url['route'] = str_replace('_','/',$this->final_url['route']);
 			foreach($this->final_url['params'] as $p=>$v){
-					$_GET[$p] = $v;
+
+				$_GET[$p] = $v;
 			}
 			$_GET['ns'] = $this->final_url['ns'];
 			$_GET['route'] = $this->final_url['route'];

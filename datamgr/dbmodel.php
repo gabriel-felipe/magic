@@ -27,8 +27,12 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 	protected $validate = array();
 	protected $validated = array();
 	protected $fields = array();
+	protected $pk_field;
 	
 		public function __construct($tabela,$fields=false,$query=false,$queryParams=false) {
+			$this->pk_field = $tabela."_id";
+			$this->{$this->pk_field} = 0;
+			$this->id = &$this->{$this->pk_field};
 			$db = new bffdbmanager;
 			$this->dbmanager = $db;
 			
@@ -278,7 +282,7 @@ destroy() = deleta o registro da tabela.
 					}
 				}
 				$query = substr($query, 0, -2);
-				$query .= " WHERE id = ".$this->id."";
+				$query .= " WHERE {$this->pk_field} = ".$this->id."";
 			}
 
 			try{
@@ -313,7 +317,7 @@ EOD
 			$this->before_destroy();
 			$id = $this->id;
 
-			$query = "DELETE FROM ".$this->tabela." where id=:id";
+			$query = "DELETE FROM ".$this->tabela." where {$this->pk_field}=:id";
 			if($this->dbmanager->query($query, array(":id" => $id))){
 				$info = $this->infoString();
 				$this->after_destroy();
@@ -335,7 +339,7 @@ Funções de pesquisa
 	}
 	public function find($id) {
 		$fields = $this->get_select();
-		$q = "SELECT $fields FROM ".$this->tabela." where id=:id";
+		$q = "SELECT $fields FROM ".$this->tabela." where {$this->pk_field}=:id";
 		$buscaSingle = $this->dbmanager->query($q,array(":id"=>$id));
 		
 		if($buscaSingle[1] == 1){
@@ -350,7 +354,7 @@ Funções de pesquisa
 
 	public function last() {
 		$fields = $this->get_select();
-		$query = "SELECT $fields FROM ".$this->tabela." ORDER by id DESC LIMIT 1";
+		$query = "SELECT $fields FROM ".$this->tabela." ORDER by {$this->pk_field} DESC LIMIT 1";
 		$buscaSingle = $this->dbmanager->query($query);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
@@ -361,7 +365,7 @@ Funções de pesquisa
 	}
 	public function first() {
 		$fields = $this->get_select();
-		$query = "SELECT $fields FROM ".$this->tabela." ORDER by id ASC LIMIT 1";
+		$query = "SELECT $fields FROM ".$this->tabela." ORDER by {$this->pk_field} ASC LIMIT 1";
 		$buscaSingle = $this->dbmanager->query($query);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
@@ -497,6 +501,8 @@ class dbModelPlural {
 		//Criando um objeto vazio
 		$this->plural = array();
 		$this->tabela = $table;
+		$this->pk_field = $table."_id";
+			
 		//Criando um objeto vazio
 		$this->plural = $plural;
 		$this->qtnbypage = $qtnbypage;
@@ -559,8 +565,8 @@ class dbModelPlural {
 		$ini = ($page-1)*$this->qtnbypage;
 		$fim = $page + $this->qtnbypage - 1;
 		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} FROM $table LIMIT $ini,$fim");
-		$qtntotal = $this->dbmanager->query("SELECT COUNT(id) FROM $table");
-		$qtntotal = $qtntotal[0][0]['COUNT(id)'];
+		$qtntotal = $this->dbmanager->query("SELECT COUNT({$this->pk_field}) FROM $table");
+		$qtntotal = $qtntotal[0][0]["COUNT({$this->pk_field})"];
 		$this->nowinpage = $page;
 		$this->last_query = "SELECT {$this->fieldsStr} FROM $table";
 		$this->total = $qtntotal;
@@ -572,10 +578,10 @@ class dbModelPlural {
 	}
 	public function last($n=1){
 		$table = $this->tabela;
-		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} FROM $table ORDER BY id DESC LIMIT $n");
+		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} FROM $table ORDER BY {$this->pk_field} DESC LIMIT $n");
 		$this->plural = $resultados[0];
 		$this->arrayToObject();
-		$this->last_query = "SELECT {$this->fieldsStr} FROM $table LIMIT $n ORDER BY id DESC";
+		$this->last_query = "SELECT {$this->fieldsStr} FROM $table LIMIT $n ORDER BY {$this->pk_field} DESC";
 		$this->last_query_array = array();
 		return $this->info();
 	}
@@ -591,7 +597,7 @@ class dbModelPlural {
 			foreach($ids as $k=>$v){
 				if($i >= $ini){
 					$param = "id".$v;
-					$ids_temp[$v] = "id = :$param";
+					$ids_temp[$v] = "{$this->pk_field} = :$param";
 					$values[":$param"] = $v;	
 					if($i == $fim){
 						break;
@@ -645,8 +651,8 @@ class dbModelPlural {
 		$ini = ($page-1)*$this->qtnbypage;
 		$fim = $page + $this->qtnbypage - 1;
 		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} FROM ".$this->tabela." WHERE ".$query. " LIMIT $ini,$fim",$array);
-		$qtntotal = $this->dbmanager->query("SELECT COUNT(id) FROM ".$this->tabela." WHERE ".$query, $array);
-		$qtntotal = $qtntotal[0][0]['COUNT(id)'];
+		$qtntotal = $this->dbmanager->query("SELECT COUNT({$this->pk_field}) FROM ".$this->tabela." WHERE ".$query, $array);
+		$qtntotal = $qtntotal[0][0]["COUNT({$this->pk_field})"];
 		$this->nowinpage = $page;
 		$this->total = $qtntotal;
 		
