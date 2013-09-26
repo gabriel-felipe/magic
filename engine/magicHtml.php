@@ -36,8 +36,13 @@ use phpbrowscap\Browscap;
 		protected $path_cache = path_cache;
 		protected $base_css = base_css;
 		protected $path_css = path_css;
-		protected $base_js = base_js;
+		protected $path_js = path_js;
+		protected $path_system_js = path_system_js;
+		protected $path_common_js = path_common_js;
+
+		protected $base_common_js = base_common_js;
 		protected $engine_path_css = path_engine_css;
+		protected $path_common_css = path_common_css;
 
 		public function __construct(){
 			$this->css_inline = array();
@@ -64,18 +69,47 @@ use phpbrowscap\Browscap;
 			if(!is_dir($this->path_css)){
 				die("Check path_css variable(\"".$this->path_css."\")");
 			}
-			$this->add_css_linked("common.css",'all',1,1);
-			$this->add_js_linked(base_js_engine."/jquery-1.9.1.js",true,true,0);
-			$this->add_js_linked(base_js_engine."/elquery.js",true,false,0);
+			$this->add_system_css("common.css",'all',1);
+			$this->add_system_js("jquery-1.9.1.js",true,true);
+
+
+			$this->add_system_js("elquery.js",true,false);
 			$browser = new Browscap($this->path_cache);
 			$this->browser = $browser->getBrowser();
 			unset($browser);
 		}
 		//Funções gerenciamento de links de css
-		public function add_css_linked($link, $media="all", $is_local=true,$systemcss=0){
+		public function add_css_linked($link, $media="all", $is_local=true,$path=false){
+			$base = false;
+			if($is_local){
+				$path = ($path) ? $path : $this->path_css;
+				$base = str_replace(path_root, path_base, $path);
+				if(!is_file($path."/".$link)){
+					$backTrace = debug_backtrace();
+					$callee    = next($backTrace);
+					debug::warning("JS $path/$link não existe, e portanto não foi adicionado ao site.",$callee);
+					return false;
+				}
+			}
+			$path = $path."/".$link;
 
-			$this->css_linked[$link] =  array("link"=>$link, "media"=>$media, "is_local"=>$is_local,"systemcss"=>$systemcss);
+			
+			
+
+			$this->css_linked[] =  array("link"=>$link, "media"=>$media, "is_local"=>$is_local,"path"=>$path,"base"=>$base);
 		}
+		public function add_css($link, $media="all", $is_local=true,$path=false){
+			$this->add_css_linked($link, $media, $is_local,$path);
+		}
+
+		public function add_system_css($link, $media="all", $is_local=true){
+			$this->add_css_linked($link, $media="all", $is_local=true,$this->engine_path_css);
+		}
+		public function add_common_css($link, $media="all"){
+			$this->add_css_linked($link, $media, 1,$this->path_common_css);
+		}
+
+
 		public function drop_css_linked($link){
 			if(isset($this->page->css_linked[$link])){
 				unset($this->page->css_linked[$link]);
@@ -102,10 +136,31 @@ use phpbrowscap\Browscap;
 			}
 		}
 		//Funções gerenciamento de links js
-		public function add_js_linked($link, $is_local=true, $js_top = false, $auto_complete_path=1){
-			$this->js_linked[$link] =  array("link"=>$link, "is_local"=>$is_local, "depends"=>true, "js_top"=>$js_top,"auto_complete_path" =>$auto_complete_path);
+
+		public function add_js_linked($link, $is_local=true, $js_top = false, $path=false){
+			$base = false;
+			if($is_local){ 
+
+				$path = ($path) ? $path : $this->path_js;
+				if(!is_file($path."/".$link)){
+					$backTrace = debug_backtrace();
+					$callee    = next($backTrace);
+					debug::warning("JS $path/$link não existe, e portanto não foi adicionado ao site.",$callee);
+					return false;
+				}
+				$base = str_replace(path_root, path_base, $path);
+			}
+			$this->js_linked[] =  array("link"=>$link, "is_local"=>$is_local, "js_top"=>$js_top,"path" =>$path,'base'=>$base);
 		}
-		
+		public function add_js($link, $is_local=true, $js_top = false, $path=false){
+			$this->add_js_linked($link, $is_local, $js_top, $path);
+		}
+		public function add_common_js($link,$js_top=false){
+			$this->add_js_linked($link,1,$js_top,$this->path_common_js);
+		}
+		public function add_system_js($link,$js_top=false){
+			$this->add_js_linked($link,1,$js_top,$this->path_system_js);
+		}
 		public function drop_js_linked($link){
 			if(isset($this->js_linked[$link])){
 				unset($this->js_linked);
@@ -170,9 +225,10 @@ use phpbrowscap\Browscap;
 			$css_all = $this->css_linked;
 			$name = ns;
 			$content = "";
-			foreach($css_all as $link => $css){
+			foreach($css_all as $k=>$css){
+				$link = $css['link'];
 				if($css['is_local']){
-					$file = ($css['systemcss']) ? $this->engine_path_css."/".$link : $this->path_css."/".$link;
+					$file = $css['path'];
 					$mod = filectime($file);
 					$timeMod = ($timeMod < $mod) ? $mod : $timeMod;
 					$name .= "-".str_replace(".css","",$link);
@@ -180,7 +236,8 @@ use phpbrowscap\Browscap;
 				else {
 					$file = $link;
 					$name .= "-".str_replace("/","-",$link);
-				}		
+				}
+				$name.="$k";
 			}
 			$name .= "-".str_replace("/","-",$_SERVER['HTTP_USER_AGENT']);
 			$name = $name.".css";
@@ -200,17 +257,20 @@ use phpbrowscap\Browscap;
 				$MajorVer = $this->browser->MajorVer;
 				$MinorVer = $this->browser->MinorVer;
 				$equery = array();
-				foreach($css_all as $link => $css){
+				foreach($css_all as $css){
+					$link = $css['link'];
 					if($css['is_local']){
-						$file = ($css['systemcss']) ? $this->engine_path_css."/".$link : $this->path_css."/".$link;
+						$file = $css['path'];
 					}
 					else {
 						$file = $link;
 					}
+					$base = $css['base'];
+					
 					$css = file($file);
 
 					foreach($css as $l=>$rule){
-						$css[$l] = str_replace("css_path",$this->base_css,$rule);
+						
 
 						if(preg_match("/([^\s]+)@eq\(([^)]+)\)/",$rule,$match)){
 							$expression = str_replace(" ","_",strtolower($match[2]));
@@ -235,10 +295,12 @@ use phpbrowscap\Browscap;
 					$basename = basename($file);
 
 					file_put_contents($this->path_cache."/".$basename, $css);
+
 					$file = str_replace($this->path_css,$this->path_cache,$file);
 					ob_start();
 					include $file;
 			        $min = ob_get_clean();
+			        $min = str_replace("css_path", $base, $min);
 
 					
 					
@@ -294,8 +356,9 @@ $obj { $style }";
 					}
 				}
 			}
-			foreach($js_all as $link => $js){
-				$path = ($js["is_local"] and $js['auto_complete_path'] === 1) ? $this->base_js."/".$link : $link;
+			foreach($js_all as $key => $js){
+				$link = $js['link'];
+				$path = ($js["is_local"]) ? $js['base']."/".$link : $link;
 				$js_link = "<script src=\"$path\"></script>";				
 				$js_links[$link] = $js_link;
 			}

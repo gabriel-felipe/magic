@@ -36,8 +36,11 @@ define("path_views",path_root."/scopes/$namespace/views");
 define("base_views",path_base."/scopes/$namespace/views");
 
 define("base_js",path_base."/scopes/$namespace/views/js");
+define("base_common_js",path_base."/scopes/$namespace/views/js");
 define("base_js_engine",path_base."/engine/js");
 define("path_js",path_root."/scopes/$namespace/views/js");
+define("path_system_js",path_root."/engine/js");
+define("path_common_js",path_root."/common-assets/js");
 if(isset($themes[$namespace])){
     $theme = $themes[$namespace];
 }
@@ -51,9 +54,13 @@ define("base_template",base_theme."/template");
 define("base_images",base_theme."/image");
 define("path_css",path_theme."/css");
 define("path_engine_css",path_root."/engine/css");
+define("path_common_css",path_root."/common-assets/css");
 define("base_css",base_theme."/css");
 define("base_cache",path_base."/cache");
 
+define("path_log",path_root."/logs");
+require_once('engine/log.php');
+require_once('engine/error.php');
 require_once('engine/action.php');
 require_once('engine/magicHtml.php');
 require_once('engine/controller.php');

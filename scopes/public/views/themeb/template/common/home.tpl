@@ -1,1 +1,1 @@
-home b
+<div class="centro">teste</div>home b
