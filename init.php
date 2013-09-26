@@ -17,7 +17,7 @@ $path = str_replace($_SERVER["DOCUMENT_ROOT"], "",dirname(__FILE__));
 // Path Constants
 define('ns',$namespace);
 define("path_root",$_SERVER["DOCUMENT_ROOT"]."$path");
-define("path_scope",$_SERVER["DOCUMENT_ROOT"]."$path/$namespace");
+define("path_scope",$_SERVER["DOCUMENT_ROOT"]."$path/scopes/$namespace");
 
 if(!is_dir(path_scope)){
 	die("Namespace '$namespace' doesn't exist");
@@ -30,14 +30,14 @@ define("path_uploads",path_root."/uploads");
 define("path_library",path_root."/librarys");
 define("path_engine_library",path_root."/engine/library");
 define("path_datamgr",path_root."/datamgr");
-define("path_models",path_root."/$namespace/model");
-define("path_controllers",path_root."/$namespace/controller");
-define("path_views",path_root."/$namespace/views");
-define("base_views",path_base."/$namespace/views");
+define("path_models",path_root."/scopes/$namespace/model");
+define("path_controllers",path_root."/scopes/$namespace/controller");
+define("path_views",path_root."/scopes/$namespace/views");
+define("base_views",path_base."/scopes/$namespace/views");
 
-define("base_js",path_base."/$namespace/views/js");
+define("base_js",path_base."/scopes/$namespace/views/js");
 define("base_js_engine",path_base."/engine/js");
-define("path_js",path_root."/$namespace/views/js");
+define("path_js",path_root."/scopes/$namespace/views/js");
 if(isset($themes[$namespace])){
     $theme = $themes[$namespace];
 }
