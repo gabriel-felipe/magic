@@ -1,1 +1,1 @@
-<?php echo $indexb ?>
+home a

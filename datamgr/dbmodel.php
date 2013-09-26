@@ -1,7 +1,7 @@
 <?php
 //Conexão com o banco de dados
-require_once(path_library."/data-cleaner.php");
 require_once(path_datamgr."/bff-dbmanager.php");
+
 
 //Classe para model padrão para manipulação de bancos de dados.
 class dbModel {
@@ -30,6 +30,13 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 	protected $pk_field;
 	
 		public function __construct($tabela,$fields=false,$query=false,$queryParams=false) {
+			if(!DB_ACTIVE){
+				$backtrace = debug_backtrace(10);
+				$backtrace = print_r($backtrace,true);
+				throw new Exception("Database not configured, please configure it in /config/db.php. Backtrace of this call:
+						\n
+					".$backtrace, 1);
+			}
 			$this->pk_field = $tabela."_id";
 			$this->{$this->pk_field} = 0;
 			$this->id = &$this->{$this->pk_field};

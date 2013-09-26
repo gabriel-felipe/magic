@@ -1,8 +1,11 @@
 <?php
-	//DEFAULT NS
-	ini_set('display_errors',1); 
- 	error_reporting(E_ALL);
- 	ini_set('html_errors', 'On');
+	require('config/project.php');
+	if(PROJECT_DEBUG == 1){
+		ini_set('display_errors',1); 
+	 	error_reporting(E_ALL);
+	 	ini_set('html_errors', 'On');
+ 	}
+
 	require_once('librarys/data-cleaner.php');
 	require_once('engine/url.php');
 	$url = new url;

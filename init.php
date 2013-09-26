@@ -1,8 +1,8 @@
 <?php
-require_once('engine/errors.php');
 require_once('config/responsive.php');
 require_once('config/default.php');
 require_once('config/routes.php');
+require_once('config/db.php');
 foreach ($routes as $ns => $rts) {
 	foreach ($rts as $route => $params) {
 		$params['ns'] = $ns;
@@ -12,7 +12,7 @@ foreach ($routes as $ns => $rts) {
 foreach ($defaults as $var => $value) {
 	if(!isset(${$var}))	${$var} = $value;
 }
-date_default_timezone_set("America/Sao_Paulo");
+
 $path = str_replace($_SERVER["DOCUMENT_ROOT"], "",dirname(__FILE__));
 // Path Constants
 define('ns',$namespace);
@@ -38,6 +38,9 @@ define("base_views",path_base."/$namespace/views");
 define("base_js",path_base."/$namespace/views/js");
 define("base_js_engine",path_base."/engine/js");
 define("path_js",path_root."/$namespace/views/js");
+if(isset($themes[$namespace])){
+    $theme = $themes[$namespace];
+}
 define("path_theme",path_views."/$theme");
 if(!is_dir(path_theme)){
 	die("Theme '$theme' doesn't exist".path_theme);
@@ -50,18 +53,6 @@ define("path_css",path_theme."/css");
 define("path_engine_css",path_root."/engine/css");
 define("base_css",base_theme."/css");
 define("base_cache",path_base."/cache");
-
-
-
-
-// Db Constants
-define('db_driver', 'mysql');
-define('db_host', 'localhost');
-define('db_user', 'root');
-define('db_password', 'password');
-define('db_name', 'databasename');
-define('db_prefix', '');
-
 
 require_once('engine/action.php');
 require_once('engine/magicHtml.php');
