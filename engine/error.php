@@ -14,7 +14,7 @@
         if($fileInfo){
             $callee = $fileInfo;
         } else {
-            $callee = current(debug_backtrace());    
+            $callee = next(debug_backtrace());    
         }
         //Trigger appropriate error
         trigger_error($message.' in <strong>'.$callee['file'].'</strong> on line <strong>'.$callee['line'].'</strong>', $level);

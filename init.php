@@ -1,8 +1,16 @@
 <?php
+$jsonConfigs = array("db","defaults","routes","themes");
+foreach($jsonConfigs as $fileConfig){
+
+${$fileConfig} = file_get_contents("config/$fileConfig.json");
+
+${$fileConfig} = json_decode(${$fileConfig},true);    
+}
+
+foreach($db as $constant=>$value)
+    define($constant,$value);
 require_once('config/responsive.php');
-require_once('config/default.php');
-require_once('config/routes.php');
-require_once('config/db.php');
+
 foreach ($routes as $ns => $rts) {
 	foreach ($rts as $route => $params) {
 		$params['ns'] = $ns;
@@ -26,6 +34,7 @@ if(!is_dir(path_scope)){
 define("path_base","http://".$_SERVER["SERVER_NAME"]."$path");
 define("base_url","http://".$_SERVER["SERVER_NAME"]."$path");
 define("path_cache",path_root."/cache");
+define("path_scopes",path_root."/scopes");
 define("path_uploads",path_root."/uploads");
 define("path_library",path_root."/librarys");
 define("path_engine_library",path_root."/engine/library");
@@ -69,5 +78,5 @@ require_once('engine/registry.php');
 require_once('engine/loader.php');
 require_once('engine/url.php');
 require_once('datamgr/dbmodel.php');
-require_once('librarys/functions.php'); // Loading default functions
+
 ?>

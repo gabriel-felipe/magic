@@ -13,18 +13,18 @@
 			} else {
 				return false;
 			}
-
 		}
-		public function model($alias, $model,$params=false){
+		public function model($model,$alias=false,$params=false){
+			if(!$alias){
+				$alias = "M".$model;
+			}
 			$file = path_models."/".$model.".php";
 			if($params) {
-				if(is_array($params)){
-					array_unshift($params, $this->registry);		
-				} else {
-					$params = array($this->registry,$params);
+				if(!is_array($params)){
+					$params = array($params);
 				}
 			} else {
-				$params = array($this->registry);
+				$params = array();
 			}
 		
 

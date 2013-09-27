@@ -1,2 +1,0 @@
-26/09/2013 08:07:55 |:| PHP Error |:| JS /Volumes/area_comum/localhost/magic/common-assets/css/common.css não existe, e portanto não foi adicionado ao site. in <strong>/Volumes/area_comum/localhost/magic/scopes/public/controller/common/home.php</strong> on line <strong>6</strong>
-26/09/2013 08:07:55 |:| PHP Error |:| JS /Volumes/area_comum/localhost/magic/common-assets/js/jquery-1.9.1.js não existe, e portanto não foi adicionado ao site. in <strong>/Volumes/area_comum/localhost/magic/scopes/public/controller/common/home.php</strong> on line <strong>7</strong>

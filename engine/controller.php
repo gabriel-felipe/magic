@@ -55,6 +55,24 @@
 		public function add_children($children){
 			$this->children[] = $children;
 		}
+		public function get_view($viewFile,$data=array()){
+			if (file_exists(path_template . '/'.$viewFile . '.tpl')) {
+				extract($data);
+				
+	      		ob_start();
+	      
+		  		require(path_template . '/'.$viewFile . '.tpl');
+	      
+		  		$this->output = ob_get_contents();
+
+	      		ob_end_clean();
+	      		
+				return $this->output;
+	    	} else {
+				trigger_error('Error: Could not load view ' . path_template . '/'.$viewFile . '.tpl !');
+				exit();				
+	    	}
+		}
 		protected function get_content() {
 			global $breakpoints, $gridColumns;
 			foreach ($this->children as $child) {
@@ -66,22 +84,7 @@
 				$this->data[$name] = $content;
 			}
 			
-			if (file_exists(path_template . '/'.$this->template . '.tpl')) {
-				extract($this->data);
-				
-	      		ob_start();
-	      
-		  		require(path_template . '/'.$this->template . '.tpl');
-	      
-		  		$this->output = ob_get_contents();
-
-	      		ob_end_clean();
-	      		
-				return $this->output;
-	    	} else {
-				trigger_error('Error: Could not load template ' . path_template . '/'.$this->template . '.tpl !');
-				exit();				
-	    	}
+			echo $this->get_view($this->template,$this->data);
 		}
 		
 	    //Funções extras
