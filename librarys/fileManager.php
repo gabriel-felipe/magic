@@ -17,13 +17,13 @@
             if(is_array($dirs)){
                 foreach($dirs as $dir=>$subdirs)
                     if(is_array($subdirs)){
-                        mkdir($base."/".$dir);
+                        mkdir($base."/".$dir,0775);
                         self::recursiveMkDir($subdirs,$base."/".$dir);
                     } else {
-                        mkdir($base."/".$subdirs);
+                        mkdir($base."/".$subdirs,0775);
                     }
             } else {
-                return mkdir($dirs);
+                return mkdir($dirs,0775);
             }
         }
         static function mkFiles($files,$base=__FILE__){
