@@ -44,45 +44,46 @@
 
 			$url = trim($url,"/");
 			$parts = $this->decompose($url); //Get array with pieces
-			
-			foreach($this->shortcuts as $k=>$sc){
-				$tmp = $sc;
-				$url_c = $this->decompose($k);
-
+			foreach($this->shortcuts as $k=>$sc){ //Analizar cada atalho
+				$tmp = $sc; //Armazenando informações do atalho numa variável temporária
+				$url_c = $this->decompose($k); //Quebrando a url amigável do atalho em parts;
 				$match = true;
+				if(count($url_c) != count($parts)){ //Se não tiver o mesmo número de pedaços já pula para a próxima.
+					$match = false;
+					continue;
+				}
+				
 				foreach($parts as $kp => $part){
+
 					if(array_key_exists($kp, $url_c)){
-						if(preg_match("/\[([^\]]+)\]/",trim($url_c[$kp]),$matches)){
+						if(preg_match("/\{(.+)\}/",trim($url_c[$kp]),$matches)){ //Verificando se essa parte é um parametro						
+							if(preg_match("/".$matches[1]."/",$part)){ //Verificando se a regex bate com o que foi passado
+								foreach($tmp as &$tmp_part){ // Se bater faz as substituições nos parametros
+									$tmp_part = str_replace("$".$kp,$part,$tmp_part); 
+								}
+							} else { //se não pula para o próximo atalho.
+								$match = false;
+								continue;
+							}
 							
-
-							$pos = stripos($url_c[$kp],"[".$matches[1]."]");
-							$posf = strlen("[".$matches[1]."]") + $pos;
-							$str_anterior = substr($url_c[$kp],0,$pos);
-							$str_f = substr($url_c[$kp],$posf,strlen($url_c[$kp]));						
-							
-							$part = str_replace($str_anterior,"",$part);
-							$part = str_replace($str_f,"",$part);
-
-							$url_c[$kp] = $part;
-							$tmp[$matches[1]] = $part;
-						}
-						if($part == $url_c[$kp]){
-							continue;
-						} else {
-							$match = false;
-							break;
+						} else { // Se não for um parametro, verifica se as duas parte são identicas.
+							if($part != $url_c[$kp]){ // Se não forem, pula para o próximo atalho.
+								$match = false;
+								continue;
+							}
 						}
 					} else {
 						$match = false;
 						break;
 					}
 				}
-				if($match){
+				if($match){ // Se bater as regras prepara os dados no $_GET.
 					if(array_key_exists("defaults", $sc) and is_array($sc['defaults'])){
 						foreach($sc['defaults'] as $key=>$val)
 							$_GET[$key] = $val;
 						
 					}
+					unset($tmp['defaults']);
 					$this->reset_final_url($tmp);
 					$this->sanitize_final_url();
 					return true;
@@ -128,25 +129,42 @@
 			}
 		}
 
-		public function compose($parts){
-			$tmp_parts = $parts;
-			$tmp_parts_shortcut = $parts;
-			foreach($tmp_parts_shortcut as $k=>$pass){
-				
-				if(!array_key_exists($k, $this->params)){
-					$tmp_parts_shortcut[$k] = '?';
-				}
-			}
-			
-			if(in_array($tmp_parts_shortcut,$this->shortcuts)){
-				$link = array_search($tmp_parts_shortcut, $this->shortcuts);
-				foreach($parts as $k=>$pass){
-					if(!array_key_exists($k, $this->params)){
-						$link = str_replace("[$k]",urlencode($pass),$link);
+		public function compose($parts,$reentered=false){
+			$tmp_parts = $parts; 
+			foreach($this->shortcuts as $url=>&$shortcut){
+				foreach($parts as $key => $value){
+					if(!array_key_exists($key, $shortcut)){ //se for passado parametros a mais que o atalho aceita pula pro próximo
+						continue 2;
 					}
 				}
-				return $link;
+				$tmp_parts_shortcut = explode("/",$url);//Pegando os pedaços da url do atalho
+
+				$paramsOnShortcut = array(); //array para armazenar as chaves => regex dos pedaços do atalho
+				foreach($tmp_parts_shortcut as $k=>$piece){
+					if(preg_match("/\{(.+)\}/",trim($piece),$matches)){ //Verificando se essa parte é um parametro
+						$paramsOnShortcut[$k] = $matches[1]; //Armazena os parametros
+					}
+				}
+				foreach($paramsOnShortcut as $k=>$regex){ //Para os pedaços variáveis na url
+					foreach($shortcut as $paramName => &$paramShortcut){ //Para cada pedaço do atalho
+						if(!is_array($paramShortcut) and strpos($paramShortcut,"\$".$k) !== false){ //Se o pedaço não for um array e existir a combinação ${chave do pedaço que varia}, ou seja se esse pedaço do atalho usar o pedaço variável da url em questão
+							if(!array_key_exists($paramName, $tmp_parts)){ //Se esse parametro é variável e ele não foi fornecido nos parametros iniciais
+								continue 3; //Vai para o próximo atalho, esse não bate.
+							}
+							$parametroFornecido = $parts[$paramName];
+							if(preg_match("/".$regex."/",$parametroFornecido)){ //Verificando se o parametro bate com a regex
+								$tmp_parts_shortcut[$k] = $parametroFornecido;
+							} else { 
+								continue 3; //Vai para o próximo atalho, esse parametro não bate;
+							}
+						}
+					}
+				}
+
+				return implode("/",$tmp_parts_shortcut);
 			}
+			
+		
 			
 			$final_url = false;
 			foreach($this->urls as $k=>$url){
@@ -204,11 +222,11 @@
 			}
 			if($final_url){
 				return $final_url;
-			} else {
+			} elseif(!$reentered) {
 
 				if(isset($parts['route']) and isset($parts['ns'])){
 
-					$url = $this->compose(array('route'=>$parts['route'],'ns'=>$parts['ns']));
+					$url = $this->compose(array('route'=>$parts['route'],'ns'=>$parts['ns']),1);
 					unset($parts['route'],$parts['ns']);
 					foreach($parts as &$part)
 						$part = urlencode($part);
