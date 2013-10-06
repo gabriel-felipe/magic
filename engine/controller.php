@@ -84,7 +84,7 @@
 				$this->data[$name] = $content;
 			}
 			
-			echo $this->get_view($this->template,$this->data);
+			return $this->get_view($this->template,$this->data);
 		}
 		
 	    //Funções extras

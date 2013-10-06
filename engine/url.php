@@ -132,8 +132,11 @@
 		public function compose($parts,$reentered=false){
 			$tmp_parts = $parts; 
 			foreach($this->shortcuts as $url=>&$shortcut){
+				
 				foreach($parts as $key => $value){
+					
 					if(!array_key_exists($key, $shortcut)){ //se for passado parametros a mais que o atalho aceita pula pro próximo
+
 						continue 2;
 					}
 				}
@@ -149,19 +152,22 @@
 					foreach($shortcut as $paramName => &$paramShortcut){ //Para cada pedaço do atalho
 						if(!is_array($paramShortcut) and strpos($paramShortcut,"\$".$k) !== false){ //Se o pedaço não for um array e existir a combinação ${chave do pedaço que varia}, ou seja se esse pedaço do atalho usar o pedaço variável da url em questão
 							if(!array_key_exists($paramName, $tmp_parts)){ //Se esse parametro é variável e ele não foi fornecido nos parametros iniciais
+
 								continue 3; //Vai para o próximo atalho, esse não bate.
 							}
 							$parametroFornecido = $parts[$paramName];
 							if(preg_match("/".$regex."/",$parametroFornecido)){ //Verificando se o parametro bate com a regex
 								$tmp_parts_shortcut[$k] = $parametroFornecido;
 							} else { 
+
 								continue 3; //Vai para o próximo atalho, esse parametro não bate;
 							}
 						}
 					}
 				}
-
-				return implode("/",$tmp_parts_shortcut);
+				if($shortcut['route'] == $parts['route']){
+					return implode("/",$tmp_parts_shortcut);
+				}
 			}
 			
 		
@@ -344,12 +350,14 @@
 			if(is_array($params)){
 				$paramsFinal = array_merge($paramsFinal,$params);
 			}
+
 			$url = $this->compose($paramsFinal);
+			
 			$url = ($url) ? $url."/" : "";
 			return base_url."/".$url;
 		}
 		function redirect($link,$params=false,$ns=false){
-			require_once(path_library."/data-cleaner.php");
+			require_once(path_engine_library."/data-cleaner.php");
 			if(!validate::absolute_url($link)){
 				$link = $this->get($link,$params,$ns);
 			}
