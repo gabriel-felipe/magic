@@ -44,7 +44,7 @@
             $allRoutes[$file] = $routes;
             
         }
-        print_r($allRoutes);
+        return $allRoutes;
      }
  }
 ?>

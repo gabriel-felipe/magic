@@ -1,0 +1,61 @@
+/*Fonts */
+@import url(http://fonts.googleapis.com/css?family=Josefin+Slab:300,400,600,700);
+@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic);
+
+
+/*Color Pallete*/
+@red: #DF3132;
+@peachy: #F3E1B6;
+@green: #7CBC9A;
+@piscina: #23998E;
+@blue: #1D5E69;
+@light-green: #f0fff0;
+/*---------------Geral */
+    /*Classes */
+    .box {.padding; background: #fff; border:1px solid @peachy;}
+    .tag {display: inline-block; padding:8px 15px; background: inherit;}
+    .error {background: @red; color:@light-green; text-align: center; font-size:14px; line-height: 31px; min-height:35px; text-align: center; .grid12;border:2px solid #fff;}
+    .bt {.tag; font-size:12px; padding:5px 8px; background: inherit; color:inherit;}
+    .bt-green {.bt;  background: @green;color:@light-green; }
+    /*Elementos gerais */
+    a {color:inherit; text-decoration: none;}
+    body {background: @light-green; font-family: 'Lato', sans-serif; letter-spacing: 0.05em; font-weight: 200; color:@blue; font-size:14px;}
+    .linhas-topo {background: @blue; .grid12;}
+    .linhas-topo li {.grid3; height:4px; background: @red;}
+    .linhas-topo li:nth-child(2) {background: @peachy; .grid3;}
+    .linhas-topo li:nth-child(3) {background: @green; .grid2;}
+    .linhas-topo li:nth-child(4) {background: @piscina; .grid2;}
+    .linhas-topo li:nth-child(5) {background: @blue; .grid2;}
+    .site-content {.grid10;.center; .padding-t}
+    h1,h2,h3,h4,h5,h6{font-family: 'Josefin Slab',sans-serif; font-weight: 600;}
+    h1 {font-size:1.8em;}
+    h2 {font-size:1.5em;}
+    h3 {font-size:1.3em;}
+    h4 {font-size:1.1em;}
+    h5 {font-size:1.05em;}
+    h6 {font-size:1.00em;}
+    button {border:0;padding:0; font-family: inherit; color:inherit; outline: none; font-size: inherit; cursor: pointer;}
+    input {border: 1px solid @light-green; font-size: inherit; padding:5px 10px; color:@piscina;  font-weight: 300;}
+    input[type='submit'] {background: @red; color: @light-green; font-size:inherit; border-color: transparent; cursor: pointer;}
+    input:focus {outline:  none; border-color: @green;}
+    
+    table {border:1px solid @piscina; width:100%;}
+    table td:last-child{border-right:1px solid @piscina;}
+    
+    tr.highlight {background: @blue; color:@light-green; font-weight: 400;}
+    
+    td {vertical-align: middle; padding:5px;}
+    td.center {text-align: center;}
+    tbody tr:hover {background: #f5f5f5}
+    tr.title, tr.title:hover {background: @light-green; color:@blue;}
+
+    /*Header */
+        .main-header {.grid12; min-height: 40px; background: @piscina; border-bottom: 3px solid @blue; color:@light-green; .margin-b; font-family: 'Josefin Slab',sans-serif; font-weight: 400;}
+        .main-header .content {.grid10; .center;.padding;}
+        .main-header-logo {font-size:34px; float:left; color:@light-green; text-shadow: 0 -1px 0 @blue; line-height: 50px; margin-bottom: 10px;}
+        .main-nav {float:right; width: auto; margin-top:10px;}
+        .main-nav li {float:left; margin-left:10px;}
+        .main-nav li:first-child{margin-left:0;}
+        .main-nav li a{display: inline-block; padding:5px 10px; border:1px solid transparent; color: @light-green}
+        .main-nav li a:hover {color:@peachy;} 
+    
