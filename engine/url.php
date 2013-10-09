@@ -2,12 +2,15 @@
 	final class url {
 		public $ns = "";
 		private $params = array(
-			'ns' => array('admin'),
+			'ns' => array(''),
 			'route' => array('regex'=>'/^[A-z0-9\/%_-]+$/')
 		);
 		private $urls = array();
 		private $shortcuts = array();
 		public function __construct(){
+			if($this->ns){
+				$this->params['ns'][] = $this->ns;
+			}
 			$this->urls = array(
 				array(
 				'format' => 'ns',
@@ -35,6 +38,7 @@
 			$this->shortcuts[$route] = $params;
 		}
 		public function set_ns($ns){
+
 			$this->ns = $ns;
 			$this->__construct();
 
@@ -165,7 +169,10 @@
 						}
 					}
 				}
-				if($shortcut['route'] == $parts['route']){
+				if(!isset($parts['ns'])){
+					$parts['ns'] = ns;
+				}
+				if($shortcut['route'] == $parts['route'] and $shortcut['ns'] == $parts['ns']){
 					return implode("/",$tmp_parts_shortcut);
 				}
 			}
@@ -240,9 +247,10 @@
 					$url .= "?".$query_string;
 					return $url;
 				} else {
-
 					trigger_error("Erro ao gerar url ".print_r($tmp_parts,true), E_USER_ERROR);
 				}
+			} else {
+				return false;
 			}
 
 		}
@@ -343,18 +351,28 @@
 			} else {
 				$params['ns'] = ns;
 			}
-			if($params['ns'] == 'public'){
-				unset($params['ns']);
-			}
-			
 			if(is_array($params)){
 				$paramsFinal = array_merge($paramsFinal,$params);
 			}
 
 			$url = $this->compose($paramsFinal);
-			
-			$url = ($url) ? $url."/" : "";
-			return base_url."/".$url;
+			if($url !== false){
+				$url = rtrim($url,"/");
+				$url = ($url) ? $url."/" : "";
+				return base_url."/".$url;
+
+			} else {
+				$url = base_url."/index.php?route=".$paramsFinal['route']."&ns=".$paramsFinal['ns'];
+				unset($paramsFinal['route']);
+				unset($paramsFinal['ns']);
+				if(count($paramsFinal) > 0){
+					foreach($paramsFinal as $param => $value){
+						$url .= "&$param=>$value";
+					}
+				}
+				return $url;
+
+			}
 		}
 		function redirect($link,$params=false,$ns=false){
 			require_once(path_engine_library."/data-cleaner.php");
