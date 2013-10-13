@@ -8,6 +8,7 @@ function majax(){
     self.getUrl = function(route,scope){
         return path_base+"/index.php";
     }
+
     self.ajax = function(methodReq, route,scope,params,success,fail,async){
         if(typeof(scope) == 'undefined' || !scope){
             scope = magic_scope;
@@ -33,23 +34,21 @@ function majax(){
                     if(typeof(success) == 'function'){
                        return success(d[self.msgKey],d[self.dataKey]);
                     } else {
-                        alert(d[self.msgKey]);
-                        console.log(d[self.dataKey]);
+                        self.onSuccess(d[self.msgKey],d[self.dataKey]);
                         return true;
                     }
                 } else {
                     if(typeof(fail) == 'function'){
                        return  fail(d[self.msgKey],d[self.dataKey]);
                     } else {
-                        alert("Erro:"+d[msgKey]);
+                        self.onFail(d[self.msgKey],d[self.dataKey]);
                         return false;
                     }
                 }       
             },
             error: function(d,m,o){
-                console.log(o);
-                console.log(m);
-                console.log(d);
+                self.onError(d,m,o);
+                
             },
             complete: function(){
                 self.onComplete();
@@ -62,7 +61,17 @@ function majax(){
     self.get = function(route,scope,params,success,fail,async){
         self.ajax("GET", route,scope,params,success,fail,async);
     }
-
+    self.onSuccess   = function(msg,data){
+        alert(msg);
+    }
+    self.onFail   = function(msg,data){
+        alert(msg);
+    }
+    self.onError = function(d,m,o){
+        console.log(o);
+                console.log(m);
+                console.log(d);
+    }
     self.onComplete = function(){
 
     }
