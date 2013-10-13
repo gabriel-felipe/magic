@@ -18,7 +18,6 @@ final class Action {
 		$path = '';
 		
 		$parts = explode('/', str_replace('../', '', (string)$route));
-		echo path_scope."\n";
 		foreach ($parts as $part) { 
 			$path .= $part;
 
