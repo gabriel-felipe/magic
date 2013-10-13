@@ -223,7 +223,7 @@ use phpbrowscap\Browscap;
 			$timeMod = 0;
 			$css_links = array();
 			$css_all = $this->css_linked;
-			$name = ns;
+			$name = scope;
 			$content = "";
 			foreach($css_all as $k=>$css){
 				$link = $css['link'];

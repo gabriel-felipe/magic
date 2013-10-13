@@ -1,3 +1,4 @@
 {
-    "public":"default"
+    "manager":"default",
+    "public" :"default"
 }

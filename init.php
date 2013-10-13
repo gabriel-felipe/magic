@@ -11,23 +11,22 @@ foreach($db as $constant=>$value)
     define($constant,$value);
 require_once('config/responsive.php');
 
-foreach ($routes as $ns => $rts) {
+foreach ($routes as $scopeb => $rts) {
 	foreach ($rts as $route => $params) {
-		$params['ns'] = $ns;
+		$params['scope'] = $scopeb;
 		$url->add_shortcut($route,$params);
 	}
 }
 foreach ($defaults as $var => $value) {
-	if(!isset(${$var}))	${$var} = $value;
+	if(!isset(${$var}) and $var)	${$var} = $value;
 }
-
 $path = str_replace($_SERVER["DOCUMENT_ROOT"], "",dirname(__FILE__));
 // Path Constants
-define('ns',$namespace);
+define('scope',$scope);
 define("path_root",$_SERVER["DOCUMENT_ROOT"]."$path");
-define("path_scope",$_SERVER["DOCUMENT_ROOT"]."$path/scopes/$namespace");
+define("path_scope",$_SERVER["DOCUMENT_ROOT"]."$path/scopes/$scope");
 if(!is_dir(path_scope)){
-	die("Namespace '$namespace' doesn't exist");
+	die("scope '$scope' doesn't exist");
 }
 
 define("path_base","http://".$_SERVER["SERVER_NAME"]."$path");
@@ -38,19 +37,19 @@ define("path_uploads",path_root."/uploads");
 define("path_library",path_root."/librarys");
 define("path_engine_library",path_root."/engine/library");
 define("path_datamgr",path_root."/datamgr");
-define("path_models",path_root."/scopes/$namespace/model");
-define("path_controllers",path_root."/scopes/$namespace/controller");
-define("path_views",path_root."/scopes/$namespace/views");
-define("base_views",path_base."/scopes/$namespace/views");
+define("path_models",path_root."/scopes/$scope/model");
+define("path_controllers",path_root."/scopes/$scope/controller");
+define("path_views",path_root."/scopes/$scope/views");
+define("base_views",path_base."/scopes/$scope/views");
 
-define("base_js",path_base."/scopes/$namespace/views/js");
-define("base_common_js",path_base."/scopes/$namespace/views/js");
+define("base_js",path_base."/scopes/$scope/views/js");
+define("base_common_js",path_base."/scopes/$scope/views/js");
 define("base_js_engine",path_base."/engine/js");
-define("path_js",path_root."/scopes/$namespace/views/js");
+define("path_js",path_root."/scopes/$scope/views/js");
 define("path_system_js",path_root."/engine/js");
 define("path_common_js",path_root."/common-assets/js");
-if(isset($themes[$namespace])){
-    $theme = $themes[$namespace];
+if(isset($themes[$scope])){
+    $theme = $themes[$scope];
 }
 define("path_theme",path_views."/$theme");
 if(!is_dir(path_theme)){

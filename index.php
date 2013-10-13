@@ -15,23 +15,25 @@
 	$url->analyze($url_amigavel);
 	if(preg_match('/^([a-z-]+)\/?$/', $url_amigavel,$match)){
 		if(is_dir($url_amigavel)){
-			if(!data::get('ns','url')){
-				$_GET['ns'] = $match[1];
+			if(!data::get('scope','url')){
+				$_GET['scope'] = $match[1];
 				
 			}
 		}
 	}
-	$ns = data::get('ns','url');
-	if($ns){
-		$namespace = $ns;
-	} else {
-		if(data::post('ns','url')){
-			$namespace = data::post('ns','url');	
+	$scope = data::get('scope','url');
+
+	if(!$scope){
+		if(data::post('scope','url')){
+			$scope = data::post('scope','url');	
 		}
 	}
-	
+	if(!$scope){
+		unset($scope);
+	}
 
 	require_once('init.php');
+	
 	$registry = new registry;
 	$magicHtml = new magicHtml;
 	$registry->set('html',$magicHtml);
@@ -39,7 +41,7 @@
 		
 		require_once(path_scope."/init.php");
 	}
-	$url->set_ns(ns);
+	$url->set_scope(scope);
 
 	if($url_amigavel){
 		$url->analyze($url_amigavel);

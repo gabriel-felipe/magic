@@ -1,35 +1,35 @@
 <?php
 	final class url {
-		public $ns = "";
+		public $scope = "";
 		private $params = array(
-			'ns' => array(''),
+			'scope' => array(''),
 			'route' => array('regex'=>'/^[A-z0-9\/%_-]+$/')
 		);
 		private $urls = array();
 		private $shortcuts = array();
 		public function __construct(){
-			if($this->ns){
-				$this->params['ns'][] = $this->ns;
+			if($this->scope){
+				$this->params['scope'][] = $this->scope;
 			}
 			$this->urls = array(
 				array(
-				'format' => 'ns',
+				'format' => 'scope',
 				'default_params' => array('route'=>'x'),
 				),
 				array(
 				'format' => 'route',
-				'default_params' => array('ns'=>$this->ns),
+				'default_params' => array('scope'=>$this->scope),
 				),
 				array(
-				'format' => 'ns/route',
+				'format' => 'scope/route',
 				),
 				array(
 				'format' => 'id/route',
 				'params' => array('id'=>array('regex'=>'/^[0-9]+$/')),
-				'default_params' => array('ns'=>$this->ns)
+				'default_params' => array('scope'=>$this->scope)
 				),
 				array(
-				'format' => 'ns/route/id?',
+				'format' => 'scope/route/id?',
 				'params' => array('id'=>array('regex'=>'/^[0-9]+$/')),
 				),
 			);
@@ -37,9 +37,9 @@
 		public function add_shortcut($route,$params){
 			$this->shortcuts[$route] = $params;
 		}
-		public function set_ns($ns){
+		public function set_scope($scope){
 
-			$this->ns = $ns;
+			$this->scope = $scope;
 			$this->__construct();
 
 		}
@@ -81,7 +81,9 @@
 						break;
 					}
 				}
+				
 				if($match){ // Se bater as regras prepara os dados no $_GET.
+
 					if(array_key_exists("defaults", $sc) and is_array($sc['defaults'])){
 						foreach($sc['defaults'] as $key=>$val)
 							$_GET[$key] = $val;
@@ -169,10 +171,10 @@
 						}
 					}
 				}
-				if(!isset($parts['ns'])){
-					$parts['ns'] = ns;
+				if(!isset($parts['scope'])){
+					$parts['scope'] = scope;
 				}
-				if($shortcut['route'] == $parts['route'] and $shortcut['ns'] == $parts['ns']){
+				if($shortcut['route'] == $parts['route'] and $shortcut['scope'] == $parts['scope']){
 					return implode("/",$tmp_parts_shortcut);
 				}
 			}
@@ -237,10 +239,10 @@
 				return $final_url;
 			} elseif(!$reentered) {
 
-				if(isset($parts['route']) and isset($parts['ns'])){
+				if(isset($parts['route']) and isset($parts['scope'])){
 
-					$url = $this->compose(array('route'=>$parts['route'],'ns'=>$parts['ns']),1);
-					unset($parts['route'],$parts['ns']);
+					$url = $this->compose(array('route'=>$parts['route'],'scope'=>$parts['scope']),1);
+					unset($parts['route'],$parts['scope']);
 					foreach($parts as &$part)
 						$part = urlencode($part);
 					$query_string = http_build_query($parts);
@@ -303,12 +305,12 @@
 
 				$_GET[$p] = $v;
 			}
-			$_GET['ns'] = $this->final_url['ns'];
+			$_GET['scope'] = $this->final_url['scope'];
 			$_GET['route'] = $this->final_url['route'];
 			return true;
 		}
 		private function reset_final_url($params=array()){
-			$this->final_url = array("ns"=>'','route'=>'', 'params'=>array());
+			$this->final_url = array("scope"=>'','route'=>'', 'params'=>array());
 			if(is_array($params)){
 				foreach($params as $param=>$value){
 					$this->parse_param_final_url($param,$value);
@@ -344,12 +346,12 @@
 			}
 			return array($min,$max);
 		}
-		function get($route,$params=false,$ns=false){
+		function get($route,$params=false,$scope=false){
 			$paramsFinal = array('route'=>str_replace("/","_",data::cleaner($route,"url")));
-			if($ns){
-				$params['ns'] = data::cleaner($ns);
+			if($scope){
+				$params['scope'] = data::cleaner($scope);
 			} else {
-				$params['ns'] = ns;
+				$params['scope'] = scope;
 			}
 			if(is_array($params)){
 				$paramsFinal = array_merge($paramsFinal,$params);
@@ -362,9 +364,9 @@
 				return base_url."/".$url;
 
 			} else {
-				$url = base_url."/index.php?route=".$paramsFinal['route']."&ns=".$paramsFinal['ns'];
+				$url = base_url."/index.php?route=".$paramsFinal['route']."&scope=".$paramsFinal['scope'];
 				unset($paramsFinal['route']);
-				unset($paramsFinal['ns']);
+				unset($paramsFinal['scope']);
 				if(count($paramsFinal) > 0){
 					foreach($paramsFinal as $param => $value){
 						$url .= "&$param=>$value";
@@ -374,10 +376,10 @@
 
 			}
 		}
-		function redirect($link,$params=false,$ns=false){
+		function redirect($link,$params=false,$scope=false){
 			require_once(path_engine_library."/data-cleaner.php");
 			if(!validate::absolute_url($link)){
-				$link = $this->get($link,$params,$ns);
+				$link = $this->get($link,$params,$scope);
 			}
 			echo "<meta http-equiv=\"refresh\" content=\"0; url=$link\">";
 		}

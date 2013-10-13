@@ -1,6 +1,6 @@
 {
     "manager" : {
-        "vsf" : { "route":"common_home" },
+        
 
         "testeb/{^[0-9]+$}/{^[a-z]+$}" : {
             "route":"common_home",
@@ -19,5 +19,8 @@
             }
         },
         "" : { "route":"common_home" }
+    },
+    "public": {
+        "vsf" : { "route":"common_home"}
     }
 }
