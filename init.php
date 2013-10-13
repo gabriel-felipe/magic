@@ -26,7 +26,6 @@ $path = str_replace($_SERVER["DOCUMENT_ROOT"], "",dirname(__FILE__));
 define('ns',$namespace);
 define("path_root",$_SERVER["DOCUMENT_ROOT"]."$path");
 define("path_scope",$_SERVER["DOCUMENT_ROOT"]."$path/scopes/$namespace");
-
 if(!is_dir(path_scope)){
 	die("Namespace '$namespace' doesn't exist");
 }

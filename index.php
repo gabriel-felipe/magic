@@ -36,6 +36,7 @@
 	$magicHtml = new magicHtml;
 	$registry->set('html',$magicHtml);
 	if(is_file(path_scope."/init.php")){
+		
 		require_once(path_scope."/init.php");
 	}
 	$url->set_ns(ns);

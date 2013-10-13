@@ -83,7 +83,7 @@
 			display: block;
 		}
 		@default-horizontal-margin: @t-margingrid;
-		@default-vertical-margin: @t-margingrid;
+		@default-vertical-margin: 10px;
 		.margin-r{margin-right: @default-horizontal-margin;}
 		.margin-l{margin-left: @default-horizontal-margin;}
 		.margin-t{margin-top: @default-vertical-margin;}
@@ -108,7 +108,7 @@
 		.lmargin-h{.lmargin-l;.lmargin-r; }
 		.lmargin  {.lmargin-v; .lmargin-h; }
 	
-		@default-horizontal-padding: @t-margingrid;
+		@default-horizontal-padding: 10px;
 		@default-vertical-padding: 15px;
 		.padding-r{padding-right: @default-horizontal-padding;}
 		.padding-l{padding-left: @default-horizontal-padding;}
