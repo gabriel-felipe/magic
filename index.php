@@ -49,6 +49,8 @@
 		$url->analyze("");
 	}
 	$registry->set('url',$url);
+	$json = new json;
+	$registry->set('json',$json);
 	
 	$loader = new loader($registry);
 	$registry->set('load',$loader);

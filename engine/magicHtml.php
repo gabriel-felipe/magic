@@ -71,6 +71,7 @@ use phpbrowscap\Browscap;
 			}
 			$this->add_system_css("common.css",'all',1);
 			$this->add_system_js("jquery-1.9.1.js",true,true);
+			$this->add_system_js("ajax.js",true,true);
 
 
 			$this->add_system_js("elquery.js",true,false);
@@ -418,6 +419,11 @@ JSINLINE;
 			$head_html .= "
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head>
 <title>".$this->title."</title>
+<script>
+var path_base = '".path_base."';
+var magic_scope = '".scope."';
+
+</script>
 $css_links
 $js_links
 $css_inline
