@@ -3,24 +3,40 @@
 <div class="scopes">
     <h2>Escopos que compõem o sistema: </h2>
     <div class="scopes-list">
-        <button class='scope'>Manager</button>
-        <button class='scope'>Public</button>
-        <button class='scope'>Admin</button>
+        <?php foreach ($scopes as $scope): ?>
+        <button class='scope'><?php echo $scope; ?></button>    
+        <?php endforeach ?>
     </div>
-
     <input class='add-scope' type="text" placeholder='Adicionar Escopo'>
-    <input class='submit-add-scope' type="submit" value='Adicionar'>
+    <input class='submit-add-scope' onclick="addScope();" type="submit" value='Adicionar'>
 </div>
 <div class="sidebar">
     <div class="data-base">
+        <?php if ($dbConfig['DB_ACTIVE'] == 0 or !$dbConfig['db_driver'] or !$dbConfig['db_host'] or !$dbConfig['db_user'] or !$dbConfig['name']): ?>
+            
+        
         <div class="error">
         Banco de dados não configurado!
         </div>
+        <?php endif ?>
         <div class="content">
             <h2>Database:</h2>
+
             <div class="campos">
                 <div class="campo">
+                    <label for="">Db Ativo</label>
+                    <select name='active'>
+                        <option value='1'>Ativo</option>
+                        <option value='0'>Inativo</option>
+                    </select>
+                </div>
+                <div class="clear"></div>
+                <div class="campo">
                     <label for="">Tipo</label>
+                    <input type="text">
+                </div>
+                <div class="campo">
+                    <label for="">Host</label>
                     <input type="text">
                 </div>
                 <div class="campo">
@@ -41,8 +57,8 @@
         </div>
     </div>
     <div class="sidebar-shortcuts">
-        <a href="#teste">Adicionar Controller</a>
-        <a href="#teste">Adicionar DbModel</a>
+        <button href="#teste" onclick='openAddController();'>Adicionar Controller</button>
+        <button href="#teste" onclick="openAddDbModel();">Adicionar DbModel</button>
     </div>
 </div>
 <div class="routes">
@@ -96,4 +112,31 @@
         </tbody>
     </table>
     <button class='add-route'>Adicionar rota</button>
+    <script>
+    
+        function openAddController(){
+            var ajaxController = new majax;
+            ajaxController.onSuccess = function(msg,data){
+                lightbox.open(msg);
+            }
+            ajaxController.post("code/controller");
+        }
+        function openAddDbModel(){
+            var ajaxDbModel = new majax;
+            ajaxDbModel.onSuccess = function(msg,data){
+                lightbox.open(msg);
+            }
+            ajaxDbModel.post("code/dbmodel");
+        }
+    
+        function addScope(){
+            var ajaxScope = new majax;
+            var scope = $("input.add-scope").val();
+            ajaxScope.onSuccess = function(){
+                $(".scopes-list").append("<button class='scope'>"+scope+"</button>");
+            }
+            ajaxScope.post("common/scopes/novo",false,{"scopo":scope});
+        }
+    </script>
 </div>
+<?php echo $footer; ?>

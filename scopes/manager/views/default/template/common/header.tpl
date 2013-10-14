@@ -1,5 +1,15 @@
 
 <div class="clear"></div>
+<div id="lightbox">
+    <div class="model">
+        <button class='close'>x</button>
+        <div class="content">
+        <p>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Similique perferendis ipsum molestiae doloremque praesentium mollitia asperiores. Laudantium, fugit, provident natus odit blanditiis inventore ea nam ipsam! Assumenda, officiis cupiditate earum.
+        </p>
+        </div>
+    </div>
+</div>
 <header class='main-header'>
     <div class="content">
         <div class='main-header-logo'>

@@ -12,11 +12,11 @@
 .data-base .content {.box;}
 .data-base .campos {.margin-v;}
 .data-base .campo label {.grid3; line-height: 28px;}
-.data-base .campo input {.grid9; .margin-l}
+.data-base .campo input,.data-base .campo select {.grid9; .margin-l}
 .data-base .salvar {background: @green; font-size: 0.8em; float:right; .margin-t}
 
-.sidebar-shortcuts a {.box; .grid12; .margin-t; font-size:1.2em; font-weight: 400;}
-.sidebar-shortcuts a:hover {background: @peachy;border-color: #fff;}
+.sidebar-shortcuts button {.box; .grid12; .margin-t; font-size:1.2em; font-weight: 400;}
+.sidebar-shortcuts button:hover {background: @peachy;border-color: #fff;}
 
 .routes {.grid8; .margin-l;.margin-t; padding:0;}
 .add-route {.bt-green; .margin; .fright; margin-right:0; }

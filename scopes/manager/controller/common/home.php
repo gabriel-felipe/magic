@@ -7,11 +7,17 @@
             $this->load->model("Scopes");
             $this->load->model("Routes");
             $this->MRoutes->getRawRoutes();
-            
+            $dbConfig = file_get_contents(path_root."/config/db.json");
+            $dbConfig = json_decode($dbConfig,true);
+            $this->data['dbConfig'] = $dbConfig;
 
             $scopes = $this->MScopes->getScopes();
+            $this->data['scopes'] = $scopes;
 			echo $this->html->render($this->get_content());
 		}
+        public function teste(){
+            echo $this->json->success("teste",array("info"=>5));
+        }
 		
 	}
 ?>

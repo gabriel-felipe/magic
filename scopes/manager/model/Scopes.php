@@ -7,9 +7,10 @@
         public function getScopes(){
             $scopes = glob(path_root."/scopes/*",GLOB_ONLYDIR);
             $scopes = array_map("basename",$scopes);
-            
             return $scopes;
-
+        }
+        public function getScopePath($scope){
+            return path_scopes."/$scope";
         }
         public function addScope($scope){
             require_once(path_library."/fileManager.php");

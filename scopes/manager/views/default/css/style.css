@@ -15,8 +15,10 @@
     .box {.padding; background: #fff; border:1px solid @peachy;}
     .tag {display: inline-block; padding:8px 15px; background: inherit;}
     .error {background: @red; color:@light-green; text-align: center; font-size:14px; line-height: 31px; min-height:35px; text-align: center; .grid12;border:2px solid #fff;}
+    .success {.error; background: @green;}
     .bt {.tag; font-size:12px; padding:5px 8px; background: inherit; color:inherit;}
     .bt-green {.bt;  background: @green;color:@light-green; }
+    .bt-red {.bt;  background: @red;color:@light-green; }
     /*Elementos gerais */
     a {color:inherit; text-decoration: none;}
     body {background: @light-green; font-family: 'Lato', sans-serif; letter-spacing: 0.05em; font-weight: 200; color:@blue; font-size:14px;}
@@ -58,4 +60,9 @@
         .main-nav li:first-child{margin-left:0;}
         .main-nav li a{display: inline-block; padding:5px 10px; border:1px solid transparent; color: @light-green}
         .main-nav li a:hover {color:@peachy;} 
-    
+    /*Lightbox */
+        #lightbox {width:100%; height: 100%; background: fade(@light-green,60%); position: fixed; display: none;}
+        #lightbox .model {.grid6;.center; margin-top:60px; padding:30px; .box; position: relative;}
+        #lightbox .model .close {position: absolute; right:10px; top:10px; background: @red; padding:0px 5px; color:@peachy; }
+        #lightbox .model .content {margin-top:20px;}
+        #lightbox .model p {line-height: 2em;}
