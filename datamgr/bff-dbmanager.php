@@ -13,6 +13,25 @@ require_once(path_datamgr."/bff-dbconnect.php");
 			$this->cnx = $cnx->connect();
 		}
 		
+		public function getTables($fetchColumns=false){
+			$cnxQuery = $this->cnx->prepare("SHOW TABLES");
+			$cnxQuery->execute();
+			$cnxQuery->setFetchMode(PDO::FETCH_ASSOC);
+			$resultados = $cnxQuery->fetchAll();
+			$tables = array();
+			foreach($resultados as $res){
+				$table = array_pop($res);
+				if ($fetchColumns) {
+					$columns = $this->fetch_columns($table);
+					$tables[$table] = $columns;
+				} else {
+					$tables[] = $table;
+				}
+				
+			}
+			return $tables;
+		}
+
 		public function has_table($table){
 			
 			$query = $this->cnx->query("SELECT * FROM $table");
