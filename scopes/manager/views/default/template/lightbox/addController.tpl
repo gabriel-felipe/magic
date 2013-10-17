@@ -29,7 +29,7 @@
     $("#bt-save-controller").click(function(){
         data = {
             "name": $("#controller-name").val(),
-            "scope": $("#controller-scope").val(),
+            "scopo": $("#controller-scope").val(),
             "methods": $("#controller-methods").val(),
         }
         sendControllerAjax.post("code/controller/send",data);

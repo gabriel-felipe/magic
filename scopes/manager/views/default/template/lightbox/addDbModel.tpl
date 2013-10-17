@@ -40,7 +40,7 @@
             "single": $("#DbModel-single").val(),
             "plural": $("#DbModel-plural").val(),
             "table": $("#DbModel-table").val(),
-            "scope": $("#DbModel-scope").val(),
+            "scopo": $("#DbModel-scope").val(),
         }
         sendDbModelAjax.post("code/dbmodel/send",data);
     });

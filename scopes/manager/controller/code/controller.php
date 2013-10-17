@@ -14,7 +14,7 @@
         public function send(){
             $name = data::post("name",'special_chars');
             $methods = data::post("methods",'special_chars');
-            $scope  = data::post("scope",'special_chars');
+            $scope  = data::post("scopo",'special_chars');
             if($name and $methods and $scope){
                 $this->load->model("Scopes");
                 $this->load->model("Code",false,array($this->MScopes));

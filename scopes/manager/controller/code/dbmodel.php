@@ -10,7 +10,7 @@
             $table = data::post("table",'special_chars');
             $single = data::post("single",'special_chars');
             $plural = data::post("plural",'special_chars');
-            $scope  = data::post("scope",'special_chars');
+            $scope  = data::post("scopo",'special_chars');
             if($single and $table and $scope and $plural){
                 $this->load->model("Scopes");
                 $this->load->model("Code",false,array($this->MScopes));
