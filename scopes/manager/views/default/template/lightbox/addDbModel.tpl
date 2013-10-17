@@ -42,6 +42,6 @@
             "table": $("#DbModel-table").val(),
             "scope": $("#DbModel-scope").val(),
         }
-        sendDbModelAjax.post("code/dbmodel/send",false,data);
+        sendDbModelAjax.post("code/dbmodel/send",data);
     });
 </script>

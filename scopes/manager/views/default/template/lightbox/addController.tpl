@@ -32,6 +32,6 @@
             "scope": $("#controller-scope").val(),
             "methods": $("#controller-methods").val(),
         }
-        sendControllerAjax.post("code/controller/send",false,data);
+        sendControllerAjax.post("code/controller/send",data);
     });
 </script>
