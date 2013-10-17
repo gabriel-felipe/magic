@@ -55,10 +55,10 @@ function majax(){
             }
         });
     }
-    self.post = function(route,scope,params,success,fail,async){
+    self.post = function(route,params,scope,success,fail,async){
         self.ajax("POST", route,scope,params,success,fail,async);
     }
-    self.get = function(route,scope,params,success,fail,async){
+    self.get = function(route,params,scope,success,fail,async){
         self.ajax("GET", route,scope,params,success,fail,async);
     }
     self.onSuccess   = function(msg,data){

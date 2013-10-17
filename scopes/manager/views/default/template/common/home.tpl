@@ -12,7 +12,7 @@
 </div>
 <div class="sidebar">
     <div class="data-base">
-        <?php if ($dbConfig['DB_ACTIVE'] == 0 or !$dbConfig['db_driver'] or !$dbConfig['db_host'] or !$dbConfig['db_user'] or !$dbConfig['name']): ?>
+        <?php if ($dbConfig['DB_ACTIVE'] == 0 or !$dbConfig['db_driver'] or !$dbConfig['db_host'] or !$dbConfig['db_user'] or !$dbConfig['db_name']): ?>
             
         
         <div class="error">
@@ -22,36 +22,36 @@
         <div class="content">
             <h2>Database:</h2>
 
-            <div class="campos">
+            <div class="campos campos-db">
                 <div class="campo">
                     <label for="">Db Ativo</label>
-                    <select name='active'>
+                    <select name='DB_ACTIVE'>
                         <option value='1'>Ativo</option>
-                        <option value='0'>Inativo</option>
+                        <option value='0' <?php echo (!$dbConfig['DB_ACTIVE']) ? "selected='selected'" : ""?>>Inativo</option>
                     </select>
                 </div>
                 <div class="clear"></div>
                 <div class="campo">
                     <label for="">Tipo</label>
-                    <input type="text">
+                    <input type="text" name='db_driver' value="<?php echo $dbConfig['db_driver'] ?>">
                 </div>
                 <div class="campo">
                     <label for="">Host</label>
-                    <input type="text">
+                    <input type="text" name='db_host' value="<?php echo $dbConfig['db_host'];?>">
                 </div>
                 <div class="campo">
                     <label for="">Usuário</label>
-                    <input type="text">
+                    <input type="text" name='db_user' value="<?php echo $dbConfig['db_user'];?>">
                 </div>
                 <div class="campo">
                     <label for="">Senha</label>
-                    <input type="text">
+                    <input type="text" name='db_password' value="<?php echo $dbConfig['db_password'];?>">
                 </div>
                 <div class="campo">
                     <label for="">Nome</label>
-                    <input type="text">
+                    <input type="text" name='db_name' value="<?php echo $dbConfig['db_name'];?>">
                 </div>
-                <input type="submit" value='Salvar Configurações' class='salvar'>
+                <input type="submit" value='Salvar Configurações' onclick='updateDb(); return false;'class='salvar'>
             </div>
             <div class="clear"></div>
         </div>
@@ -62,7 +62,7 @@
     </div>
 </div>
 <div class="routes">
-    <table>
+   <!--  <table>
         <thead>
         <tr class='highlight'>
             <td>Rota</td>
@@ -111,7 +111,8 @@
         </tr>
         </tbody>
     </table>
-    <button class='add-route'>Adicionar rota</button>
+    <button class='add-route'>Adicionar rota</button> -->
+</div>
     <script>
     
         function openAddController(){
@@ -135,8 +136,21 @@
             ajaxScope.onSuccess = function(){
                 $(".scopes-list").append("<button class='scope'>"+scope+"</button>");
             }
-            ajaxScope.post("common/scopes/novo",false,{"scopo":scope});
+            ajaxScope.post("common/scopes/novo",{"scopo":scope});
+        }
+        function updateDb(){
+            var ajaxDb = new majax;
+            ajaxDb.onSuccess = function(msg){
+                lightbox.open("<div class='success'>"+msg+"</div>");
+            }
+            ajaxDb.onFail = function(msg){
+                lightbox.open("<div class='fail'>"+msg+"</div>");
+            }
+            data = {"db": {}};
+            $(".campos-db select,.campos-db input[type='text']").each(function(){
+                data['db'][$(this).attr("name")] = $(this).val();
+            })
+            ajaxDb.post("common/db/update",data);
         }
     </script>
-</div>
 <?php echo $footer; ?>
