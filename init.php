@@ -1,5 +1,5 @@
 <?php
-$jsonConfigs = array("db","defaults","routes","themes");
+$jsonConfigs = array("db","defaults","themes");
 foreach($jsonConfigs as $fileConfig){
 
 ${$fileConfig} = file_get_contents("config/$fileConfig.json");
@@ -11,14 +11,8 @@ foreach($db as $constant=>$value)
     define($constant,$value);
 require_once('config/responsive.php');
 
-foreach ($routes as $scopeb => $rts) {
-	foreach ($rts as $route => $params) {
-		$params['scope'] = $scopeb;
-		$url->add_shortcut($route,$params);
-	}
-}
 foreach ($defaults as $var => $value) {
-	if(!isset(${$var}) and $var)	${$var} = $value;
+    if(!isset(${$var}) and $var)    ${$var} = $value;
 }
 $path = str_replace($_SERVER["DOCUMENT_ROOT"], "",dirname(__FILE__));
 // Path Constants
@@ -26,7 +20,7 @@ define('scope',$scope);
 define("path_root",$_SERVER["DOCUMENT_ROOT"]."$path");
 define("path_scope",$_SERVER["DOCUMENT_ROOT"]."$path/scopes/$scope");
 if(!is_dir(path_scope)){
-	die("scope '$scope' doesn't exist");
+    die("scope '$scope' doesn't exist");
 }
 
 define("path_base","http://".$_SERVER["SERVER_NAME"]."$path");
@@ -53,7 +47,7 @@ if(isset($themes[$scope])){
 }
 define("path_theme",path_views."/$theme");
 if(!is_dir(path_theme)){
-	die("Theme '$theme' doesn't exist".path_theme);
+    die("Theme '$theme' doesn't exist".path_theme);
 }
 define("base_theme",base_views."/$theme");
 define("path_template",path_theme."/template");
