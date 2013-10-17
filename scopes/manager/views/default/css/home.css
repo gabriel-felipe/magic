@@ -18,6 +18,6 @@
 .sidebar-shortcuts button {.box; .grid12; .margin-t; font-size:1.2em; font-weight: 400;}
 .sidebar-shortcuts button:hover {background: @peachy;border-color: #fff;}
 
-.routes {.grid8; .margin-l;.margin-t; padding:0;}
+.routes,.dirs {.grid8; .margin-l;.margin-t; padding:0;}
 .add-route {.bt-green; .margin; .fright; margin-right:0; }
 .route-controller {.bt; .grid12}

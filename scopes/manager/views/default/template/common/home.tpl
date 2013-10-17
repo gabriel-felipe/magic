@@ -61,6 +61,27 @@
         <button href="#teste" onclick="openAddDbModel();">Adicionar DbModel</button>
     </div>
 </div>
+<?php if ($writabbleDirs !== true): ?>
+<div class="dirs">
+    <h2>Pastas que precisam de permissão de escrita:</h2><br />
+    <table>
+        <thead>
+            <tr class='highlight'>
+                <td>Pasta</td>
+                <td>Status</td>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($writabbleDirs as $dir => $status): ?>
+            <tr>
+                <td><?php echo $dir ?></td>
+                <td><?php echo ($status) ? "Ok" : "Falta Permissão" ?></td>
+            </tr>
+            <?php endforeach ?>
+        </tbody>
+    </table>
+</div>
+<?php endif ?>
 <div class="routes">
    <!--  <table>
         <thead>
