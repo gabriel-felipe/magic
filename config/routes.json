@@ -19,8 +19,6 @@
             }
         },
         "" : { "route":"common_home" }
-    },
-    "public": {
-        "vsf" : { "route":"common_home"}
     }
+    
 }
