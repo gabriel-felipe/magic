@@ -75,7 +75,7 @@ class Code
     }
     class $plural extends dbModelPlural
     {
-        public $single = \"\$single\";
+        public \$single = \"$single\";
         public function __construct(\$fields=false,\$query=false,\$queryParams=false,\$plural=array(),\$page=1,\$qtnbypage=9999999999)
         {                   
             parent::__construct(\"$table\", \$fields,\$query,\$queryParams,\$plural,\$page,\$qtnbypage);
