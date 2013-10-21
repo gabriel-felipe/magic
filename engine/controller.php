@@ -15,15 +15,26 @@
 		protected $template;
 
 		public function __construct($registry=array()){
+			$this->before_construct();
 			$this->registry = $registry;	
 			$this->requires = array();
 			$this->errors = array();
 			$this->warnings = array();
 			$this->data = array();
 			$this->children = array();
+			$this->after_construct();
 		}
 		//Funções gerenciamento de links de css
 		
+		//Triggers
+		protected function before_construct(){
+
+		}
+		protected function after_construct(){
+
+		}
+
+
 		//Funções gerenciamento de erros;
 		public function print_errors(){
 			foreach($this->warnings as $warning){
@@ -80,7 +91,6 @@
 				$name = end($name);
 				$name = $name;
 				$content = $this->getChild($child);				
-
 				$this->data[$name] = $content;
 			}
 			

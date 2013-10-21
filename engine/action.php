@@ -18,6 +18,7 @@ final class Action {
 		$path = '';
 		
 		$parts = explode('/', str_replace('../', '', (string)$route));
+		
 		foreach ($parts as $part) { 
 			$path .= $part;
 
@@ -110,15 +111,15 @@ final class Action {
 				if(!class_exists($class)){
 					$errors[] = "Error with class. Class ".$class." doesn't exist.";
 				}
-				$obj = new $class;
-				if(!method_exists($obj, $method)){
+				$controller = new $class($this->registry);
+				if(!method_exists($controller, $method)){
 					$errors[] = "Error with method. Method ".$method." doesn't exist.";	
 				}
 				if(count($errors) > 0){
 					throw new Exception("Error Processing Request. <br />\n".implode("<br />\n", $errors). ", 1");
 				}
 				
-				$controller = new $class($this->registry);
+				
 				if(!$this->registry->get('page')){
 					$this->registry->set("page",$controller);
 				}

@@ -347,6 +347,7 @@
 			return array($min,$max);
 		}
 		function get($route,$params=false,$scope=false){
+
 			$paramsFinal = array('route'=>str_replace("/","_",data::cleaner($route,"url")));
 			if($scope){
 				$params['scope'] = data::cleaner($scope);
@@ -358,13 +359,15 @@
 			}
 
 			$url = $this->compose($paramsFinal);
-			if($url !== false){
+
+			
+			if($url !== false and $url !== "?"){
 				$url = rtrim($url,"/");
 				$url = ($url) ? $url."/" : "";
 				return base_url."/".$url;
 
 			} else {
-				$url = base_url."/index.php?route=".$paramsFinal['route']."&scope=".$paramsFinal['scope'];
+				$url = base_url."/index.php?route=".$route."&scope=".$paramsFinal['scope'];
 				unset($paramsFinal['route']);
 				unset($paramsFinal['scope']);
 				if(count($paramsFinal) > 0){
