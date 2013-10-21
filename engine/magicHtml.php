@@ -32,6 +32,7 @@ use phpbrowscap\Browscap;
 		protected $errors;
 		protected $warnings;
 		//Path Variables
+		protected $cssScopes = array();
 		protected $base_cache = base_cache;
 		protected $path_cache = path_cache;
 		protected $base_css = base_css;
@@ -61,6 +62,11 @@ use phpbrowscap\Browscap;
 			$this->requires = array();
 			$this->errors = array();
 			$this->warnings = array();
+			$this->cssScopes = array(
+				"system" => path_engine_css,
+				"theme"  => path_css,
+				"common" => path_common_css
+			);
 			
 			
 			if(!is_dir($this->path_cache) or !is_writable($this->path_cache)){
@@ -102,7 +108,12 @@ use phpbrowscap\Browscap;
 		public function add_css($link, $media="all", $is_local=true,$path=false){
 			$this->add_css_linked($link, $media, $is_local,$path);
 		}
-
+		public function add_css_scope($scope,$link,$media="all"){
+			if(isset($this->cssScopes[$scope])){
+				$path = $this->cssScopes[$scope];
+				$this->add_css($link,$media,1,$path);
+			}
+		}
 		public function add_system_css($link, $media="all", $is_local=true){
 			$this->add_css_linked($link, $media="all", $is_local=true,$this->engine_path_css);
 		}
