@@ -11,6 +11,10 @@ require_once(path_datamgr."/bff-dbconnect.php");
 		public function __construct($table = false){
 			$cnx = new bffdbconnect;
 			$this->cnx = $cnx->connect();
+			if(!$this->cnx){
+				throw new Exception("Erro ao conectar com o banco de dados", 1);
+				
+			}
 		}
 		
 		public function getTables($fetchColumns=false){
