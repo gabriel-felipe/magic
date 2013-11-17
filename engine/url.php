@@ -56,20 +56,22 @@
 					$match = false;
 					continue;
 				}
-				
+				$cp = 1;
 				foreach($parts as $kp => $part){
 
 					if(array_key_exists($kp, $url_c)){
+
 						if(preg_match("/\{(.+)\}/",trim($url_c[$kp]),$matches)){ //Verificando se essa parte é um parametro						
+
 							if(preg_match("/".$matches[1]."/",$part)){ //Verificando se a regex bate com o que foi passado
 								foreach($tmp as &$tmp_part){ // Se bater faz as substituições nos parametros
-									$tmp_part = str_replace("$".$kp,$part,$tmp_part); 
+									$tmp_part = str_replace("$".$cp,$part,$tmp_part); 
 								}
 							} else { //se não pula para o próximo atalho.
 								$match = false;
 								continue;
 							}
-							
+							$cp++;
 						} else { // Se não for um parametro, verifica se as duas parte são identicas.
 							if($part != $url_c[$kp]){ // Se não forem, pula para o próximo atalho.
 								$match = false;
@@ -136,7 +138,7 @@
 		}
 
 		public function compose($parts,$reentered=false){
-			$tmp_parts = $parts; 
+			$tmp_parts = $parts; 	
 			foreach($this->shortcuts as $url=>&$shortcut){
 				
 				foreach($parts as $key => $value){
@@ -149,21 +151,26 @@
 				$tmp_parts_shortcut = explode("/",$url);//Pegando os pedaços da url do atalho
 
 				$paramsOnShortcut = array(); //array para armazenar as chaves => regex dos pedaços do atalho
+				$count = 1;
+				$mapParamsCount = array();
 				foreach($tmp_parts_shortcut as $k=>$piece){
 					if(preg_match("/\{(.+)\}/",trim($piece),$matches)){ //Verificando se essa parte é um parametro
-						$paramsOnShortcut[$k] = $matches[1]; //Armazena os parametros
+						$paramsOnShortcut[$count] = $matches[1]; //Armazena os parametros
+						$mapParamsCount[$count] = $k;
+						$count++;
 					}
 				}
 				foreach($paramsOnShortcut as $k=>$regex){ //Para os pedaços variáveis na url
-					foreach($shortcut as $paramName => &$paramShortcut){ //Para cada pedaço do atalho
+					foreach($shortcut as $paramName => $paramShortcut){ //Para cada pedaço do atalho
 						if(!is_array($paramShortcut) and strpos($paramShortcut,"\$".$k) !== false){ //Se o pedaço não for um array e existir a combinação ${chave do pedaço que varia}, ou seja se esse pedaço do atalho usar o pedaço variável da url em questão
 							if(!array_key_exists($paramName, $tmp_parts)){ //Se esse parametro é variável e ele não foi fornecido nos parametros iniciais
-
 								continue 3; //Vai para o próximo atalho, esse não bate.
 							}
 							$parametroFornecido = $parts[$paramName];
+
 							if(preg_match("/".$regex."/",$parametroFornecido)){ //Verificando se o parametro bate com a regex
-								$tmp_parts_shortcut[$k] = $parametroFornecido;
+								$key = $mapParamsCount[$k];
+								$tmp_parts_shortcut[$key] = $parametroFornecido;
 							} else { 
 
 								continue 3; //Vai para o próximo atalho, esse parametro não bate;
@@ -178,7 +185,6 @@
 					return implode("/",$tmp_parts_shortcut);
 				}
 			}
-			
 		
 			
 			$final_url = false;
