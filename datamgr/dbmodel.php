@@ -28,6 +28,8 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 	protected $validated = array();
 	protected $fields = array();
 	protected $pk_field;
+	protected $defaultValues = array(); //array to fill with default values after a find.
+
 	
 		public function __construct($tabela,$fields=false,$query=false,$queryParams=false) {
 			if(!DB_ACTIVE){
@@ -345,12 +347,16 @@ Funções de pesquisa
 		return implode(", ",$keys);
 	}
 	public function find($id) {
+		$this->defaultValues = array();
 		$fields = $this->get_select();
 		$q = "SELECT $fields FROM ".$this->tabela." where {$this->pk_field}=:id";
 		$buscaSingle = $this->dbmanager->query($q,array(":id"=>$id));
-		
 		if($buscaSingle[1] == 1){
+
 			$this->setAtributos($buscaSingle[0][0]);
+			foreach($buscaSingle[0][0] as $key=>$val){
+				$this->defaultValues[$key] = $val;
+			}
 			return true;
 		} else 
 		{
@@ -360,34 +366,46 @@ Funções de pesquisa
 	}
 
 	public function last() {
+		$this->defaultValues = array();
 		$fields = $this->get_select();
 		$query = "SELECT $fields FROM ".$this->tabela." ORDER by {$this->pk_field} DESC LIMIT 1";
 		$buscaSingle = $this->dbmanager->query($query);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
+			foreach($buscaSingle[0][0] as $key=>$val){
+				$this->defaultValues[$key] = $val;
+			}
 		} else 
 		{
 			echo "<h1>Ocorreu um erro, me desculpe<h1>";
 		}
 	}
 	public function first() {
+		$this->defaultValues = array();
 		$fields = $this->get_select();
 		$query = "SELECT $fields FROM ".$this->tabela." ORDER by {$this->pk_field} ASC LIMIT 1";
 		$buscaSingle = $this->dbmanager->query($query);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
+			foreach($buscaSingle[0][0] as $key=>$val){
+				$this->defaultValues[$key] = $val;
+			}
 		} else 
 		{
 			echo "<h1>Ocorreu um erro, me desculpe<h1>";
 		}
 	}
 	public function where($query,$array=array()){
+		$this->defaultValues = array();
 		$fields = $this->get_select();
 		
 		$q = "SELECT $fields FROM ".$this->tabela." WHERE $query LIMIT 1";
 		$buscaSingle = $this->dbmanager->query($q, $array);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
+			foreach($buscaSingle[0][0] as $key=>$val){
+				$this->defaultValues[$key] = $val;
+			}
 			return $this->info();
 		} else {
 			return false;
