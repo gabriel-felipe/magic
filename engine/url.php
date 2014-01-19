@@ -139,11 +139,12 @@
 
 		public function compose($parts,$reentered=false){
 			$tmp_parts = $parts; 	
+
 			foreach($this->shortcuts as $url=>&$shortcut){
 				
 				foreach($parts as $key => $value){
-					
-					if(!array_key_exists($key, $shortcut)){ //se for passado parametros a mais que o atalho aceita pula pro próximo
+					$defaults = (isset($shortcut['defaults'])) ? $shortcut['defaults'] : array();
+					if(!array_key_exists($key, $shortcut) and !array_key_exists($key, $defaults)){ //se for passado parametros a mais que o atalho aceita pula pro próximo
 
 						continue 2;
 					}
@@ -258,6 +259,7 @@
 					trigger_error("Erro ao gerar url ".print_r($tmp_parts,true), E_USER_ERROR);
 				}
 			} else {
+
 				return false;
 			}
 
@@ -353,7 +355,12 @@
 			return array($min,$max);
 		}
 		function get($route,$params=false,$scope=false){
-
+			if (AUTO_GENERATE_LANGUAGE_URLS) {
+				$magic_language = data::get("magic_language");
+				if($magic_language){
+					$params['magic_language'] = $magic_language;
+				}
+			}
 			$paramsFinal = array('route'=>str_replace("/","_",data::cleaner($route,"url")));
 			if($scope){
 				$params['scope'] = data::cleaner($scope);
@@ -391,6 +398,9 @@
 				$link = $this->get($link,$params,$scope);
 			}
 			echo "<meta http-equiv=\"refresh\" content=\"0; url=$link\">";
+		}
+		public function getShortcuts(){
+			return $this->shortcuts;
 		}
 	}
 ?>

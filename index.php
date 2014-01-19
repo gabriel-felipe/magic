@@ -1,13 +1,17 @@
 <?php
+	require("root_paths.php");
 	require('config/project.php');
 	if(PROJECT_DEBUG == 1){
 		ini_set('display_errors',1); 
 	 	error_reporting(E_ALL);
 	 	ini_set('html_errors', 'On');
  	}
-
+ 	require_once('engine/registry.php');
+	require_once('engine/language.php');
 	require_once('engine/url.php');
 	require_once('engine/library/data-cleaner.php');
+	$registry = new registry;
+
 	$routes = file_get_contents("config/routes.json");
 	$routes = json_decode($routes,true);    
 	$url = new url;
@@ -18,7 +22,12 @@
 			$url->add_shortcut($route,$params);
 		}
 	}
-	
+	$registry->set("url",$url);
+	$language = new language($registry);
+	if(AUTO_GENERATE_LANGUAGE_URLS){
+		$language->generateUrls();
+	}
+	$registry->set("language",$language);
 	if(!isset($_GET['scope'])){
 		if(isset($_POST['scope'])) {
 			$_GET['scope'] = $_POST['scope'];
@@ -31,17 +40,22 @@
 	
 	require_once('init.php');
 	
-	$registry = new registry;
 	$magicHtml = new magicHtml;
 	$registry->set('html',$magicHtml);
 	if(is_file(path_scope."/init.php")){
 		
 		require_once(path_scope."/init.php");
 	}
-	$registry->set('url',$url);
+	
+	$language->init("pt-br"); //If exist language pt-br, that will be the default one, else it will select the first in alphabetical order.
+	if(AUTO_GENERATE_LANGUAGE_URLS){
+		$magic_language = data::get("magic_language");
+		if($magic_language){
+			$language->select($magic_language);
+		}
+	}
 	$json = new json;
 	$registry->set('json',$json);
-	
 	$loader = new loader($registry);
 	$registry->set('load',$loader);
 	if(array_key_exists("route", $_GET)){

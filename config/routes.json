@@ -1,16 +1,7 @@
+
 {
     "manager" : {
-        
-
         "testeb/{^[0-9]+$}/{^[a-z]+$}" : {
-            "route":"common_home",
-            "id": "$1",
-            "idb": "$2",
-            "defaults": {
-                "idb": "testePadrao"
-            }
-        },
-       "testeb/{^[0-9]+$}/{^[a-z]+$}" : {
             "route":"common_home",
             "id": "$1",
             "idb": "$2",
