@@ -252,7 +252,7 @@ use phpbrowscap\Browscap;
 				$name.="$k";
 			}
 			$name .= "-".str_replace("/","-",$_SERVER['HTTP_USER_AGENT']);
-			$name = $name.".css";
+			$name = md5($name).".css";
 			
 			$arquivo = $this->path_cache."/$name";
 			$modFile = 0;
