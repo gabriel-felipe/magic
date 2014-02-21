@@ -138,8 +138,7 @@
 		}
 
 		public function compose($parts,$reentered=false){
-			$tmp_parts = $parts; 	
-
+			$tmp_parts = $parts; 
 			foreach($this->shortcuts as $url=>&$shortcut){
 				
 				foreach($parts as $key => $value){
@@ -183,6 +182,13 @@
 					$parts['scope'] = scope;
 				}
 				if($shortcut['route'] == $parts['route'] and $shortcut['scope'] == $parts['scope']){
+					if (isset($shortcut['defaults']) and count($shortcut['defaults']) > 0) {
+						foreach($shortcut['defaults'] as $key => $value){
+							if(!isset($parts[$key]) or $parts[$key] != $value){
+								continue 2;
+							}
+						}
+					}
 					return implode("/",$tmp_parts_shortcut);
 				}
 			}
@@ -226,6 +232,7 @@
 				
 				if($nparts <= $max and $nparts >= $min){
 					$default_params = (array_key_exists('default_params', $url)) ? $url['default_params'] : array();
+
 					$params = array_merge($default_params, $parts);
 					
 					$match = true;
@@ -249,11 +256,14 @@
 				if(isset($parts['route']) and isset($parts['scope'])){
 
 					$url = $this->compose(array('route'=>$parts['route'],'scope'=>$parts['scope']),1);
-					unset($parts['route'],$parts['scope']);
+					if ($url) {
+						unset($parts['route'],$parts['scope']);
+					}
+					
 					foreach($parts as &$part)
 						$part = urlencode($part);
 					$query_string = http_build_query($parts);
-					$url .= "?".$query_string;
+					$url .= "?".$query_string;		
 					return $url;
 				} else {
 					trigger_error("Erro ao gerar url ".print_r($tmp_parts,true), E_USER_ERROR);
@@ -355,6 +365,7 @@
 			return array($min,$max);
 		}
 		function get($route,$params=false,$scope=false){
+
 			if (AUTO_GENERATE_LANGUAGE_URLS) {
 				$magic_language = data::get("magic_language");
 				if($magic_language){
@@ -370,13 +381,13 @@
 			if(is_array($params)){
 				$paramsFinal = array_merge($paramsFinal,$params);
 			}
-
+			
 			$url = $this->compose($paramsFinal);
-
 			
 			if($url !== false and $url !== "?"){
 				$url = rtrim($url,"/");
-				$url = ($url) ? $url."/" : "";
+				
+				$url = ($url and strpos($url,"?") === false) ? $url."/" : $url;
 				return base_url."/".$url;
 
 			} else {

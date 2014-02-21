@@ -28,6 +28,8 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 	protected $validated = array();
 	protected $fields = array();
 	protected $pk_field;
+	protected $joins = array();
+	protected $addFields = array();
 	protected $defaultValues = array(); //array to fill with default values after a find.
 
 	
@@ -65,12 +67,32 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 
 		}
 
-
-
-	
+	protected function isSelected($error,$triggerException=true){
+		if($this->id){
+			return true;
+		} else {
+			if($triggerException){
+				throw new Exception($error, 1);
+			}
+			return false;
+		}
+	}
+	public function getAtts(){
+		$atts = $this->listaAtts;
+		$joinAtts = array();
+		foreach($this->joins as $table => $join){
+			foreach($join['fields'] as $field => $name){
+				$joinAtts[$name] = "";
+			}
+		}
+		foreach($this->addFields as $query => $field){
+			$joinAtts[$field] = "";
+		}
+		return array_merge($atts,$joinAtts);
+	}
 	public function setAtributos($args=false){
 		if(!$args){
-			foreach($this->listaAtts as $att => $value) {
+			foreach($this->getAtts() as $att => $value) {
 			$this->$att = $value;
 			}	
 		} else {
@@ -342,14 +364,38 @@ EOD
 /*
 Funções de pesquisa
 */
+	public function addJoin($table,$fields=array(),$on=""){
+		$on = ($on) ? $on : $table.".".$table."_id = [t].".$this->pk_field;
+		$this->joins[$table] = array(
+			"fields" => $fields,
+			"on" => $on
+		);
+	}
 	public function get_select(){
 		$keys = array_keys($this->listaAtts);
-		return implode(", ",$keys);
+		foreach($keys as &$key){
+			$key = $this->tabela.".$key";
+		}
+		$keys = implode(", ",$keys);
+		$from = " FROM ".$this->tabela." ";
+		$joins = "";
+		foreach ($this->joins as $table => $join) {
+			$on = str_replace("[t]",$this->tabela, $join['on']);
+			$joins .= "LEFT JOIN $table on ($on) ";
+			foreach($join['fields'] as $field => $name){
+				$keys .= ", $table.$field as $name ";
+			}
+		}
+		foreach($this->addFields as $query => $field){
+			$query = str_replace("[t]",$this->tabela, $query);
+			$keys .= ", $query as $field ";
+		}
+		return $keys.$from.$joins;
 	}
 	public function find($id) {
 		$this->defaultValues = array();
 		$fields = $this->get_select();
-		$q = "SELECT $fields FROM ".$this->tabela." where {$this->pk_field}=:id";
+		$q = "SELECT $fields where {$this->tabela}.{$this->pk_field}=:id";
 		$buscaSingle = $this->dbmanager->query($q,array(":id"=>$id));
 		if($buscaSingle[1] == 1){
 
@@ -368,7 +414,7 @@ Funções de pesquisa
 	public function last() {
 		$this->defaultValues = array();
 		$fields = $this->get_select();
-		$query = "SELECT $fields FROM ".$this->tabela." ORDER by {$this->pk_field} DESC LIMIT 1";
+		$query = "SELECT $fields ORDER by {$this->tabela}.{$this->pk_field} DESC LIMIT 1";
 		$buscaSingle = $this->dbmanager->query($query);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
@@ -383,7 +429,7 @@ Funções de pesquisa
 	public function first() {
 		$this->defaultValues = array();
 		$fields = $this->get_select();
-		$query = "SELECT $fields FROM ".$this->tabela." ORDER by {$this->pk_field} ASC LIMIT 1";
+		$query = "SELECT $fields ORDER by {$this->pk_field} ASC LIMIT 1";
 		$buscaSingle = $this->dbmanager->query($query);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
@@ -399,7 +445,7 @@ Funções de pesquisa
 		$this->defaultValues = array();
 		$fields = $this->get_select();
 		
-		$q = "SELECT $fields FROM ".$this->tabela." WHERE $query LIMIT 1";
+		$q = "SELECT $fields WHERE $query LIMIT 1";
 		$buscaSingle = $this->dbmanager->query($q, $array);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
@@ -416,14 +462,19 @@ Retornar só as infos dos atributos
 */
 	public function info(){
 		$info = array();
-			foreach($this->listaAtts as $att => $value) {
-			$info[$att] = $this->$att;
+			foreach($this->getAtts() as $att => $value) {
+				if (isset($this->$att)) {
+					$info[$att] = $this->$att;
+				} else {
+					$info[$att] = "";
+				}
 			}	
 		return $info;
 	}
 	public function infoString(){
 		$info = "";
 		foreach($this->info() as $key => $value){
+			$value = print_r($value,true);
 			$info .= "$key : $value | ";
 		}
 		return $info;
@@ -495,7 +546,12 @@ Funções te relações.
 					
 		}	
 	}
-
+	public function getJoins(){
+		return $this->joins;
+	}
+	public function getAddFields(){
+		return $this->addFields;
+	}
 	///MAGIC METHODS
 	 public function __set($name, $value)
     {
@@ -534,16 +590,18 @@ class dbModelPlural {
 		$db = new bffdbmanager;
 		$this->dbmanager = $db;
 		$this->listaAtts = array();
-		if($fields and $fields != "*"){
-			$colunas = $this->dbmanager->fetch_columns($table);
-			foreach($colunas as $coluna){
-				if(!$fields or (is_array($fields) and in_array($coluna['name'], $fields)) or $fields == $coluna['name'] or $fields == "*" ){
-					$this->listaAtts[$coluna['name']] = "";
-				}
+		$colunas = $this->dbmanager->fetch_columns($table);
+		foreach($colunas as $coluna){
+			if(!$fields or (is_array($fields) and in_array($coluna['name'], $fields)) or $fields == $coluna['name'] or $fields == "*" ){
+				$this->listaAtts[$coluna['name']] = "";
 			}
+		}
+
+		if($fields and $fields != "*"){
+			
 			$this->fieldsStr = $this->get_select();
 		} else {
-			$this->fieldsStr = "*";
+			$this->fieldsStr = $this->get_select();
 		}
 		
 		
@@ -554,10 +612,45 @@ class dbModelPlural {
 		}
 		
 	}
+	// public function get_select(){
+	// 	$keys = array_keys($this->listaAtts);
+	// 	return implode(", ",$keys);
+	// }
 	public function get_select(){
 		$keys = array_keys($this->listaAtts);
-		return implode(", ",$keys);
+		foreach($keys as &$key){
+			$key = $this->tabela.".$key";
+		}
+		$keys = implode(", ",$keys);
+		$from = $this->get_from();
+		$joins = "";
+		$joinsObj = array();
+		$addFieldsObj = array();
+		if($this->single != "dbModel"){
+			$class = $this->single;
+			$class = new $class;
+			$joinsObj = $class->getJoins();
+			$addFieldsObj = $class->getAddFields();
+			unset($class);
+		}
+		foreach ($joinsObj as $table => $join) {
+			$on = str_replace("[t]",$this->tabela, $join['on']);
+			$joins .= "LEFT JOIN $table on ($on) ";
+			foreach($join['fields'] as $field => $name){
+				$keys .= ", $table.$field as $name ";
+			}
+		}
+		foreach ($addFieldsObj as $key => $value) {
+			$key = str_replace("[t]", $this->tabela, $key);
+			$keys .= ", $key as $value";
+		}
+
+		return $keys.$from.$joins;
 	}
+	public function get_from(){
+		return " FROM ".$this->tabela." ";
+	}
+	
 	
 	protected function arrayToObject(){
 		if(is_array($this->plural)){
@@ -585,28 +678,27 @@ class dbModelPlural {
 		return $array;
 	}
 	public function all($page=1){
-		
 		$table = $this->tabela;
 		$ini = ($page-1)*$this->qtnbypage;
 		$fim = $page + $this->qtnbypage - 1;
-		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} FROM $table LIMIT $ini,$fim");
-		$qtntotal = $this->dbmanager->query("SELECT COUNT({$this->pk_field}) FROM $table");
+		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} LIMIT $ini,$fim");
+		$qtntotal = $this->dbmanager->query("SELECT COUNT({$this->pk_field}) FROM ".$this->tabela);
 		$qtntotal = $qtntotal[0][0]["COUNT({$this->pk_field})"];
 		$this->nowinpage = $page;
-		$this->last_query = "SELECT {$this->fieldsStr} FROM $table";
+		$this->last_query = "SELECT {$this->fieldsStr}";
 		$this->total = $qtntotal;
 		$this->plural = $resultados[0];
 		$this->arrayToObject();
-		$this->last_query = "SELECT {$this->fieldsStr} FROM $table LIMIT $ini,$fim";
+		$this->last_query = "SELECT {$this->fieldsStr} LIMIT $ini,$fim";
 		$this->last_query_array = array();
 		return $this->info();
 	}
 	public function last($n=1){
 		$table = $this->tabela;
-		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} FROM $table ORDER BY {$this->pk_field} DESC LIMIT $n");
+		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} ORDER BY {$this->pk_field} DESC LIMIT $n");
 		$this->plural = $resultados[0];
 		$this->arrayToObject();
-		$this->last_query = "SELECT {$this->fieldsStr} FROM $table LIMIT $n ORDER BY {$this->pk_field} DESC";
+		$this->last_query = "SELECT {$this->fieldsStr} LIMIT $n ORDER BY {$this->pk_field} DESC";
 		$this->last_query_array = array();
 		return $this->info();
 	}
@@ -675,13 +767,13 @@ class dbModelPlural {
 		$this->plural = array();
 		$ini = ($page-1)*$this->qtnbypage;
 		$fim = $page + $this->qtnbypage - 1;
-		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} FROM ".$this->tabela." WHERE ".$query. " LIMIT $ini,$fim",$array);
+		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr}  WHERE ".$query. " LIMIT $ini,$fim",$array);
 		$qtntotal = $this->dbmanager->query("SELECT COUNT({$this->pk_field}) FROM ".$this->tabela." WHERE ".$query, $array);
 		$qtntotal = $qtntotal[0][0]["COUNT({$this->pk_field})"];
 		$this->nowinpage = $page;
 		$this->total = $qtntotal;
 		
-		$this->last_query = "SELECT {$this->fieldsStr} FROM ".$this->tabela." WHERE ".$query;
+		$this->last_query = "SELECT {$this->fieldsStr} WHERE ".$query;
 		$this->last_query_array=$array;
 		$this->plural = $resultados[0];
 		$this->arrayToObject();

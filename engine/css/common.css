@@ -139,7 +139,6 @@
 			echo ".grid$i{.fluid-column-grid($i);}";
 		}
 		?>
-
 		<?php 
 		$c = 0;
 			foreach($breakpoints as $label => $size){

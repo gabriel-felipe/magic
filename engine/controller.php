@@ -34,6 +34,9 @@
 
 		}
 
+		protected function before_get_content(){
+
+		}
 
 		//Funções gerenciamento de erros;
 		public function print_errors(){
@@ -85,6 +88,7 @@
 	    	}
 		}
 		protected function get_content() {
+			$this->before_get_content();
 			global $breakpoints, $gridColumns;
 			foreach ($this->children as $child) {
 				$name = explode("/",$child);

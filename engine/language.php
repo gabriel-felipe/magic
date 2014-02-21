@@ -82,9 +82,14 @@ class Language
             throw new Exception("Language file not founded.", 1);
         }
     }
-
+    public function getLang(){
+        return $this->language;
+    }
     public function get($key){
         return (isset($this->data[$key])) ? $this->data[$key] : $key;
+    }
+    public function getData(){
+        return $this->data;
     }
 
     public function __get($key) 

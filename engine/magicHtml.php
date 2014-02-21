@@ -20,8 +20,8 @@ use phpbrowscap\Browscap;
 		protected $site_container_class;
 		protected $doctype;
 		protected $html_lang;
-		protected $body_id;
-		protected $body_class;
+		public $body_id;
+		public $body_class;
 
 		//Definindo outras Variáveis
 		protected $requires;
@@ -99,10 +99,6 @@ use phpbrowscap\Browscap;
 				}
 			}
 			$path = $path."/".$link;
-
-			
-			
-
 			$this->css_linked[] =  array("link"=>$link, "media"=>$media, "is_local"=>$is_local,"path"=>$path,"base"=>$base);
 		}
 		public function add_css($link, $media="all", $is_local=true,$path=false){
