@@ -20,6 +20,8 @@ use phpbrowscap\Browscap;
 		protected $site_container_class;
 		protected $doctype;
 		protected $html_lang;
+		protected $headAppends = array();
+
 		public $body_id;
 		public $body_class;
 
@@ -57,7 +59,7 @@ use phpbrowscap\Browscap;
 			$this->body_class = "";
 			$this->site_container_class = "";
 			$this->site_container = "all-site";
-			$this->doctype = "<!DOCTYPE HTML>";
+			$this->doctype = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">";
 			$this->html_lang = "pt-br";
 			$this->requires = array();
 			$this->errors = array();
@@ -158,7 +160,7 @@ use phpbrowscap\Browscap;
 				}
 				$base = str_replace(path_root, path_base, $path);
 			}
-			$this->js_linked[] =  array("link"=>$link, "is_local"=>$is_local, "js_top"=>$js_top,"path" =>$path,'base'=>$base);
+			$this->js_linked[$link] =  array("link"=>$link, "is_local"=>$is_local, "js_top"=>$js_top,"path" =>$path,'base'=>$base);
 		}
 		public function add_js($link, $is_local=true, $js_top = false, $path=false){
 			$this->add_js_linked($link, $is_local, $js_top, $path);
@@ -183,6 +185,20 @@ use phpbrowscap\Browscap;
 		}
 
 		//funções para gerenciamento de metainformações
+		public function appendToHead($alias,$content){
+
+			$this->headAppends[$alias] = $content;
+			return true;
+		}
+		public function unappendFromHead($alias){
+			
+			if(isset($this->headAppends[$alias])){
+				unset($this->headAppends[$alias]);
+				return true;
+			} else {
+				return false;
+			}
+		}
 		public function set_body_class($class){
 			$this->body_class = $class;
 		}
@@ -429,6 +445,7 @@ JSINLINE;
 <script>
 var path_base = '".path_base."';
 var magic_scope = '".scope."';
+var magic_language = '".magic_language."';
 
 </script>
 $css_links

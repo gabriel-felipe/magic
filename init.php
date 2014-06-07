@@ -1,4 +1,7 @@
 <?php
+if(session_id() == ""){
+session_start();	
+}
 $jsonConfigs = array("db","defaults","themes");
 foreach($jsonConfigs as $fileConfig){
 
@@ -46,7 +49,7 @@ define("base_template",base_theme."/template");
 define("base_images",base_theme."/image");
 define("path_css",path_theme."/css");
 define("path_engine_css",path_root."/engine/css");
-define("path_common_css",path_root."/common-assets/css");
+define("path_common_css",path_root."/common/css");
 define("base_css",base_theme."/css");
 define("base_cache",path_base."/cache");
 
@@ -60,6 +63,7 @@ require_once('engine/json.php');
 require_once('engine/controller.php');
 require_once('engine/module.php');
 require_once('engine/loader.php');
+require_once('librarys/functions.php');
 require_once('datamgr/dbmodel.php');
 
 ?>

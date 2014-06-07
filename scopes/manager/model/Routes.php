@@ -46,5 +46,12 @@
         }
         return $allRoutes;
      }
+    public function getDefinedUrls(){
+        $routes = file_get_contents(path_root."/config/routes.json");
+        return json_decode($routes,true);
+    }
+    public function addUrl($url,$route,$defaults=array()){
+        
+    }
  }
 ?>

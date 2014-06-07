@@ -9,7 +9,8 @@
                 "idb": "testePadrao"
             }
         },
-        "" : { "route":"common_home" }
+        "" : { "route":"common_home" },
+        "routes" : {"route":"scope_routes"}
     }
     
 }

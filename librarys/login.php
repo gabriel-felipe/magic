@@ -1,8 +1,7 @@
 <?php
-if(session_id() == ""){
-session_start();	
+if(!isset($_SESSION['login'])){
+	$_SESSION['login'] = array();
 }
-require_once(path_models."/pessoas.php");
 class login {
 	// DEFININDO VARIÁVEIS
 	protected $table = "admin";
@@ -25,7 +24,7 @@ class login {
 	
 	// FAZENDO LOGIN DO USUARIO
 	function login($login,$pass) {
-
+		unset($_SESSION['login']);
 		$this->userpass = $pass;
 		$this->username = $login;
 		// Verifica se o usuário existe
@@ -36,7 +35,7 @@ class login {
 		if($campos){	
 			//Se a senha estiver incorreta
 			if(crypt($this->userpass,$info['salt']) != $info[$this->passField]){
-			$this->msgErro = "A senha está errada / ".crypt($this->userpass,$info['salt']);
+			$this->msgErro = "A senha está errada";
 			$this->falhaLogin();
 			return false;
 			// Se a senha estiver correta
@@ -45,18 +44,21 @@ class login {
 				$this->userpass = "";
 				unset($info[$this->passField]);
 				$this->userInfo = $info;
-				if(isset($info['pessoa_id'])){
-					$_SESSION['pessoa_id'] = $info['pessoa_id'];
+				if(isset($info[$this->primaryField])){
+					$_SESSION['login']['user_id'] = $info[$this->primaryField];
 				}
-				$_SESSION['user_info'] = $info;
+				$_SESSION['login']['user_info'] = $info;
 				// Coloca as informações em sessões
 				if($this->groupField){
-					$_SESSION['user_group'] = $info[$this->groupField];
+					$_SESSION['login']['user_group'] = $info[$this->groupField];
 					$this->registry_token($info[$this->groupField]);
 				} else {
 					$this->registry_token();
 				}
+				$_SESSION['login']['table'] = $this->table;
+				$this->postLogin($info);
 				unset($info);
+				
 				return true;
 			}
 		}
@@ -72,30 +74,39 @@ class login {
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$browser = $_SERVER['HTTP_USER_AGENT'];		
 		$token = md5($rand.$ip.$browser);
-		$_SESSION['rand_token'] = $rand;
-		$_SESSION['token'] = $token;
-		$_SESSION['user_group'] = $userGroup;
-		$_SESSION['token_start'] = time();
-		$_SESSION['token_touch'] = time();
+		$_SESSION['login']['rand_token'] = $rand;
+		$_SESSION['login']['token'] = $token;
+		$_SESSION['login']['user_group'] = $userGroup;
+		$_SESSION['login']['token_start'] = time();
+		$_SESSION['login']['token_touch'] = time();
 	}
-	function is_logged($userGroup=""){
-
-		$rand = data::session('rand_token','special_chars');
+	function is_logged($userGroup="",$table='default'){
+		if($table==='default'){
+			$table = $this->table;
+		}
+		if($table){
+			if(!isset($_SESSION['login']['table']) or $_SESSION['login']['table'] != $table){
+				return false;
+			}
+		}
+		$rand = (isset($_SESSION['login']['rand_token'])) ? sanitize::special_chars($_SESSION['login']['rand_token']) : "";
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$browser = $_SERVER['HTTP_USER_AGENT'];
 		$token = md5($rand.$ip.$browser);
 		$token_life = 60*60*8;
-		$expirou = (time() - data::session('token_touch', 'int') > $token_life) ? true : false;
+		$token_touch = (isset($_SESSION['login']['token_touch'])) ? $_SESSION['login']['token_touch'] : "";
+		$expirou = (time() - sanitize::int($token_touch) > $token_life) ? true : false;
 		if($this->groupField){
-			$grupo = ($userGroup == data::session('user_group','special_chars') or $userGroup == "") ? true : false;
+			$sessionUserGroup = (isset($_SESSION['login']['user_group'])) ? $_SESSION['login']['user_group'] : "";
+			$grupo = ($userGroup == sanitize::special_chars($sessionUserGroup) or $userGroup == "") ? true : false;
 		} else {
 			$grupo = true;
 		}
 
-		if(isset($_SESSION['token']) and $token == $_SESSION['token'] and !$expirou and $grupo){
-			if(isset($_SESSION['pessoa_id'])){
+		if(isset($_SESSION['login']['token']) and $token == $_SESSION['login']['token'] and !$expirou and $grupo){
+			if(isset($_SESSION['login']['pessoa_id'])){
 				$pessoa = new pessoa;
-				$pessoa->find($_SESSION['pessoas_id']);
+				$pessoa->find($_SESSION['login']['pessoas_id']);
 				$info = $pessoa->info();
 				$this->registry->set("logged",$info);
 				
@@ -103,12 +114,12 @@ class login {
 			$this->touch_token();
 			return true;
 		} else{
-			if (!isset($_SESSION['token']) or $token != $_SESSION['token']){
+			if (!isset($_SESSION['login']['token']) or $token != $_SESSION['login']['token']){
 				$this->msgErro = "Por favor faça o login";
 			}
 			elseif (!$grupo){
 
-			 	$this->msgErro = "Seu grupo não possui esse nível de permissão $userGroup -".$_SESSION['user_group'];
+			 	$this->msgErro = "Seu grupo não possui esse nível de permissão $userGroup -".$_SESSION['login']['user_group'];
 			} 
 			elseif ($expirou){
 				
@@ -118,8 +129,11 @@ class login {
 			return false;
 		}
 	}
+	protected function postLogin($info){
+
+	}
 	function touch_token(){
-		$_SESSION['token_touch'] = time();
+		$_SESSION['login']['token_touch'] = time();
 	}
 	// VERIFICA SE O USUÁRIO ESTÁ LOGADO
 	function verificar($nivel = false) {
@@ -143,11 +157,7 @@ class login {
 	}
 	// LOGOUT
 	public function logout($redireciona = false) {
-		unset($_SESSION['rand_token']);
-		unset($_SESSION['token']);
-		unset($_SESSION['user_group']);
-		unset($_SESSION['token_start']);
-		unset($_SESSION['token_touch']);
+		unset($_SESSION['login']['rand_token']);
 		$this->username = "";
 		$this->password = "";
 		$this->userInfo = "";

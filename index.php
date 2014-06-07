@@ -47,13 +47,14 @@
 		require_once(path_scope."/init.php");
 	}
 	
-	$language->init("pt-br"); //If exist language pt-br, that will be the default one, else it will select the first in alphabetical order.
+	$language->init("br"); //If exist language br, that will be the default one, else it will select the first in alphabetical order.
 	if(AUTO_GENERATE_LANGUAGE_URLS){
 		$magic_language = data::get("magic_language");
 		if($magic_language){
 			$language->select($magic_language);
 		}
 	}
+	define("magic_language",$language->getLang());
 	$json = new json;
 	$registry->set('json',$json);
 	$loader = new loader($registry);
@@ -63,8 +64,7 @@
 	} elseif (array_key_exists("route", $_POST)){
 		$route = $_POST['route'];
 	}
-
-
+	$route = str_replace("_","/",$route);
 	require_once('engine/library/phpbrowsercap.php');
 	use phpbrowscap\Browscap;
 	$browser = new Browscap(path_cache);
@@ -72,4 +72,3 @@
 	$registry->set('browser',$browser);
 	$action = new action($route,array(),$registry);	
 	$action->execute();
-?>

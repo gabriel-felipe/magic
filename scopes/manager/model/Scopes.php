@@ -14,6 +14,7 @@
         }
         public function addScope($scope){
             require_once(path_library."/fileManager.php");
+            $scope = strtolower($scope);
             if(is_dir(path_scopes."/".$scope)){
                 throw new Exception("Scope already exists, aborting", 1);
                 return false;
@@ -22,6 +23,9 @@
                     $scope => array(
                         "controller",
                         "model",
+                        "language" => array(
+                            "pt-br"
+                        ),
                         "views" => array(
                             "js",
                             "default" => array(
@@ -31,8 +35,33 @@
                         )
                     )
                 );
+                
+                $scopeController = "
+<?php
+class ".$scope."Controller extends Controller
+{
 
+}
+?>
+";
                 fileManager::recursiveMkDir($dirs,path_scopes);
+
+                $fileName = path_scopes."/$scope/".$scope."Controller.php";
+                $handler = fopen($fileName,"w+");
+
+                fwrite($handler, $scopeController);
+                fclose($handler);
+
+                $scopeInit = "
+<?php
+require(\"".$scope."Controller.php\");
+?>
+";
+                 $fileName = path_scopes."/$scope/init.php";
+                $handler = fopen($fileName,"w+");
+
+                fwrite($handler, $scopeInit);
+                fclose($handler);
             }
         }
     }

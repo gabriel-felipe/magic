@@ -4,6 +4,7 @@
             $this->basicLayoutTasks();
             $this->html->add_css_linked("home.css");
 			$this->template = 'common/home';
+            $this->set_template('common/home');
             $this->load->model("Scopes");
             $this->load->model("Routes");
             $this->MRoutes->getRawRoutes();

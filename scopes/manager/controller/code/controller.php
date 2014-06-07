@@ -6,7 +6,7 @@
     {
         
         public function index(){
-            $this->template = "lightbox/addController";
+            $this->set_template("lightbox/addController");
             $this->load->model("Scopes");
             $this->data['scopes'] = $this->MScopes->getScopes();
             echo $this->json->success($this->get_content());

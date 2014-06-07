@@ -349,6 +349,26 @@ class bffimage{
 	return $dstimage;
     }
     
+    public function getWidth(){
+    	return imagesx($this->img);
+    }
+    public function getHeight(){
+    	return imagesy($this->img);
+    }
+
+    public function matchProportion($x,$y,$margem=3){
+    	$proportion = $x/$y;
+    	$h = imagesy($this->img);
+    	$w = imagesx($this->img);
+    	$proportionImg = $w/$h;
+    	$margem = $margem/100;
+    	if(($proportionImg - $proportion) <= $margem and ($proportionImg - $proportion) >= $margem*-1){
+    		return true;
+    	} else {
+    		return false;
+    	}
+    }
+
 	public function extensao($path){
 	$extensao =  end(explode(".", $path));	
 	return $extensao;
@@ -383,7 +403,8 @@ class bffimage{
 	}
 	public function save($nome=false){
 	$nome = (!$nome) ? $this->path : $nome;
-	$extensao = end(explode(".", $nome));
+	$ext = explode(".", $nome);
+	$extensao = end($ext);
 	$img = $this->img;
 		switch($extensao){
 		case "jpg": imagejpeg($img, $nome,99); break;

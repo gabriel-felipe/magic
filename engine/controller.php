@@ -12,7 +12,8 @@
 		//Definindo Variáveis de conteudo
 		protected $data;
 		public $children;
-		protected $template;
+		private $template;
+		protected $pathsTemplates;
 
 		public function __construct($registry=array()){
 			$this->before_construct();
@@ -22,6 +23,9 @@
 			$this->warnings = array();
 			$this->data = array();
 			$this->children = array();
+			$this->pathsTemplates = array(
+				"default"=>path_template."/",
+				"common" =>path_root."/common/templates/");
 			$this->after_construct();
 		}
 		//Funções gerenciamento de links de css
@@ -70,12 +74,12 @@
 			$this->children[] = $children;
 		}
 		public function get_view($viewFile,$data=array()){
-			if (file_exists(path_template . '/'.$viewFile . '.tpl')) {
+			if (file_exists($viewFile . '.tpl')) {
 				extract($data);
 				
 	      		ob_start();
 	      
-		  		require(path_template . '/'.$viewFile . '.tpl');
+		  		require($viewFile . '.tpl');
 	      
 		  		$this->output = ob_get_contents();
 
@@ -83,7 +87,7 @@
 	      		
 				return $this->output;
 	    	} else {
-				trigger_error('Error: Could not load view ' . path_template . '/'.$viewFile . '.tpl !');
+				trigger_error('Error: Could not load view ' . $viewFile . '.tpl !');
 				exit();				
 	    	}
 		}
@@ -112,8 +116,16 @@
 		public function get_data(){
 	
 	    }
-	    protected function set_template($template){
-	    	$this->template = $template;
+	    protected function set_template($template,$pathAlias="default"){
+	    	if (isset($this->pathsTemplates[$pathAlias])) {
+	    		$this->template = $this->pathsTemplates[$pathAlias].$template;
+	    		return true;
+	    	} else {
+	    		throw new Exception("Caminho ($pathAlias) para templates não foi encontrado.", 1);
+	    		
+	    	}
+
+	    	
 	    }
 	    public function __get($key) {
 			return $this->registry->get($key);

@@ -10,5 +10,6 @@ define("path_library",path_root."/librarys");
 define("path_engine_library",path_root."/engine/library");
 define("path_datamgr",path_root."/datamgr");
 define("path_system_js",path_root."/engine/js");
-define("path_common_js",path_root."/common-assets/js");
+define("path_common_js",path_root."/common/js");
+define("path_common",path_root."/common");
 ?>

@@ -29,7 +29,7 @@ class Code
                 $className = "Controller".str_replace("/","",$folder);
                 $className .= $name;
                 $file = "<?php
-    class $className extends Controller {
+    class $className extends ".$scope."Controller {
 ";
                 $methods = explode(",",$methods);
                 foreach ($methods as $method) {
