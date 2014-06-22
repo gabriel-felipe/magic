@@ -1,4 +1,5 @@
 <?php
+	define("magic_version","1.1");
 	ini_set("memory_limit","200M");
 	require("root_paths.php");
 	require('config/project.php');
