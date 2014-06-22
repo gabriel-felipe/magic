@@ -439,6 +439,7 @@ JSINLINE;
 			$css_links = implode("\n", $this->get_css_links());
 			$js_links = implode("\n", $this->get_js_links("top"));
 			$css_inline = $this->get_css_inline();
+			$headAppends = implode("\n",$this->headAppends);
 			$head_html .= "
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head>
 <title>".$this->title."</title>
@@ -451,6 +452,7 @@ var magic_language = '".magic_language."';
 $css_links
 $js_links
 $css_inline
+$headAppends
 </head>";
 		return $head_html;
 		}

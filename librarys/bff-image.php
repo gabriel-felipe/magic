@@ -210,6 +210,16 @@ class bffimage{
 	imagecopymerge($img, $copia, 0, 0, 0, 0, imagesx($img), imagesy($img), 30);
 	$this->grayscale($img);
 	}
+//--------------------------------------------**Funções de corte**-------------------------//
+	public function crop($x,$y,$w,$h){
+		$img = $this->img;
+		$xi = imagesx($img);
+		$yi = imagesy($img);
+		$imgDis = $this->imageCreateTransparent($w,$h);
+		imagecopyresampled($imgDis, $img, 0, 0, $x, $y, $xi,$yi, $xi,$yi);
+		$this->img = $imgDis;
+		return $imgDis;
+	}
 //--------------------------------------------**Marca D'agua!**------------------------------------------------------//
 	public function marca_agua($marcaAgua, $fotoEntrada, $confUser=""){
 	$default = array(
@@ -256,7 +266,7 @@ class bffimage{
 	$img = $this->img;
 	imagecopyresampled($img2, $img, 0, 0, 0, 0, $x, $y, imagesx($img), imagesy($img));
 	$this->img = $img2;
-
+	return $img2;
 	}
 	
 	public function imageCreateTransparent($x, $y) {

@@ -35,6 +35,7 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 	protected $parsedAtts = array();
 	
 		public function __construct($tabela,$fields=false,$query=false,$queryParams=false) {
+			$tabela = str_replace("`","",$tabela);
 			if(!DB_ACTIVE){
 				$backtrace = debug_backtrace(10);
 				$backtrace = print_r($backtrace,true);
@@ -50,14 +51,14 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 			
 			
 			$this->listaAtts = array();
-			$colunas = $this->dbmanager->fetch_columns($tabela);
+			$colunas = $this->dbmanager->fetch_columns("`".$tabela."`");
 			foreach($colunas as $coluna){
 				if($coluna['name'] == $this->pk_field or !$fields or (is_array($fields) and in_array($coluna['name'], $fields)) or $fields == $coluna['name'] or $fields == "*" ){
 					$this->listaAtts[$coluna['name']] = "";
 				}
 			}
 			$this->setAtributos();
-			$this->tabela = $tabela;
+			$this->tabela = "`".$tabela."`";
 			$this->sanitizer = new sanitize;
 			$this->validator = new validate;
 			if(is_int($query) and $query > 0){
@@ -305,7 +306,8 @@ destroy() = deleta o registro da tabela.
 			foreach($this->listaAtts as $att => $value){
 				$valores[":$att"] = $this->sanitized[$att];
 			}
-			if($this->id == ""){
+			if($this->{$this->pk_field} == ""){
+
 				foreach($this->listaAtts as $att => $value){
 					$listaCampos .= $att.",";
 					$listaValores .= ":$att,";
@@ -315,16 +317,16 @@ destroy() = deleta o registro da tabela.
 				$query = "insert into ".$this->tabela."($listaCampos) VALUES ($listaValores)";
 			} else 
 			{
-				unset($valores[':id']);
+				unset($valores[':'.$this->pk_field]);
 				$this->before_update();
 				$query = "UPDATE ".$this->tabela." set ";
 				foreach($this->listaAtts as $att => $value){
-					if($att != "id"){
+					if($att != $this->pk_field){
 						$query .= "$att = :$att, ";
 					}
 				}
 				$query = substr($query, 0, -2);
-				$query .= " WHERE {$this->pk_field} = ".$this->id."";
+				$query .= " WHERE {$this->pk_field} = ".$this->{$this->pk_field}."";
 			}
 
 			try{
@@ -513,6 +515,9 @@ Funções de pesquisa
 /*
 Retornar só as infos dos atributos
 */
+	public function post_info($info){
+		return $info;
+	}
 	public function info(){
 		$this->before_info();
 		$info = array();
@@ -523,7 +528,7 @@ Retornar só as infos dos atributos
 					$info[$att] = "";
 				}
 			}	
-		return $info;
+		return $this->post_info($info);
 	}
 	public function infoString(){
 		$info = "";
@@ -634,22 +639,24 @@ class dbModelPlural {
 	protected $fieldsStr;
 	public $single = "dbModel";
 	public $groupBy = false;
+	public $orderBy = false;
 	protected $globalWhere = array(); //Array to fill with global conditions;
 
 
 	public function __construct($table,$fields=false,$where=false,$array=array(),$plural=array(),$page=1,$qtnbypage=9999999999) {
 		//Criando um objeto vazio
 		$this->plural = array();
-		$this->tabela = $table;
+		$this->tabela = "`".$table."`";
 		$this->pk_field = $table."_id";
-			
+		$this->orderBy = $this->pk_field;
+
 		//Criando um objeto vazio
 		$this->plural = $plural;
 		$this->qtnbypage = $qtnbypage;
 		$db = new bffdbmanager;
 		$this->dbmanager = $db;
 		$this->listaAtts = array();
-		$colunas = $this->dbmanager->fetch_columns($table);
+		$colunas = $this->dbmanager->fetch_columns("`".$table."`");
 		foreach($colunas as $coluna){
 			if($coluna['name'] == $this->pk_field or !$fields or (is_array($fields) and in_array($coluna['name'], $fields)) or $fields == $coluna['name'] or $fields == "*" ){
 				$this->listaAtts[$coluna['name']] = "";
@@ -741,6 +748,7 @@ class dbModelPlural {
 		if ($this->groupBy) {
 			$query .= " GROUP BY ".sanitize::no_special($this->groupBy);
 		}
+		$query .= " ORDER BY ".sanitize::no_special($this->orderBy);
 
 		return array($query,$data);
 	}

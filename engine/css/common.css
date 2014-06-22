@@ -21,7 +21,7 @@
 			-moz-border-radius: @radius;
 			border-radius: @radius;
 		}
-		.circle {.border-radius(50%);}
+		.circle(@size) {width:@size; height:@size; .border-radius(50%);}
 
 		.transition (@arguments){
 			transition: @arguments;
@@ -63,7 +63,7 @@
 
 		/* PADRÃ•ES DO SITE */
 	html {height: 100%;}
-	body{height:100%;}
+	body{min-height:100%;}
 
 	#all-site{width: 100%; height: 100%; position: relative;}
 
@@ -168,7 +168,7 @@
 						
 						echo ".$label"."container-$div-col > div {.".$label."grid$col; .".$label."margin-l;}";
 						echo ".$label"."container-$div-col > div {.".$label."grid$col; .".$label."margin-l;}";
-						echo ".$label"."container-$div-col > div:nth-child(".$div."n + 1) {margin-left:0;}";
+						echo ".$label"."container-$div-col > div:nth-child(".$div."n + 1) {margin-left:0; clear:left;}";
 						
 					}
 					echo ".".$label."grid$i{.fluid-column-grid($i);}";

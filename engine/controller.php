@@ -14,7 +14,7 @@
 		public $children;
 		private $template;
 		protected $pathsTemplates;
-
+		protected $templatePath;
 		public function __construct($registry=array()){
 			$this->before_construct();
 			$this->registry = $registry;	
@@ -26,6 +26,7 @@
 			$this->pathsTemplates = array(
 				"default"=>path_template."/",
 				"common" =>path_root."/common/templates/");
+			$this->templatePath = $this->pathsTemplates['default'];
 			$this->after_construct();
 		}
 		//Funções gerenciamento de links de css
@@ -73,7 +74,8 @@
 		public function add_children($children){
 			$this->children[] = $children;
 		}
-		public function get_view($viewFile,$data=array()){
+		public function get_view($viewFile,$data=array(),$templatePath=false){
+			$viewFile = ($templatePath) ? $this->pathsTemplates[$templatePath].$viewFile : $this->templatePath.$viewFile;
 			if (file_exists($viewFile . '.tpl')) {
 				extract($data);
 				
@@ -118,7 +120,8 @@
 	    }
 	    protected function set_template($template,$pathAlias="default"){
 	    	if (isset($this->pathsTemplates[$pathAlias])) {
-	    		$this->template = $this->pathsTemplates[$pathAlias].$template;
+	    		$this->template = $template;
+	    		$this->templatePath = $this->pathsTemplates[$pathAlias];
 	    		return true;
 	    	} else {
 	    		throw new Exception("Caminho ($pathAlias) para templates não foi encontrado.", 1);

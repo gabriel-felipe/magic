@@ -1,4 +1,5 @@
 <?php
+	ini_set("memory_limit","200M");
 	require("root_paths.php");
 	require('config/project.php');
 	if(PROJECT_DEBUG == 1){
@@ -39,7 +40,8 @@
 	$scope = data::get('scope','url');
 	
 	require_once('init.php');
-	
+	$loader = new loader($registry);
+	$registry->set('load',$loader);
 	$magicHtml = new magicHtml;
 	$registry->set('html',$magicHtml);
 	if(is_file(path_scope."/init.php")){
@@ -57,8 +59,7 @@
 	define("magic_language",$language->getLang());
 	$json = new json;
 	$registry->set('json',$json);
-	$loader = new loader($registry);
-	$registry->set('load',$loader);
+	
 	if(array_key_exists("route", $_GET)){
 		$route = $_GET['route'];
 	} elseif (array_key_exists("route", $_POST)){
@@ -71,4 +72,5 @@
 	$browser = $browser->getBrowser();
 	$registry->set('browser',$browser);
 	$action = new action($route,array(),$registry);	
+	$registry->set("action",$action);
 	$action->execute();

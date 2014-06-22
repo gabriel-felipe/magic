@@ -2,6 +2,7 @@
 	final class Loader {
 		protected $registry;
 		protected $file;
+		protected $loadedPlugins = array();
 		public function __construct($registry){
 			$this->registry = $registry;
 		}
@@ -38,5 +39,16 @@
 
 			}
 
+		}
+		public function plugin($plugin){
+			$file = path_root."/plugins/".$plugin."/init.php";
+			if (!in_array($plugin, $this->loadedPlugins)) {
+				if (is_file($file)) {
+					require_once($file);
+					$this->loadedPlugins[] = $plugin;
+				} else {
+					throw new Exception("Init file ($file) not found at plugin directory. ", 1);
+				}
+			}
 		}
 	}

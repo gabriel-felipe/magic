@@ -56,7 +56,7 @@ require_once(path_datamgr."/bff-dbconnect.php");
 				if($erro[1] == 1146){
 					return false;
 				} else {
-					die ("A query possui algum problema, mais detalhes técnicos em: ".$this->cnx->errorInfo());
+					die ("A query possui algum problema, mais detalhes técnicos em: ".($this->cnx->errorInfo()));
 				}
 		    }
 			
