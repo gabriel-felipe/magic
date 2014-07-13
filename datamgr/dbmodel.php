@@ -879,9 +879,9 @@ class dbModelPlural {
 		$ini = ($page-1)*$this->qtnbypage;
 		$fim = $page + $this->qtnbypage - 1;
 		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} ".$where[0]. " LIMIT $ini,$fim",$where[1]);
-		$qtntotal = $this->dbmanager->query("SELECT COUNT({$this->pk_field}) FROM ".$this->tabela.$where[0], $where[1]);
+		$qtntotal = $this->dbmanager->query("SELECT COUNT({$this->tabela}.{$this->pk_field}), {$this->fieldsStr} ".$where[0], $where[1]);
 		if (isset($qtntotal[0][0])) {
-			$qtntotal = $qtntotal[0][0]["COUNT({$this->pk_field})"];
+			$qtntotal = $qtntotal[0][0]["COUNT({$this->tabela}.{$this->pk_field})"];
 		} else {
 			$qtntotal = 0;
 		}

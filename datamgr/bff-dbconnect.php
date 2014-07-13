@@ -21,7 +21,7 @@
 			try {
 				if(!self::$connected){
 					self::$nConnections++;
-					$this->cnx = new PDO($this->dbtype.':host='.$this->dbhost.';dbname='.$this->dbname,$this->dbuser,$this->dbpass, array(PDO::ATTR_PERSISTENT => true) );				
+					$this->cnx = new PDO($this->dbtype.':host='.$this->dbhost.';dbname='.$this->dbname.";charset=utf8",$this->dbuser,$this->dbpass, array(PDO::ATTR_PERSISTENT => true) );				
 					self::$connected  = $this->cnx;
 				} else {
 					$this->cnx = self::$connected;

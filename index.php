@@ -1,5 +1,4 @@
 <?php
-	define("magic_version","1.1");
 	ini_set("memory_limit","200M");
 	require("root_paths.php");
 	require('config/project.php');
@@ -67,11 +66,14 @@
 		$route = $_POST['route'];
 	}
 	$route = str_replace("_","/",$route);
+	$_GET['route'] = $route;
 	require_once('engine/library/phpbrowsercap.php');
 	use phpbrowscap\Browscap;
 	$browser = new Browscap(path_cache);
 	$browser = $browser->getBrowser();
 	$registry->set('browser',$browser);
+	$mobileDetect = new Mobile_Detect();
+	$registry->set("mobileDetect",$mobileDetect);
 	$action = new action($route,array(),$registry);	
 	$registry->set("action",$action);
 	$action->execute();

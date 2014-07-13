@@ -1,4 +1,4 @@
-/*TESTE RESET*/
+s/*TESTE RESET*/
 @charset "utf-8";
 
 /* ----- RESET ----- */
@@ -59,6 +59,30 @@
 			-webkit-box-flex: @flex;
   			-moz-box-flex: @flex;
   			box-flex: @flex;
+		}
+
+		.filter(@arguments){
+			filter: @arguments;
+			-moz-filter: @arguments;
+			-webkit-filter: @arguments;
+			-o-filter: @arguments;
+
+		}
+
+		.size(@arguments){
+	    width: @arguments;
+	    height: @arguments;
+	  }
+
+	  .size(@width, @height){
+	    width: @width;
+	    height: @height;
+	  }
+
+	  .circle(@radius: 25px) {
+			.border-radius(50%);
+			width:@radius;
+			height:@radius;
 		}
 
 		/* PADRÃ•ES DO SITE */
@@ -182,8 +206,10 @@
 		
 	/* PadrÃµes */
 	.clear{clear:both; float:none;}
-	.fleft{float: left;}
-	.fright{float: right;}
+	.fleft, .fl{float: left;}
+	.fright, .fr{float: right;}
+	.grid{width: 100%;}
+	.db{display: block;}
 
 	/*TEXTO */
 	.talign-center {text-align:center;}

@@ -20,7 +20,7 @@ function deleteDir($dirPath) {
                 rmdir($dirPath);
             }
 // This function will proportionally resize image 
-function resizeImage($CurWidth,$CurHeight,$MaxSize,$DestFolder,$SrcImage,$Quality,$ImageType)
+function resizeImage($CurWidth,$CurHeight,$DestFolder,$SrcImage,$Quality,$ImageType)
 {
     //Check Image size is not 0
     if($CurWidth <= 0 || $CurHeight <= 0) 
@@ -29,7 +29,7 @@ function resizeImage($CurWidth,$CurHeight,$MaxSize,$DestFolder,$SrcImage,$Qualit
     }
     
     //Construct a proportional size of new image
-    $ImageScale         = min($MaxSize/$CurWidth, $MaxSize/$CurHeight); 
+    $ImageScale         = 1; 
     $NewWidth           = ceil($ImageScale*$CurWidth);
     $NewHeight          = ceil($ImageScale*$CurHeight);
     $NewCanves          = imagecreatetruecolor($NewWidth, $NewHeight);

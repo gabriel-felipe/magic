@@ -30,6 +30,7 @@ use phpbrowscap\Browscap;
 		protected $datamgr;
 		protected $output;
 		protected $browser;
+		protected $mobileDetect;
 		//Definindo Variáveis de tratamento de erro
 		protected $errors;
 		protected $warnings;
@@ -85,6 +86,8 @@ use phpbrowscap\Browscap;
 			$this->add_system_js("elquery.js",true,false);
 			$browser = new Browscap($this->path_cache);
 			$this->browser = $browser->getBrowser();
+			$mobileDetect = new Mobile_Detect();
+			$this->mobileDetect = $mobileDetect;
 			unset($browser);
 		}
 		//Funções gerenciamento de links de css
@@ -277,6 +280,8 @@ use phpbrowscap\Browscap;
 				$less = new lessc;
 				$cssFinal = fopen($arquivo,"w+");
 				$browser = $this->browser->Browser;
+				$isTablet = $this->mobileDetect->isTablet();
+				$isMobile = $this->mobileDetect->isMobile();
 				$version = $this->browser->Version;
 				$MajorVer = $this->browser->MajorVer;
 				$MinorVer = $this->browser->MinorVer;
@@ -442,6 +447,7 @@ JSINLINE;
 			$headAppends = implode("\n",$this->headAppends);
 			$head_html .= "
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head>
+<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
 <title>".$this->title."</title>
 <script>
 var path_base = '".path_base."';

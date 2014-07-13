@@ -59,6 +59,7 @@ require_once('engine/error.php');
 require_once('engine/action.php');
 require_once('engine/functions.php');
 require_once('engine/magicHtml.php');
+require_once('engine/library/Mobile_Detect.php');
 require_once('engine/json.php');
 require_once('engine/controller.php');
 require_once('engine/module.php');
