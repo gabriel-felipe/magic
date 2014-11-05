@@ -1,7 +1,7 @@
 <?php
     class Controllercodedbmodel extends Controller {
         public function index(){
-            $this->set_template("lightbox/addDbModel");
+            $this->template = "lightbox/addDbModel";
             $this->load->model("Scopes");
             $this->data['scopes'] = $this->MScopes->getScopes();
             echo $this->json->success($this->get_content());

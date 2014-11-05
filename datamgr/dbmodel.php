@@ -33,7 +33,7 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 	protected $globalWhere = array(); //Array to fill with global conditions;
 	protected $defaultValues = array(); //array to fill with default values after a find.
 	protected $parsedAtts = array();
-	
+	public $groupBy = false;
 		public function __construct($tabela,$fields=false,$query=false,$queryParams=false) {
 			$tabela = str_replace("`","",$tabela);
 			if(!DB_ACTIVE){
@@ -69,6 +69,9 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 
 		}
 
+	public function getLastQuery(){
+		return $this->dbmanager->lastQuery;
+	}
 	protected function isSelected($error,$triggerException=true){
 		if($this->id){
 			return true;
@@ -382,11 +385,12 @@ Funções de pesquisa
 		$this->addFields[$alias] = $sql;
 		return true;
 	}
-	public function addJoin($table,$fields=array(),$on=""){
+	public function addJoin($table,$fields=array(),$on="",$method='left'){
 		$on = ($on) ? $on : $table.".".$table."_id = [t].".$table."_id";
 		$this->joins[$table] = array(
 			"fields" => $fields,
-			"on" => $on
+			"on" => $on,
+			'method'=>$method
 		);
 	}
 	public function removeJoin($table){
@@ -405,7 +409,7 @@ Funções de pesquisa
 		$joins = "";
 		foreach ($this->joins as $table => $join) {
 			$on = str_replace("[t]",$this->tabela, $join['on']);
-			$joins .= "LEFT JOIN $table on ($on) ";
+			$joins .= $join['method']." JOIN $table on ($on) ";
 			foreach($join['fields'] as $field => $name){
 				$keys .= ", $table.$field as $name ";
 			}
@@ -419,7 +423,7 @@ Funções de pesquisa
 	public function getGlobalWhere(){
 		return $this->globalWhere();
 	}
-	public function globalWhereQuery($query,$data){
+	public function globalWhereQuery($query="",$data=array()){
 		foreach($this->globalWhere as $q => $values){
 			$and = ($query) ? " and " : "";
 			$query .= $and.$q;
@@ -427,6 +431,9 @@ Funções de pesquisa
 		}
 		if ($query) {
 			$query = " WHERE $query";
+		}
+		if ($this->groupBy) {
+			$query .= " GROUP BY ".sanitize::no_special($this->groupBy);
 		}
 		return array($query,$data);
 	}
@@ -454,8 +461,9 @@ Funções de pesquisa
 	public function last() {
 		$this->defaultValues = array();
 		$fields = $this->get_select();
-		$query = "SELECT $fields ORDER by {$this->tabela}.{$this->pk_field} DESC LIMIT 1";
-		$buscaSingle = $this->dbmanager->query($query);
+		$where = $this->globalWhereQuery();
+		$query = "SELECT $fields {$where[0]} ORDER by {$this->tabela}.{$this->pk_field} DESC LIMIT 1";
+		$buscaSingle = $this->dbmanager->query($query,$where[1]);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
 			foreach($buscaSingle[0][0] as $key=>$val){
@@ -469,8 +477,9 @@ Funções de pesquisa
 	public function rand(){
 		$this->defaultValues = array();
 		$fields = $this->get_select();
-		$query = "SELECT $fields ORDER by RAND() LIMIT 1";
-		$buscaSingle = $this->dbmanager->query($query);
+		$where = $this->globalWhereQuery();
+		$query = "SELECT $fields {$where[0]} ORDER by RAND() LIMIT 1";
+		$buscaSingle = $this->dbmanager->query($query,$where[1]);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
 			foreach($buscaSingle[0][0] as $key=>$val){
@@ -484,8 +493,9 @@ Funções de pesquisa
 	public function first() {
 		$this->defaultValues = array();
 		$fields = $this->get_select();
-		$query = "SELECT $fields ORDER by {$this->pk_field} ASC LIMIT 1";
-		$buscaSingle = $this->dbmanager->query($query);
+		$where = $this->globalWhereQuery();
+		$query = "SELECT $fields {$where[0]} ORDER by {$this->pk_field} ASC LIMIT 1";
+		$buscaSingle = $this->dbmanager->query($query,$where[1]);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
 			foreach($buscaSingle[0][0] as $key=>$val){
@@ -499,9 +509,9 @@ Funções de pesquisa
 	public function where($query,$array=array()){
 		$this->defaultValues = array();
 		$fields = $this->get_select();
-		
-		$q = "SELECT $fields WHERE $query LIMIT 1";
-		$buscaSingle = $this->dbmanager->query($q, $array);
+		$where = $this->globalWhereQuery($query,$array);
+		$q = "SELECT $fields {$where[0]} LIMIT 1";
+		$buscaSingle = $this->dbmanager->query($q, $where[1]);
 		if($buscaSingle[1] == 1){
 			$this->setAtributos($buscaSingle[0][0]);
 			foreach($buscaSingle[0][0] as $key=>$val){
@@ -640,6 +650,7 @@ class dbModelPlural {
 	public $single = "dbModel";
 	public $groupBy = false;
 	public $orderBy = false;
+	public $orderMode = "ASC";
 	protected $globalWhere = array(); //Array to fill with global conditions;
 
 
@@ -648,7 +659,7 @@ class dbModelPlural {
 		$this->plural = array();
 		$this->tabela = "`".$table."`";
 		$this->pk_field = $table."_id";
-		$this->orderBy = $this->pk_field;
+		$this->orderBy = $this->tabela.".".$this->pk_field;
 
 		//Criando um objeto vazio
 		$this->plural = $plural;
@@ -667,6 +678,7 @@ class dbModelPlural {
 			$class = new $class;
 			$this->joins = $class->getJoins();
 			$this->addFields = $class->getAddFields();
+			$this->groupBy = $class->groupBy;
 			unset($class);
 		}
 		$this->update_fields();
@@ -677,6 +689,9 @@ class dbModelPlural {
 			$this->arrayToObject();
 		}
 		
+	}
+	public function getLastQuery(){
+		return $this->dbmanager->lastQuery;
 	}
 	// public function get_select(){
 	// 	$keys = array_keys($this->listaAtts);
@@ -690,11 +705,12 @@ class dbModelPlural {
 		$this->fieldsStr = $this->get_select();
 		return true;
 	}
-	public function addJoin($table,$fields=array(),$on=""){
+	public function addJoin($table,$fields=array(),$on="",$method="LEFT"){
 		$on = ($on) ? $on : $table.".".$table."_id = [t].".$table."_id";
 		$this->joins[$table] = array(
 			"fields" => $fields,
-			"on" => $on
+			"on" => $on,
+			"method" => $method
 		);
 		$this->fieldsStr = $this->get_select();
 
@@ -716,12 +732,10 @@ class dbModelPlural {
 		}
 		$keys = implode(", ",$keys);
 		$from = $this->get_from();
-		$joins = "";
 		$joinsObj = $this->joins;
 		$addFieldsObj = $this->addFields;
 		foreach ($joinsObj as $table => $join) {
 			$on = str_replace("[t]",$this->tabela, $join['on']);
-			$joins .= "LEFT JOIN $table on ($on) ";
 			foreach($join['fields'] as $field => $name){
 				$keys .= ", $table.$field as $name ";
 			}
@@ -731,7 +745,7 @@ class dbModelPlural {
 			$keys .= ", $key as $value";
 		}
 
-		return $keys.$from.$joins;
+		return $keys.$from;
 	}
 	public function getGlobalWhere(){
 		return $this->globalWhere();
@@ -748,12 +762,18 @@ class dbModelPlural {
 		if ($this->groupBy) {
 			$query .= " GROUP BY ".sanitize::no_special($this->groupBy);
 		}
-		$query .= " ORDER BY ".sanitize::no_special($this->orderBy);
+		$query .= " ORDER BY ".sanitize::no_special($this->orderBy)." ".sanitize::no_special($this->orderMode);
 
 		return array($query,$data);
 	}
 	public function get_from(){
-		return " FROM ".$this->tabela." ";
+		$joins = "";
+		$joinsObj = $this->joins;
+		foreach ($joinsObj as $table => $join) {
+			$on = str_replace("[t]",$this->tabela, $join['on']);
+			$joins .= $join['method']." JOIN $table on ($on) ";
+		}
+		return " FROM ".$this->tabela." ".$joins;
 	}
 	
 	
@@ -764,7 +784,7 @@ class dbModelPlural {
 				
 				if($class == 'dbModel'){
 					$single = new dbModel($this->tabela);	
-
+					$single->joins = $this->joins;
 				} else {
 					$single = new $class;
 					$single->joins = $this->joins;
@@ -788,23 +808,25 @@ class dbModelPlural {
 		$where = $this->globalWhereQuery("",array());
 		$table = $this->tabela;
 		$ini = ($page-1)*$this->qtnbypage;
-		$fim = $page + $this->qtnbypage - 1;
+		$fim = $this->qtnbypage;
 		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} ".$where[0]." LIMIT $ini,$fim",$where[1]);
-		$qtntotal = $this->dbmanager->query("SELECT COUNT({$this->pk_field}) FROM ".$this->tabela.$where[0], $where[1]);
-		$qtntotal = $qtntotal[0][0]["COUNT({$this->pk_field})"];
+		$qtntotal = $this->dbmanager->query("SELECT COUNT(*) ".$this->get_from().$where[0], $where[1]);
+		$qtntotal = ($qtntotal[1] > 1) ? $qtntotal[1] : $qtntotal[0][0]["COUNT(*)"];
 		$this->nowinpage = $page;
-		$this->last_query = "SELECT {$this->fieldsStr} FROM ".$this->tabela.$where[0];
+		$this->last_query = "SELECT {$this->fieldsStr} ".$this->get_from()." ".$this->tabela.$where[0];
 		$this->total = $qtntotal;
 		$this->plural = $resultados[0];
 		$this->arrayToObject();
-		$this->last_query = "SELECT {$this->fieldsStr} FROM ".$this->tabela.$where[0]." LIMIT $ini,$fim";
+		$this->last_query = "SELECT {$this->fieldsStr} ".$this->get_from()." ".$this->tabela.$where[0]." LIMIT $ini,$fim";
 		$this->last_query_array = array();
 		return $this->info();
 	}
 	public function last($n=1){
+		$this->orderBy = $this->pk_field;
+		$this->orderMode = "DESC";
 		$where = $this->globalWhereQuery("",array());
 		$table = $this->tabela;
-		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} ".$where[0]." ORDER BY {$this->pk_field} DESC LIMIT $n",$where[1]);
+		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} ".$where[0]." LIMIT $n",$where[1]);
 		$this->plural = $resultados[0];
 		$this->arrayToObject();
 		$this->last_query = "SELECT {$this->fieldsStr} ".$where[0]." LIMIT $n ORDER BY {$this->pk_field} DESC";
@@ -877,11 +899,11 @@ class dbModelPlural {
 		$where = $this->globalWhereQuery($query,$array);
 		$this->plural = array();
 		$ini = ($page-1)*$this->qtnbypage;
-		$fim = $page + $this->qtnbypage - 1;
+		$fim = $this->qtnbypage;
 		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} ".$where[0]. " LIMIT $ini,$fim",$where[1]);
-		$qtntotal = $this->dbmanager->query("SELECT COUNT({$this->tabela}.{$this->pk_field}), {$this->fieldsStr} ".$where[0], $where[1]);
+		$qtntotal = $this->dbmanager->query("SELECT COUNT(*) ".$this->get_from().$where[0], $where[1]);
 		if (isset($qtntotal[0][0])) {
-			$qtntotal = $qtntotal[0][0]["COUNT({$this->tabela}.{$this->pk_field})"];
+			$qtntotal = $qtntotal[0][0]["COUNT(*)"];
 		} else {
 			$qtntotal = 0;
 		}

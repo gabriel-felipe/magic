@@ -3,11 +3,10 @@
 		public function index(){
             $this->basicLayoutTasks();
             $this->html->add_css_linked("home.css");
-			$this->template = 'common/home';
             $this->set_template('common/home');
             $this->load->model("Scopes");
-            $this->load->model("Routes");
-            $this->MRoutes->getRawRoutes();
+            // $this->load->model("Routes");
+            // $this->MRoutes->getRawRoutes();
             $dbConfig = file_get_contents(path_root."/config/db.json");
             $dbConfig = json_decode($dbConfig,true);
             $this->data['dbConfig'] = $dbConfig;

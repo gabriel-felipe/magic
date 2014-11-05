@@ -8,7 +8,7 @@ s/*TESTE RESET*/
 	
 	/* Universal */
 
-	 *{
+	 *,*:after,*:before{
 	 	-webkit-box-sizing: border-box;
 	 	-moz-box-sizing: border-box;
 	 	box-sizing: border-box;
@@ -36,6 +36,22 @@ s/*TESTE RESET*/
 			-webkit-transform: @arguments;
 			-o-transform: @arguments;
 		}
+
+		.transform-style(@arguments){
+		    -webkit-transform-style: @arguments; /* Chrome, Safari, Opera */
+		    transform-style: @arguments;
+		}
+
+		.perspective(@arguments){
+		    -webkit-perspective: @arguments; /* Chrome, Safari, Opera */
+		    perspective: @arguments;
+		}
+	
+		.transform-origin(@arguments){
+		    -webkit-transform-origin: @arguments; /* Chrome, Safari, Opera */
+		    transform-origin: @arguments;
+		}
+
 
 		.box-shadow (@shadow: 1px 1px 6px rgba(0,0,0,0.11)){
 			box-shadow: @arguments;
@@ -87,9 +103,9 @@ s/*TESTE RESET*/
 
 		/* PADRÃ•ES DO SITE */
 	html {height: 100%;}
-	body{min-height:100%;}
+	body {height:100%; position: relative;}
 
-	#all-site{width: 100%; height: 100%; position: relative;}
+	#all-site{width: 100%; min-height: 100%; position: relative;}
 
 /* Estilos */
 	.center{float:none !important; margin: 0 auto;}

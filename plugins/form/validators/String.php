@@ -4,7 +4,7 @@ class StringValidator implements IFormValidator
 	protected $min,$max;
 	protected $error = "";
 	protected $errorString = "";
-	function __construct($min=1,$max=9999999,$errorString=false)
+	function __construct($min=1,$max=99999999999999,$errorString=false)
 	{
 		$this->min = $min;
 		$this->max = $max;

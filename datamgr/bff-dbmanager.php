@@ -13,7 +13,7 @@ require_once(path_datamgr."/bff-dbconnect.php");
 		protected $cacheLife = 3600; //in seconds
 		protected $minExecTimeToCache = 0.0016;
 		protected $cache = array();
-
+		public $lastQuery = "";
 		//primary function
 		public function __construct($table = false){
 			// $this->logExecTimeFile = path_root."/logs/queryexectime.log";
@@ -128,6 +128,7 @@ require_once(path_datamgr."/bff-dbconnect.php");
 			}
 		}
 		public function query($query, $values=array()){
+			$this->lastQuery = $query;
 			list($usec, $sec) = explode(' ', microtime());
 			$script_start = (float) $sec + (float) $usec;
 			
@@ -234,7 +235,7 @@ require_once(path_datamgr."/bff-dbconnect.php");
 			$q->execute();
 			$table_fields = $q->fetchAll();
 			foreach($table_fields as $field){
-				$fields[] = array("name"=>$field[0],"type"=>$field[1]);
+				$fields[] = array("name"=>$field[0],"type"=>$field[1],"key"=>$field[3]);
 			}
 			return $fields;
 			} else {

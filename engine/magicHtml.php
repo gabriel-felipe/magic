@@ -47,8 +47,11 @@ use phpbrowscap\Browscap;
 		protected $base_common_js = base_common_js;
 		protected $engine_path_css = path_engine_css;
 		protected $path_common_css = path_common_css;
+		protected $registry = false;
 
 		public function __construct(){
+			global $registry;
+			$this->registry = $registry;
 			$this->css_inline = array();
 			$this->css_linked = array();
 			$this->js_linked = array();
