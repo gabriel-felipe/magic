@@ -294,12 +294,12 @@ class bffimage{
 				$xfp = $xi * $px;
 				$yfp = $yi * $px;
 				$margemTop = ($yfp - $yf)/2;
-				imagecopyresampled($imgDis, $img, 0, 0, 0, $margemTop,$xfp, $yfp, $xi, $yi);
+				imagecopyresampled($imgDis, $img, 0, 0, 0, 0,$xfp, $yfp, $xi, $yi);
 			} elseif ($py > $px) {
 				$xfp = $xi * $py;
 				$yfp = $yi * $py;
 				$margemTop = ($xfp - $xf)/2;
-				imagecopyresampled($imgDis, $img, 0, 0, $margemLeft, 0,$xfp, $yfp, $xi, $yi);
+				imagecopyresampled($imgDis, $img, 0, 0, 0, 0,$xfp, $yfp, $xi, $yi);
 			} else {
 				$xfp = $xi * $px;
 				$yfp = $yi * $px;
@@ -318,16 +318,16 @@ class bffimage{
 			$this->img = $imgDis;
 		}
 	}
-	public function redimensiona_max_proporcional_sc($x_final, $y_final){ //(arquivo de imagem, tamanho no eixo x (largura), tamanho no eixo y (altura))
+	public function redimensiona_max_proporcional_sc($xf, $yf){ //(arquivo de imagem, tamanho no eixo x (largura), tamanho no eixo y (altura))
 		//Definindo var/áriaveis
-	$img = $this->img;
-	imagealphablending($img, false); 
-	imagesavealpha($img, true); // save alphablending setting (important)
-	$xi = imagesx($img);
-	$yi = imagesy($img);
-	$px = $xf/$xi; //definindo as porcentagens  relacao ao eixo x
-	$py = $yf/$yi; //definindo as porcentagens  relacao ao eixo y
-	$imgDis = $this->imageCreateTransparent($xf,$yf);
+		$img = $this->img;
+		imagealphablending($img, false); 
+		imagesavealpha($img, true); // save alphablending setting (important)
+		$xi = imagesx($img);
+		$yi = imagesy($img);
+		$px = $xf/$xi; //definindo as porcentagens  relacao ao eixo x
+		$py = $yf/$yi; //definindo as porcentagens  relacao ao eixo y
+		$imgDis = $this->imageCreateTransparent($xf,$yf);
 		if($xi >= $xf or $yi >= $yf){ //Se a imagem for maior que o tamanho estipulado em alguma dimensão
 			$imgDis = $this->imageCreateTransparent($xf,$yf);
 			if($px > $py) {
@@ -341,11 +341,10 @@ class bffimage{
 				$yfp = $yi * $px;
 			}
 			$imgDis = $this->imageCreateTransparent($xfp,$yfp);
-			imagecopyresampled($imgDis, $img, 0, 0, 0, 0,$xfp, $yfp, $xi, $yi);			
+			imagecopyresampled($imgDis, $img, 0, 0, 0, 0,$xfp, $yfp, $xi, $yi);
+			$this->img = $imgDis;
 		}
-		else {
-		echo "Imagem pequena demais olá =D";
-		}
+
 	}
 	//--------------------------------------------**Funções de Arquivo!**------------------------------------------------------//
 	public function novaimg($path){
