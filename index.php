@@ -13,6 +13,8 @@
 	require_once('engine/library/data-cleaner.php');
 	$registry = new registry;
 
+
+
 	$routes = file_get_contents("config/routes.json");
 	$routes = json_decode($routes,true);    
 	$url = new url;
@@ -42,8 +44,6 @@
 	require_once('init.php');
 	$loader = new loader($registry);
 	$registry->set('load',$loader);
-	$magicHtml = new magicHtml;
-	$registry->set('html',$magicHtml);
 	if(is_file(path_scope."/init.php")){
 		
 		require_once(path_scope."/init.php");
@@ -74,6 +74,8 @@
 	$registry->set('browser',$browser);
 	$mobileDetect = new Mobile_Detect();
 	$registry->set("mobileDetect",$mobileDetect);
+   	require_once("engine/document/init.php");
+
 	$action = new action($route,array(),$registry);	
 	$registry->set("action",$action);
 	$action->execute();

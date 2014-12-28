@@ -1,5 +1,4 @@
 <?php
-
 namespace phpbrowscap;
 
 /**
@@ -41,9 +40,9 @@ class Browscap
     /**
      * Current version of the class.
      */
-    const VERSION = '2.0b';
+    const VERSION = '2.0.4';
 
-    const CACHE_FILE_VERSION = '2.0b';
+    const CACHE_FILE_VERSION = '2.0.4';
 
     /**
      * Different ways to access remote and local files.
@@ -99,12 +98,12 @@ class Browscap
      * is MINIMAL, so there is no reason to use the standard file whatsoever. Either go for light,
      * which is blazing fast, or get the full one. (note: light version doesn't work, a fix is on its way)
      */
-    public $remoteIniUrl = 'http://browscap.org/stream?q=PHP_BrowscapINI';
+    public $remoteIniUrl = 'http://browscap.org/stream?q=PHP_BrowsCapINI';
     public $remoteVerUrl = 'http://browscap.org/version';
     public $timeout = 5;
     public $updateInterval = 432000; // 5 days
     public $errorInterval = 7200; // 2 hours
-    public $doAutoUpdate = false;
+    public $doAutoUpdate = true;
     public $updateMethod = null;
 
     /**
@@ -121,7 +120,7 @@ class Browscap
      *
      * @var string
      */
-    public $userAgent = 'Browser Capabilities Project - PHP Browscap/%v %m';
+    public $userAgent = 'http://browscap.org/ - PHP Browscap/%v %m';
 
     /**
      * Flag to enable only lowercase indexes in the result.
@@ -212,7 +211,6 @@ class Browscap
      */
     public function __construct($cache_dir)
     {
-        $this->localFile = path_root."/config/browscap.ini";
         // has to be set to reach E_STRICT compatibility, does not affect system/app settings
         date_default_timezone_set(date_default_timezone_get());
 
@@ -250,6 +248,37 @@ class Browscap
     {
         return $this->_source_version;
     }
+    
+    /**
+     * @return bool
+     */
+    public function shouldCacheBeUpdated ()
+    {
+        // Load the cache at the first request
+        if ($this->_cacheLoaded) {
+            return false;
+        } else {
+            $cache_file = $this->cacheDir . $this->cacheFilename;
+            $ini_file   = $this->cacheDir . $this->iniFilename;
+
+            // Set the interval only if needed
+            if ($this->doAutoUpdate && file_exists($ini_file)) {
+                $interval = time() - filemtime($ini_file);
+            } else {
+                $interval = 0;
+            }
+
+            $shouldBeUpdated = true;
+
+            if (file_exists($cache_file) && file_exists($ini_file) && ($interval <= $this->updateInterval)) {
+                if ($this->_loadCache($cache_file)) {
+                    $shouldBeUpdated = false;
+                }
+            }
+            
+            return $shouldBeUpdated;
+        }
+    }
 
     /**
      * XXX parse
@@ -265,46 +294,26 @@ class Browscap
      */
     public function getBrowser($user_agent = null, $return_array = false)
     {
-        // Load the cache at the first request
-        if (!$this->_cacheLoaded) {
+        if ($this->shouldCacheBeUpdated()) {
+            try {
+                $this->updateCache();
+            } catch (Exception $e) {
+                if (file_exists($ini_file)) {
+                    // Adjust the filemtime to the $errorInterval
+                    touch($ini_file, time() - $this->updateInterval + $this->errorInterval);
+                } elseif ($this->silent) {
+                    // Return an array if silent mode is active and the ini db doesn't exsist
+                    return array();
+                }
+
+                if (!$this->silent) {
+                    throw $e;
+                }
+            }
+            
             $cache_file = $this->cacheDir . $this->cacheFilename;
-            $ini_file   = $this->cacheDir . $this->iniFilename;
-
-            // Set the interval only if needed
-            if ($this->doAutoUpdate && file_exists($ini_file)) {
-                $interval = time() - filemtime($ini_file);
-            } else {
-                $interval = 0;
-            }
-
-            $update_cache = true;
-
-            if (file_exists($cache_file) && file_exists($ini_file) && ($interval <= $this->updateInterval)) {
-                if ($this->_loadCache($cache_file)) {
-                    $update_cache = false;
-                }
-            }
-
-            if ($update_cache) {
-                try {
-                    $this->updateCache();
-                } catch (Exception $e) {
-                    if (file_exists($ini_file)) {
-                        // Adjust the filemtime to the $errorInterval
-                        touch($ini_file, time() - $this->updateInterval + $this->errorInterval);
-                    } elseif ($this->silent) {
-                        // Return an array if silent mode is active and the ini db doesn't exsist
-                        return array();
-                    }
-
-                    if (!$this->silent) {
-                        throw $e;
-                    }
-                }
-
-                if (!$this->_loadCache($cache_file)) {
-                    throw new Exception('Cannot load this cache version - the cache format is not compatible.');
-                }
+            if (!$this->_loadCache($cache_file)) {
+                throw new Exception('Cannot load this cache version - the cache format is not compatible.');
             }
         }
 
@@ -357,7 +366,7 @@ class Browscap
                     $browser += $value;
                 }
 
-                if (!empty($browser[3])) {
+                if (!empty($browser[3]) && array_key_exists($browser[3], $this->_userAgents)) {
                     $browser[3] = $this->_userAgents[$browser[3]];
                 }
 
@@ -373,7 +382,7 @@ class Browscap
             } elseif ($value === 'false') {
                 $value = false;
             }
-            
+
             $tmp_key = $this->_properties[$key];
             if ($this->lowercase) {
                 $tmp_key = strtolower($this->_properties[$key]);
@@ -507,10 +516,17 @@ class Browscap
      *
      * Parses the ini file and updates the cache files
      *
+     * @throws Exception
      * @return bool whether the file was correctly written to the disk
      */
     public function updateCache()
     {
+        $lockfile = $this->cacheDir . 'cache.lock';
+
+        if (file_exists($lockfile) || !touch($lockfile)) {
+            throw new Exception('temporary file already exists');
+        }
+
         $ini_path   = $this->cacheDir . $this->iniFilename;
         $cache_path = $this->cacheDir . $this->cacheFilename;
 
@@ -618,9 +634,27 @@ class Browscap
 
         // Get the whole PHP code
         $cache = $this->_buildCache();
+        $dir   = dirname($cache_path);
 
-        // Save and return
-        return (bool) file_put_contents($cache_path, $cache, LOCK_EX);
+        // "tempnam" did not work with VFSStream for tests
+        $tmpFile = $dir . '/temp_' . md5(time() . basename($cache_path));
+
+        // asume that all will be ok
+        if (false === file_put_contents($tmpFile, $cache)) {
+            // writing to the temparary file failed
+            throw new Exception('writing to temporary file failed');
+        }
+
+        if (false === rename($tmpFile, $cache_path)) {
+            // renaming file failed, remove temp file
+            @unlink($tmpFile);
+
+            throw new Exception('could not rename temporary file to the cache file');
+        }
+
+        @unlink($lockfile);
+
+        return true;
     }
 
     /**
@@ -860,19 +894,39 @@ class Browscap
             }
         }
 
-        // Get updated .ini file
-        $browscap = $this->_getRemoteData($url);
-        $browscap = explode("\n", $browscap);
-        $pattern  = self::REGEX_DELIMITER . '(' . self::VALUES_TO_QUOTE . ')="?([^"]*)"?$' . self::REGEX_DELIMITER;
-
-        // Ok, lets read the file
-        $content = '';
-        foreach ($browscap as $subject) {
-            $subject = trim($subject);
-            $content .= preg_replace($pattern, '$1="$2"', $subject) . "\n";
-        }
-
         if ($url != $path) {
+            // Check if it's possible to write to the .ini file.
+            if (is_file($path)) {
+                if (!is_writable($path)) {
+                    throw new Exception(
+                        'Could not write to "' . $path . '" (check the permissions of the current/old ini file).'
+                    );
+                }
+            } else {
+                // Test writability by creating a file only if one already doesn't exist, so we can safely delete it after the test.
+                $test_file = fopen($path, 'a');
+                if ($test_file) {
+                    fclose($test_file);
+                    unlink($path);
+                } else {
+                    throw new Exception(
+                        'Could not write to "' . $path . '" (check the permissions of the cache directory).'
+                    );
+                }
+            }
+
+            // Get updated .ini file
+            $browscap = $this->_getRemoteData($url);
+            $browscap = explode("\n", $browscap);
+            $pattern  = self::REGEX_DELIMITER . '(' . self::VALUES_TO_QUOTE . ')="?([^"]*)"?$' . self::REGEX_DELIMITER;
+
+            // Ok, lets read the file
+            $content = '';
+            foreach ($browscap as $subject) {
+                $subject = trim($subject);
+                $content .= preg_replace($pattern, '$1="$2"', $subject) . "\n";
+            }
+
             if (!file_put_contents($path, $content)) {
                 throw new Exception("Could not write .ini content to $path");
             }
@@ -946,8 +1000,8 @@ class Browscap
             }
 
             $strings[] = $key . $value;
+            $array[$key] = null;
         }
-
         return "array(\n" . implode(",\n", $strings) . "\n)";
     }
 
@@ -955,7 +1009,7 @@ class Browscap
      * Checks for the various possibilities offered by the current configuration
      * of PHP to retrieve external HTTP data
      *
-     * @return string the name of function to use to retrieve the file
+     * @return string|false the name of function to use to retrieve the file or false if no methods are available
      */
     protected function _getUpdateMethod()
     {

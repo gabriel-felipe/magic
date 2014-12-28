@@ -2,7 +2,7 @@
 	class controllerCommonHome extends ManagerController {
 		public function index(){
             $this->basicLayoutTasks();
-            $this->html->add_css_linked("home.css");
+            $this->html->addLink(new ScopeCss("home.css"));
             $this->set_template('common/home');
             $this->load->model("Scopes");
             // $this->load->model("Routes");

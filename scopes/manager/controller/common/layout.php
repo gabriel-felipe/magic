@@ -7,8 +7,8 @@ class ControllerCommonLayout extends ManagerController
     
     public function header(){
         $this->set_template('common/header');
-        $this->html->add_css_linked('style.css');
-        $this->html->add_js_linked("lightbox.js");
+        $this->html->addLink(new ScopeCss('style.css'));
+        $this->html->addScript(new ScopeJs("lightbox.js"));
         echo $this->get_content();
     }
     public function footer(){

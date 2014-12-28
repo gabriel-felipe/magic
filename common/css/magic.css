@@ -1,0 +1,236 @@
+s/*TESTE RESET*/
+@charset "utf-8";
+
+/* ----- RESET ----- */
+    html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td,article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, hr{margin: 0;padding: 0;border: 0;font-size: 100%;font: inherit;vertical-align: baseline;}article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}body{line-height: 1;}ol, ul{list-style: none;}blockquote, q {quotes: none;}blockquote:before, blockquote:after, q:before, q:after {content: '';content: none;}table {border-collapse: collapse; border-spacing: 0;}
+
+/* ----- PADRÃ.ES GERAIS----- */
+	
+	/* Universal */
+
+	 *,*:after,*:before{
+	 	-webkit-box-sizing: border-box;
+	 	-moz-box-sizing: border-box;
+	 	box-sizing: border-box;
+	 }
+
+
+	/* Outros */
+		.border-radius (@radius: 4px){
+			-webkit-border-radius: @radius;
+			-moz-border-radius: @radius;
+			border-radius: @radius;
+		}
+		.circle(@size) {width:@size; height:@size; .border-radius(50%);}
+
+		.transition (@arguments){
+			transition: @arguments;
+			-moz-transition: @arguments;
+			-webkit-transition: @arguments;
+			-o-transition: @arguments;
+		}
+
+		.transform (@arguments){
+			transform: @arguments;
+			-moz-transform: @arguments;
+			-webkit-transform: @arguments;
+			-o-transform: @arguments;
+		}
+
+		.transform-style(@arguments){
+		    -webkit-transform-style: @arguments; /* Chrome, Safari, Opera */
+		    transform-style: @arguments;
+		}
+
+		.perspective(@arguments){
+		    -webkit-perspective: @arguments; /* Chrome, Safari, Opera */
+		    perspective: @arguments;
+		}
+	
+		.transform-origin(@arguments){
+		    -webkit-transform-origin: @arguments; /* Chrome, Safari, Opera */
+		    transform-origin: @arguments;
+		}
+
+
+		.box-shadow (@shadow: 1px 1px 6px rgba(0,0,0,0.11)){
+			box-shadow: @arguments;
+			-webkit-box-shadow: @arguments;
+			-moz-box-shadow: @arguments;
+		}
+
+		.box-orient (@alinhamento: horizontal){
+			display: -webkit-box;
+  			-webkit-box-orient: @alinhamento;
+
+  			display: -moz-box;
+  			-moz-box-orient: @alinhamento;
+
+  			display: box;
+  			box-orient: @alinhamento;
+
+		}
+
+		.box-flex (@flex: 1){
+			-webkit-box-flex: @flex;
+  			-moz-box-flex: @flex;
+  			box-flex: @flex;
+		}
+
+		.filter(@arguments){
+			filter: @arguments;
+			-moz-filter: @arguments;
+			-webkit-filter: @arguments;
+			-o-filter: @arguments;
+
+		}
+
+		.size(@arguments){
+	    width: @arguments;
+	    height: @arguments;
+	  }
+
+	  .size(@width, @height){
+	    width: @width;
+	    height: @height;
+	  }
+
+	  .circle(@radius: 25px) {
+			.border-radius(50%);
+			width:@radius;
+			height:@radius;
+		}
+
+		/* PADRÃ•ES DO SITE */
+	html {height: 100%;}
+	body {height:100%; position: relative;}
+
+	#all-site{width: 100%; min-height: 100%; position: relative;}
+
+/* Estilos */
+	.center{float:none !important; margin: 0 auto;}
+	.container {position: relative;}
+	/* Grid Fluido*/
+		/* t -> tamanho // n -> nÃºmero */
+		@t-totalgrid: 100%;
+		@t-margingrid: <?php echo $this->gridMargin;?>;
+		@n-colunasgrid: <?php echo $this->gridColumns?>;
+		@t-coluna: (@t-totalgrid - ((@n-colunasgrid - 1) * @t-margingrid)) / @n-colunasgrid;
+
+		.fluid-column-grid(@n-colunas: 1){
+			width: ((@t-coluna * @n-colunas) + ((@n-colunas - 1) * @t-margingrid));
+			float: left;
+			display: block;
+		}
+		@default-horizontal-margin: @t-margingrid;
+		@default-vertical-margin: 10px;
+		.margin-r{margin-right: @default-horizontal-margin;}
+		.margin-l{margin-left: @default-horizontal-margin;}
+		.margin-t{margin-top: @default-vertical-margin;}
+		.margin-b{margin-bottom: @default-vertical-margin;}
+		.margin-v{.margin-t;.margin-b; }
+		.margin-h{.margin-l;.margin-r; }
+		.margin  {.margin-v; .margin-h; }
+
+		.smargin-r{margin-right: @default-horizontal-margin/2;}
+		.smargin-l{margin-left: @default-horizontal-margin/2;}
+		.smargin-t{margin-top: @default-vertical-margin/2;}
+		.smargin-b{margin-bottom: @default-vertical-margin/2;}
+		.smargin-v{.smargin-t;.smargin-b; }
+		.smargin-h{.smargin-l;.smargin-r; }
+		.smargin  {.smargin-v; .smargin-h; }
+
+		.lmargin-r{margin-right: @default-horizontal-margin*2;}
+		.lmargin-l{margin-left: @default-horizontal-margin*2;}
+		.lmargin-t{margin-top: @default-vertical-margin*2;}
+		.lmargin-b{margin-bottom: @default-vertical-margin*2;}
+		.lmargin-v{.lmargin-t;.lmargin-b; }
+		.lmargin-h{.lmargin-l;.lmargin-r; }
+		.lmargin  {.lmargin-v; .lmargin-h; }
+	
+		@default-horizontal-padding: 10px;
+		@default-vertical-padding: 15px;
+		.padding-r{padding-right: @default-horizontal-padding;}
+		.padding-l{padding-left: @default-horizontal-padding;}
+		.padding-t{padding-top: @default-vertical-padding;}
+		.padding-b{padding-bottom: @default-vertical-padding;}
+		.padding-v{.padding-t;.padding-b; }
+		.padding-h{.padding-l;.padding-r; }
+		.padding  {.padding-v; .padding-h; }
+
+		.l-padding-r{padding-right: @default-horizontal-padding*2;}
+		.l-padding-l{padding-left: @default-horizontal-padding*2;}
+		.l-padding-t{padding-top: @default-vertical-padding*2;}
+		.l-padding-b{padding-bottom: @default-vertical-padding*2;}
+		.l-padding-v{.l-padding-t;.l-padding-b; }
+		.l-padding-h{.l-padding-l;.l-padding-r; }
+		.l-padding  {.l-padding-v; .l-padding-h; }
+
+		.s-padding-r{padding-right: @default-horizontal-padding/2;}
+		.s-padding-l{padding-left: @default-horizontal-padding/2;}
+		.s-padding-t{padding-top: @default-vertical-padding/2;}
+		.s-padding-b{padding-bottom: @default-vertical-padding/2;}
+		.s-padding-v{.s-padding-t;.s-padding-b; }
+		.s-padding-h{.s-padding-l;.s-padding-r; }
+		.s-padding  {.s-padding-v; .s-padding-h; }
+
+		<?php
+		for($i=1;$i<=$this->gridColumns;$i++){
+			echo ".grid$i{.fluid-column-grid($i);}";
+		}
+		?>
+		<?php 
+		$c = 0;
+			foreach($this->breakpoints as $label => $size){
+				if(isset($size['min']) and isset($size['max'])){
+					echo "@media screen and (min-width: ".$size['min']."px) and (max-width:".$size['max']."px){";	
+				} else if(isset($size['min'])){
+					echo "@media screen and (min-width:".$size['min']."px){";
+				} else {
+					echo "@media screen and (max-width:".$size['max']."px){";
+				}
+				?>
+				.<?php echo $label?>no-margin {margin:0;}
+				.<?php echo $label?>margin-r{margin-right: @default-horizontal-margin;}
+				.<?php echo $label?>margin-l{margin-left: @default-horizontal-margin;}
+				.<?php echo $label?>margin-t{margin-top: @default-vertical-margin;}
+				.<?php echo $label?>margin-b{margin-bottom: @default-vertical-margin;}
+				.<?php echo $label?>margin-v{.margin-t;.margin-b; }
+				.<?php echo $label?>margin-h{.margin-l;.margin-r; }
+				.<?php echo $label?>margin  {.margin-v; .margin-h; }
+				
+				<?php
+				echo ".".$label."grid{.fluid-column-grid($this->gridColumns);}";
+				for($i=1;$i<=$this->gridColumns;$i++){
+					if($this->gridColumns % $i == 0){
+						$div = $this->gridColumns/$i;
+						$col = $this->gridColumns/$div;
+						
+						echo ".$label"."container-$div-col > div {.".$label."grid$col; .".$label."margin-l;}";
+						echo ".$label"."container-$div-col > div {.".$label."grid$col; .".$label."margin-l;}";
+						echo ".$label"."container-$div-col > div:nth-child(".$div."n + 1) {margin-left:0; clear:left;}";
+						
+					}
+					echo ".".$label."grid$i{.fluid-column-grid($i);}";
+				}
+				$c++;
+				echo "}";
+			}
+		?>
+
+
+		
+	/* PadrÃµes */
+	.clear{clear:both; float:none;}
+	.fleft, .fl{float: left;}
+	.fright, .fr{float: right;}
+	.grid{width: 100%;}
+	.db{display: block;}
+
+	/*TEXTO */
+	.talign-center {text-align:center;}
+	.talign-left   {text-align:left;}
+	.talign-right  {text-align:right;}
+	.valign-center {display: table-cell; vertical-align: middle;}
+	
+	
