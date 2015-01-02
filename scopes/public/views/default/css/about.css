@@ -1,6 +1,6 @@
 section.about {background: #d5d5d5; padding:50px;}
 if($this->browser == "Chrome"):
-	section.about {background: #d4a0a0;}
+	section.about {background: #d5a5a5;}
 end
 
 section.about p@eq(max width 400) {font-size:12px; color:#f00;}

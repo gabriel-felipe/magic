@@ -1,4 +1,5 @@
 <?php
+use Magic\Engine\Mvc\Controller;
 class publicController extends Controller
 {
 	public function basicLayoutTasks(){
