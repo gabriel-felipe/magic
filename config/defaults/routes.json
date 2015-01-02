@@ -1,0 +1,19 @@
+{
+    "public" : {
+        "" : {"route":"home"},
+        "about" : {"route":"about"}
+    },
+    "manager" : {
+        "testeb/{^[0-9]+$}/{^[a-z]+$}" : {
+            "route":"common_home",
+            "id": "$1",
+            "idb": "$2",
+            "defaults": {
+                "idb": "testePadrao"
+            }
+        },
+        "manager" : { "route":"common_home" },
+        "routes" : {"route":"scope_routes"}
+    }
+    
+}

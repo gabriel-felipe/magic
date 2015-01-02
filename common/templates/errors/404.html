@@ -1,0 +1,35 @@
+<?php echo $this->doctype ?>
+
+<html lang="<?php echo $this->lang ?>">
+	<head>
+		<?php foreach ($this->getAppends(true,"head") as $append): ?>
+		
+		<?php echo $append ?>
+		<?php endforeach ?>
+		<title><?php echo $this->title ?></title>
+		<?php foreach ($this->getMetas() as $meta): ?>
+		
+		<?php echo $meta ?>
+		<?php endforeach ?>
+
+		<?php foreach ($this->getLinks() as $link): ?>
+		
+		<?php echo $link ?>
+		<?php endforeach ?>
+		
+		<?php foreach ($this->getScripts("top") as $script): ?>
+		
+		<?php echo $script ?>
+		<?php endforeach ?>
+		<?php foreach ($this->getAppends(false,"head") as $append): ?>
+		
+		<?php echo $append ?>
+		<?php endforeach ?>
+
+	</head>
+
+	<body id="<?php echo $this->bodyId ?>" class="<?php echo $this->bodyClass ?>">
+		<h1>Página não encontrada.</h1>
+	</body>
+
+</html>

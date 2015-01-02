@@ -1,0 +1,31 @@
+$(document).ready(function(){
+	var ajax = new majax;
+	ajax.on(
+		200,
+		function(msg,data){
+			$("link").addClass("old");
+			$("head").append(data["css"]);
+			window.setTimeout(function(){
+				$("link.old").remove();
+				ajax.post(magic_route,{"css_only":true});
+			},100);
+		}
+	);
+	ajax.on(
+		304,
+		function(msg){
+			console.log(msg);
+			window.setTimeout(function(){
+				ajax.post(magic_route,{"css_only":true});
+			},100);
+		}
+	)
+	ajax.onError = function(){
+		window.setTimeout(function(){
+			ajax.post(magic_route,{"css_only":true});
+		},100);
+	}
+	window.setTimeout(function(){
+		ajax.post(magic_route,{"css_only":true});
+	},2000)
+})

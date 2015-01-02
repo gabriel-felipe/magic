@@ -1,0 +1,15 @@
+{
+	"magicCss": {
+		"gridTotal": "100%",
+		"gridColumns": 12,
+		"gridMargin": "2%",
+		"breakpoints": {
+			"xs-":{"max":"460","alias":"mobile portrait"}, 
+			"s-":{"min":"460","max":"860","alias":"mobile landscape"},
+			"m-":{"min":"860","max":"960","alias":"tablet"},
+			"": {"min":"960","max":"1460","alias":"usual desktop"},
+			"l-":{"min":"1460","max":"2000","alias":"large desktop"},
+			"xl-":{"max":"3000","alias":"really large screen"}
+		}
+	}
+}
