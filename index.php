@@ -1,22 +1,47 @@
 <?php
-	ini_set("memory_limit","200M");
 	require("root_paths.php");
-	require('config/project.php');
-	if(PROJECT_DEBUG == 1){
+	define('APPLICATION_ENV', getenv("APPLICATION_ENV"));
+	require_once('engine/config/init.php');
+	$globalConfig = new MagicConfig;
+	$globalConfig->addFolder(path_root."/config/defaults");
+	$globalConfig->addFolder(path_root."/config/".APPLICATION_ENV);
+	$globalConfig->loadInAllAs("db.json","database");
+	$globalConfig->loadInAllAs("routes.json","routes");
+	$globalConfig->loadInAllAs("themes.json","themes");
+	$globalConfig->loadInAllAs("errors.json","errors");
+	$globalConfig->loadInAll("config.json");
+
+	if($globalConfig->projectDebug == 1){
 		ini_set('display_errors',1); 
 	 	error_reporting(E_ALL);
 	 	ini_set('html_errors', 'On');
  	}
+ 	date_default_timezone_set($globalConfig->default_timezone);
+ 	define("AUTO_GENERATE_LANGUAGE_URLS", $globalConfig->auto_generate_language_urls);
+
  	require_once('engine/registry.php');
-	require_once('engine/language.php');
-	require_once('engine/url.php');
-	require_once('engine/library/data-cleaner.php');
 	$registry = new registry;
+	
+	require_once('engine/hooks/init.php');
+	require_once('engine/compilador/init.php');
+	require_once("engine/document/init.php");
+	require_once('engine/language.php');
+	require_once('engine/mvc/init.php');
+	require_once('engine/library/data-cleaner.php');
+	require_once('engine/scope/init.php');
+	require_once('engine/log.php');
+	require_once('engine/error.php');
+	require_once('engine/functions.php');
+	require_once('engine/loader.php');
+	require_once('librarys/functions.php');
+	require_once('datamgr/dbmodel.php');
+	require_once('engine/plugin/init.php');
 
-
-
-	$routes = file_get_contents("config/routes.json");
-	$routes = json_decode($routes,true);    
+	$loader = new loader($registry);
+	$registry->set('load',$loader);
+	$registry->set("config",$globalConfig);
+	
+	$routes = $globalConfig->routes->getData();
 	$url = new url;
 	$url_amigavel = data::get('url','url');
 	foreach ($routes as $scopeb => $rts) {
@@ -26,11 +51,11 @@
 		}
 	}
 	$registry->set("url",$url);
-	$language = new language($registry);
+
 	if(AUTO_GENERATE_LANGUAGE_URLS){
-		$language->generateUrls();
+		language::generateUrls();
 	}
-	$registry->set("language",$language);
+	
 	if(!isset($_GET['scope'])){
 		if(isset($_POST['scope'])) {
 			$_GET['scope'] = $_POST['scope'];
@@ -42,23 +67,12 @@
 	$scope = data::get('scope','url');
 	
 	require_once('init.php');
-	$loader = new loader($registry);
-	$registry->set('load',$loader);
-	if(is_file(path_scope."/init.php")){
-		
-		require_once(path_scope."/init.php");
-	}
+	$scope = new scope($scope,$registry);
+	$registry->set("scope",$scope);
+	$scope->init();
+
+	define("magic_language",$scope->language->getLang());
 	
-	$language->init("br"); //If exist language br, that will be the default one, else it will select the first in alphabetical order.
-	if(AUTO_GENERATE_LANGUAGE_URLS){
-		$magic_language = data::get("magic_language");
-		if($magic_language){
-			$language->select($magic_language);
-		}
-	}
-	define("magic_language",$language->getLang());
-	$json = new json;
-	$registry->set('json',$json);
 	
 	if(array_key_exists("route", $_GET)){
 		$route = $_GET['route'];
@@ -66,16 +80,8 @@
 		$route = $_POST['route'];
 	}
 	$route = str_replace("_","/",$route);
-	$_GET['route'] = $route;
-	require_once('engine/library/phpbrowsercap.php');
-	use phpbrowscap\Browscap;
-	$browser = new Browscap(path_cache);
-	$browser = $browser->getBrowser();
-	$registry->set('browser',$browser);
-	$mobileDetect = new Mobile_Detect();
-	$registry->set("mobileDetect",$mobileDetect);
-   	require_once("engine/document/init.php");
-
-	$action = new action($route,array(),$registry);	
+	$registry->set("route",$route);
+	
+	$action = new action($route,$scope,array(),$registry);	
 	$registry->set("action",$action);
 	$action->execute();

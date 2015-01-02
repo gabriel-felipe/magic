@@ -9,6 +9,6 @@
  */
 final class CacheCss extends CssAbstract
 {
-	protected $rootPath = "/cache/document/style/";
+	protected $rootPath = "/cache/document/asset/style/";
 }
 ?>

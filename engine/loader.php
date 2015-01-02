@@ -19,7 +19,7 @@
 			if(!$alias){
 				$alias = "M".$model;
 			}
-			$file = path_models."/".$model.".php";
+			$file = $this->scope->getModelFolder()."/".$model.".php";
 			if($params) {
 				if(!is_array($params)){
 					$params = array($params);
@@ -41,14 +41,21 @@
 
 		}
 		public function plugin($plugin){
-			$file = path_root."/plugins/".$plugin."/init.php";
+			$folder = path_root."/plugins/".$plugin;
+			$file = $folder."/".$plugin."Plugin.php";
 			if (!in_array($plugin, $this->loadedPlugins)) {
 				if (is_file($file)) {
-					require_once($file);
+					require($file);
+					$class = $plugin."Plugin";
+					$pluginObj = new $class($plugin,$folder,$this->registry);
+					$this->registry->set($plugin,$pluginObj);
 					$this->loadedPlugins[] = $plugin;
 				} else {
 					throw new Exception("Init file ($file) not found at plugin directory. ", 1);
 				}
 			}
+		}
+		public function __get($name){
+			return $this->registry->get($name);
 		}
 	}

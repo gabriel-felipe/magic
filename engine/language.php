@@ -9,12 +9,12 @@ class Language
     protected $languages = array();
     protected $language = false;
     public $data = array();
-    public function __construct($registry=array())
+    public function __construct($registry=array(),$languageFolder)
     {   
+        $this->languageFolder = $languageFolder;
         $this->registry = $registry;
     }
     public function init($defaultLanguage=""){
-        $this->languageFolder = path_scope."/language";
         if(!is_dir($this->languageFolder)){
             throw new Exception("No language folder founded.", 1);
         }
@@ -31,11 +31,12 @@ class Language
         $languages = array_map("basename",$languages);
         $this->languages = $languages;
     }
-    public function generateUrls(){
+    public static function generateUrls(){
+        global $registry;
         $scopes = glob(path_scopes."/*",GLOB_ONLYDIR);
         $scopes = array_map("basename",$scopes);
         $languagesScopes = array();
-        $scs = $this->url->getShortcuts(); //create URL Multi Language;
+        $scs = $registry->url->getShortcuts(); //create URL Multi Language;
         $finalScs = array();
         foreach($scopes as $scope){
             $languages = glob(path_scopes."/$scope/language/*",GLOB_ONLYDIR);
@@ -53,7 +54,7 @@ class Language
                     $sc_copy['route'] = rtrim($sc['route'],"/");
                     $key = ltrim(rtrim($k,"/")."/".$lang,"/");
                     $finalScs[$key] = $sc_copy;
-                    $this->url->add_shortcut($key,$sc_copy);
+                    $registry->url->add_shortcut($key,$sc_copy);
                 }
             }
         }

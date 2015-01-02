@@ -18,8 +18,42 @@
 */
 Abstract class AbstractAsset
 {
-	protected $path,$isLocal=1,$rootPath;
-	
+	protected $path,$isLocal=1,$rootPath="/",$compilador=false,$shouldCompile=1;
+	protected $data = array();
+    protected $registry;
+    function __construct($file){
+        global $registry;
+        $this->registry = $registry;
+        $this->path = $file;
+    }
+
+    
+
+    public function setShouldCompile($should){
+        $this->shouldCompile = $should;
+    }
+    public function getShouldCompile(){
+        return $this->shouldCompile;
+    }
+    public function __set($name,$value){
+        $this->data[$name] = $value;
+    }
+    public function setCompilador(InterfaceCompilador $compilador){
+        $this->compilador = $compilador;
+    }
+
+    public function getCompilador(){
+        if (!$this->compilador) {
+            $this->compilador = new Compilador();
+        }
+        return $this->compilador;
+    }
+
+    public function addCompiladorDecorator(AbstractCompiladorDecorator $decorator){
+        $decorator->setCompilador($this->compilador);
+        return $this->setCompilador($decorator);
+    }
+
     /**
      * retorna o caminho para o arquivo, se for local concatena com o diretório raiz.
      */
@@ -104,6 +138,46 @@ Abstract class AbstractAsset
     public function getContent(){
         return file_get_contents($this->getAbsPath());
     }
+    public function doExist(){
+        if ($this->getIsLocal() and !is_file($this->getAbsPath())) {
+            return false;
+        }
+        return true;
+    }
+    /**
+     * Compila esse css parseando os atalhos php e as variáveis contidas em $this->data;
+     * @return string Css compilado no formato de string.
+     */
+    public function compilar(){
+        if (!$this->getIsLocal()) {
+            throw new Exception("Can't compile remote asset: ".$this->getAbsPath(), 1);
+            return null;
+        }
+        //Pega o conteúdo de todos os css locais em um só.
+        $content = $this->getContent();
+        $content = str_replace("magic_path",dirname($this->getRelPath()),$content);
+
+        $compilador = $this->getCompilador();
+        $content = $compilador->compilarTodos($content);
+        ob_start();
+        eval("?> ".$content. "<?php ");
+        $content = ob_get_clean();
+        return $content;
+    }
+
+
+    public function getData(){
+        return $this->data;
+    }
+    public function mergeData(array $data){
+        $this->data = array_merge($this->data,$data);
+        return true;
+    }
+
+    public function __get($name){
+        return (isset($this->data[$name])) ? $this->data[$name] : $this->registry->get($name);
+    }
+
     /**
      * @return string Pega o conteúdo do asset e retorna em forma de string.
      */

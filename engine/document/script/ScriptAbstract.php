@@ -15,9 +15,7 @@ Abstract class ScriptAbstract extends AbstractAsset
 	protected $registry;
 
 	function __construct($file,$position="bottom"){
-		global $registry;
-		$this->registry = $registry;
-		$this->path = $file;
+		parent::__construct($file);
 		$this->setPosition($position);
 		
 	}

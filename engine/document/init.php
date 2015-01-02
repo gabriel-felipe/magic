@@ -1,47 +1,45 @@
 <?php 
+require_once(path_engine."/document/Response.php");
 require_once(path_engine."/document/MagicDocument.php");
 require_once(path_engine."/document/AbstractAsset.php");
+require_once(path_engine."/document/AbstractAssetManager.php");
 require_once(path_engine."/document/link/LinkAbstract.php");
 require_once(path_engine."/document/link/LinkManager.php");
-require_once(path_engine."/document/link/css/lessc.php");
+require_once(path_engine."/document/link/FavIconLink.php");
 require_once(path_engine."/document/link/css/CssAbstract.php");
 require_once(path_engine."/document/link/css/CommonCss.php");
-require_once(path_engine."/document/link/css/ScopeCss.php");
 require_once(path_engine."/document/link/css/CacheCss.php");
 require_once(path_engine."/document/link/css/ExternalCss.php");
 require_once(path_engine."/document/script/ScriptAbstract.php");
 require_once(path_engine."/document/script/ScriptManager.php");
 require_once(path_engine."/document/script/CommonJs.php");
-require_once(path_engine."/document/script/ScopeJs.php");
+require_once(path_engine."/document/script/CacheJs.php");
+require_once(path_engine."/document/script/ExternalJs.php");
 require_once(path_engine."/document/meta/MetaManager.php");
 require_once(path_engine."/document/meta/Meta.php");
-
-$less = new lessc;
-$registry->set("less",$less);
+require_once(path_engine."/document/append/AppendManager.php");
+require_once(path_engine."/document/append/AppendAbstract.php");
+require_once(path_engine."/document/append/JsAppend.php");
+require_once(path_engine."/document/DocumentError.php");
 
 $LinkManager = new LinkManager;
 $registry->set("LinkManager",$LinkManager);
 
+$AppendManager = new AppendManager;
+$registry->set("AppendManager",$AppendManager);
+
 $MetaManager = new MetaManager;
 $registry->set("MetaManager",$MetaManager);
-$MetaManager->addMeta(new Meta("contentType","http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\""));
-$MetaManager->addMeta(new Meta("viewport","name=\"viewport\" content=\"width=device-width,initial-scale=1\""));
-$ScriptManager = new ScriptManager;
-$registry->set("ScriptManager",$ScriptManager);
 
+$BottomScriptManager = new ScriptManager;
+$registry->set("BottomScriptManager",$BottomScriptManager);
 
+$TopScriptManager = new ScriptManager;
+$registry->set("TopScriptManager",$TopScriptManager);
 
 $MagicDocument = new MagicDocument($registry);
 $registry->set("html",$MagicDocument);
 
-$magicCss = new CommonCss("magic.css");
-$magicCss->gridColumns = $gridColumns;
-$magicCss->gridMargin = $gridMargin;
-$magicCss->breakpoints = $breakpoints;
-
-$LinkManager->addLink($magicCss);
-
-$ScriptManager->addScript(new CommonJs("jquery-1.9.1.js","top"));
-$ScriptManager->addScript(new CommonJs("majax.js","top"));
-
+$DocumentError = new DocumentError($registry);
+$registry->set("htmlError",$DocumentError);
 ?>

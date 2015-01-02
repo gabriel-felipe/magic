@@ -1,6 +1,7 @@
 <?php
 class validate {
 	static function email($str){
+		
 	 	return preg_match("/^.+@.+\..+/",$str) ? $str : false;
 	}
 	static function str($str, $min=1,$max=10000){
@@ -82,25 +83,7 @@ class sanitize {
 	 	}
 	}
 	static function sql($str){
-		return mysqli_real_escape_string($str);
-	}
-
-	static function mssql($str){
-        if ( !isset($str) or $str === "") return '';
-	    if ( is_numeric($str) ) return $str;
-
-        $non_displayables = array(
-            '/%0[0-8bcef]/',            // url encoded 00-08, 11, 12, 14, 15
-            '/%1[0-9a-f]/',             // url encoded 16-31
-            '/[\x00-\x08]/',            // 00-08
-            '/\x0b/',                   // 11
-            '/\x0c/',                   // 12
-            '/[\x0e-\x1f]/'             // 14-31
-        );
-        foreach ( $non_displayables as $regex )
-            $str = preg_replace( $regex, '', $str );
-        $str = str_replace("'", "''", $str );
-        return $str;
+		return mysql_real_escape_string($str);
 	}
 	static function no_accents_n_spaces($str){
 		$a = array('À','Á','Â','Ã','Ä','Å','à','á','â','ã','ä','å','á');
@@ -121,25 +104,6 @@ class sanitize {
 		}
 		$var = preg_replace("/[^A-z-0-9]+/","-", $var);
 		
-		return $var;
-	}
-	static function no_accents($str){
-		$a = array('À','Á','Â','Ã','Ä','Å','à','á','â','ã','ä','å','á');
-		$e = array('È','É','Ê','Ë','è','é','ê','ë');
-		$c = array('Ç', 'ç');
-		$i = array('Ì','Í','Î','Ï','ì','í','î','ï');
-		$n = array('Ñ', 'ñ');
-		$o = array('Ò','Ó','Ô','Õ','Ö','ò','ó','ô','õ','ö');
-		$u = array('Ù','Ú','Û','Ü','ù','ú','û','ü');
-		$y = array('Ý', 'ý','ÿ');
-		$all = array('a' => $a, 'e' => $e, 'c' => $c, 'i' => $i, 'n' => $n, 'o' => $o, 'u' => $u, 'y' => $y );	
-		$var = strtolower($str);		
-		foreach($all as $k=>$tmp){
-			foreach($tmp as $l){
-				${$k}[] = htmlentities($l,ENT_COMPAT,'UTF-8');
-				$var = str_replace(${$k},$k, $var);
-			}
-		}
 		return $var;
 	}
 	static function color($str){

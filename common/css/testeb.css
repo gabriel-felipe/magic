@@ -1,4 +1,0 @@
-body {background: <?php echo $this->cor ?>;}
-if($this->MajorVer > 37) :
-body {background: #f0f;}
-end
