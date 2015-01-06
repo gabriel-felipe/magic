@@ -35,13 +35,13 @@ class Language
     }
     public static function generateUrls(){
         global $registry;
-        $scopes = glob(path_scopes."/*",GLOB_ONLYDIR);
+        $scopes = glob("Scopes"."/*",GLOB_ONLYDIR);
         $scopes = array_map("basename",$scopes);
         $languagesScopes = array();
         $scs = $registry->url->getShortcuts(); //create URL Multi Language;
         $finalScs = array();
         foreach($scopes as $scope){
-            $languages = glob(path_scopes."/$scope/language/*",GLOB_ONLYDIR);
+            $languages = glob("Scopes"."/$scope/language/*",GLOB_ONLYDIR);
             $languages = array_map("basename",$languages);
             foreach($languages as $lang){
                 foreach($scs as $k=>$sc){

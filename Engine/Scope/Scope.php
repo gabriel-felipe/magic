@@ -16,7 +16,7 @@ class Scope
 	protected $name;
 	protected $folder;
     protected $base;
-	protected $scopesFolder="/scopes";
+	protected $scopesFolder="/Scopes";
 	protected $registry;
     public $language;
     protected $themes=array();

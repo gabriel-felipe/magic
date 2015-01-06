@@ -6,11 +6,6 @@ namespace Magic\Engine\Hooks;
 */
 abstract class AbstractHook
 {
-	protected $registry;
-	function __construct($registry){
-		$this->registry = $registry;
-	}
-
 	abstract function action(Array &$params);
 	abstract function register();
 	public function run(Array $params){
@@ -25,7 +20,8 @@ abstract class AbstractHook
 		$this->name = $name;
 	}
 	public function __get($name){
-		return $this->registry->get($name);
+		global $registry;
+		return $registry->get($name);
 	}
 }
 ?>

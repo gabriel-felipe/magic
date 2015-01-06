@@ -9,6 +9,6 @@ namespace Magic\Engine\Document\Link\Css;
  * Classe que serve para inserir css's comuns ao projeto, localizados na pasta magic/common/css
  */
 final class CommonCss extends CssAbstract {
-	protected $rootPath = "/common/css/";
+	protected $rootPath = "/Common/css/";
 }
 ?>

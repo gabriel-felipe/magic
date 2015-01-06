@@ -13,13 +13,30 @@
 		protected $cnx;
 		protected static $connected = false;
 		protected static $nConnections = 0;
-		public function __construct(){
-			global $path_common;
-			$this->dbtype = db_driver;
-			$this->dbhost = db_host;
-			$this->dbuser = db_user;
-			$this->dbpass = db_password;
-			$this->dbname = db_name;
+		public function __construct($dbname=false,$dbpass=false,$dbuser=false,$dbhost=false,$dbtype=false){
+			global $registry;
+			$config = $registry->get("config");
+			if (!$dbtype) {
+				$dbtype = $config->database->get("db_driver");
+			}
+			if (!$dbhost) {
+				$dbhost = $config->database->get("db_host");
+			}
+			if (!$dbuser) {
+				$dbuser = $config->database->get("db_user");
+			}
+			if (!$dbpass) {
+				$dbpass = $config->database->get("db_password");
+			}
+			if (!$dbname) {
+				$dbname = $config->database->get("db_name");
+			}
+
+			$this->dbtype = $dbtype;
+			$this->dbhost = $dbhost;
+			$this->dbuser = $dbuser;
+			$this->dbpass = $dbpass;
+			$this->dbname = $dbname;
 		}
 		public function connect(){
 			try {

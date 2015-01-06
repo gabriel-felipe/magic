@@ -14,7 +14,7 @@ final class ThemeCSS extends CssAbstract {
 		$c = 0;
 		foreach ($scope->getThemes() as $theme) {
 			$c++;
-			$this->rootPath = "/scopes/".$scope->getName()."/views/".$theme."/css/";
+			$this->rootPath = "/Scopes/".$scope->getName()."/views/".$theme."/css/";
 			parent::__construct($file);
 			if ($this->doExist()) {
 				break;

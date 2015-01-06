@@ -1,235 +1,61 @@
 <?php
 namespace Magic\Engine\Datamgr;
-use \Exception;
-use \sanitize;
-use \validate;
+use Magic\Engine\Datamgr\Sql\AbstractDbSelect;
 
 class dbModelPlural {
 	
-	protected $tabela;
+	public $dbSelect;
+	public $dbDelete;
+	protected $single;
 	public $plural = array();
-	protected $listaAtts;
-	protected $dbmanager;
-	public $qtnbypage;
-	public $total;
-	public $nowinpage;
-	public $last_query;
-	public $last_query_array;
-	protected $fields;
-	protected $registry;
-	public $joins = array();
-	public $addFields = array();
-	protected $fieldsStr;
-	public $single = "dbModel";
-	public $groupBy = false;
-	public $orderBy = false;
-	public $orderMode = "ASC";
-	protected $globalWhere = array(); //Array to fill with global conditions;
 
 
-	public function __construct($table,$fields=false,$where=false,$array=array(),$plural=array(),$page=1,$qtnbypage=9999999999) {
-		//Criando um objeto vazio
+	public function __construct(DbModel $dbModel,$qtnByPage=999999999999) {
+		$dbSelect = $dbModel->dbSelect;
+		$this->dbSelect = $dbSelect;
+		$this->dbDelete = $dbModel->dbDelete;
+
+		$this->dbSelect->setPage(1);
+		$this->dbSelect->setQtnByPage($qtnByPage);
+
+		$this->single = $dbModel;
+		
+	}
+	public function setPage($page=false){
+		$this->dbSelect->setPage($page);
+	}
+	
+	protected function runSelect(AbstractDbSelect $select){
 		$this->plural = array();
-		$this->tabela = "`".$table."`";
-		$this->pk_field = $table."_id";
-		$this->orderBy = $this->tabela.".".$this->pk_field;
-
-		//Criando um objeto vazio
-		$this->plural = $plural;
-		$this->qtnbypage = $qtnbypage;
-		$db = new DbManager;
-		$this->dbmanager = $db;
-		$this->listaAtts = array();
-		$colunas = $this->dbmanager->fetch_columns("`".$table."`");
-		foreach($colunas as $coluna){
-			if($coluna['name'] == $this->pk_field or !$fields or (is_array($fields) and in_array($coluna['name'], $fields)) or $fields == $coluna['name'] or $fields == "*" ){
-				$this->listaAtts[$coluna['name']] = "";
-			}
-		}
-		if($this->single != "dbModel"){
-			$class = $this->single;
-			$class = new $class;
-			$this->joins = $class->getJoins();
-			$this->addFields = $class->getAddFields();
-			$this->groupBy = $class->groupBy;
-			unset($class);
-		}
-		$this->update_fields();
-		
-		if($where){
-			$this->where($where,$array,$page);
-		} elseif(count($plural) > 0){
-			$this->arrayToObject();
-		}
-		
-	}
-	public function getLastQuery(){
-		return $this->dbmanager->lastQuery;
-	}
-	// public function get_select(){
-	// 	$keys = array_keys($this->listaAtts);
-	// 	return implode(", ",$keys);
-	// }
-	public function update_fields(){
-		$this->fieldsStr = $this->get_select();
-	}
-	public function addField($alias,$sql){
-		$this->addFields[$alias] = $sql;
-		$this->fieldsStr = $this->get_select();
-		return true;
-	}
-	public function addJoin($table,$fields=array(),$on="",$method="LEFT"){
-		$on = ($on) ? $on : $table.".".$table."_id = [t].".$table."_id";
-		$this->joins[$table] = array(
-			"fields" => $fields,
-			"on" => $on,
-			"method" => $method
-		);
-		$this->fieldsStr = $this->get_select();
-
-	}
-	public function removeJoin($table){
-		unset($this->joins[$table]);
-		$this->fieldsStr = $this->get_select();
-
-	}
-	public function removeField($alias){
-		unset($this->addFields[$alias]);
-		$this->fieldsStr = $this->get_select();
-
-	}
-	public function get_select(){
-		$keys = array_keys($this->listaAtts);
-		foreach($keys as &$key){
-			$key = $this->tabela.".$key";
-		}
-		$keys = implode(", ",$keys);
-		$from = $this->get_from();
-		$joinsObj = $this->joins;
-		$addFieldsObj = $this->addFields;
-		foreach ($joinsObj as $table => $join) {
-			$on = str_replace("[t]",$this->tabela, $join['on']);
-			foreach($join['fields'] as $field => $name){
-				$keys .= ", $table.$field as $name ";
-			}
-		}
-		foreach ($addFieldsObj as $value => $key) {
-			$key = str_replace("[t]", $this->tabela, $key);
-			$keys .= ", $key as $value";
-		}
-
-		return $keys.$from;
-	}
-	public function getGlobalWhere(){
-		return $this->globalWhere();
-	}
-	public function globalWhereQuery($query,$data){
-		foreach($this->globalWhere as $q => $values){
-			$and = ($query) ? " and " : "";
-			$query .= $and.$q;
-			$data = array_merge($data,$values);
-		}
-		if ($query) {
-			$query = " WHERE $query";
-		}
-		if ($this->groupBy) {
-			$query .= " GROUP BY ".sanitize::no_special($this->groupBy);
-		}
-		$query .= " ORDER BY ".sanitize::no_special($this->orderBy)." ".sanitize::no_special($this->orderMode);
-
-		return array($query,$data);
-	}
-	public function get_from(){
-		$joins = "";
-		$joinsObj = $this->joins;
-		foreach ($joinsObj as $table => $join) {
-			$on = str_replace("[t]",$this->tabela, $join['on']);
-			$joins .= $join['method']." JOIN $table on ($on) ";
-		}
-		return " FROM ".$this->tabela." ".$joins;
-	}
-	
-	
-	protected function arrayToObject(){
-		if(is_array($this->plural)){
-			foreach ($this->plural as $key=>$atributos){
-				$class = $this->single;
-				
-				if($class == 'dbModel'){
-					$single = new dbModel($this->tabela);	
-					$single->joins = $this->joins;
-				} else {
-					$single = new $class;
-					$single->joins = $this->joins;
-					$single->addFields = $this->addFields;
-				}
-				
-				$single->setAtributos($atributos);
-				$this->plural[$key] = $single;
+		$resultados = $select->run();
+		if($resultados[0]){
+			foreach ($resultados[0] as $key=>$atributos){
+				$single = clone $this->single;
+				$single->setData($atributos);
+				$this->plural[] = $single;
 			}
 		}
 	}
 
-	public function get_element_list(){
-		$array = array();
-		foreach($this->plural as $obj){
-			$array[] = $obj->id;
-		}
-		return $array;
-	}
+
 	public function all($page=1){
-		$where = $this->globalWhereQuery("",array());
-		$table = $this->tabela;
-		$ini = ($page-1)*$this->qtnbypage;
-		$fim = $this->qtnbypage;
-		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} ".$where[0]." LIMIT $ini,$fim",$where[1]);
-		$qtntotal = $this->dbmanager->query("SELECT COUNT(*) ".$this->get_from().$where[0], $where[1]);
-		$qtntotal = ($qtntotal[1] > 1) ? $qtntotal[1] : $qtntotal[0][0]["COUNT(*)"];
-		$this->nowinpage = $page;
-		$this->last_query = "SELECT {$this->fieldsStr} ".$this->get_from()." ".$this->tabela.$where[0];
-		$this->total = $qtntotal;
-		$this->plural = $resultados[0];
-		$this->arrayToObject();
-		$this->last_query = "SELECT {$this->fieldsStr} ".$this->get_from()." ".$this->tabela.$where[0]." LIMIT $ini,$fim";
-		$this->last_query_array = array();
+		$select = clone $this->dbSelect;
+		$this->runSelect($select);
 		return $this->info();
 	}
 	public function last($n=1){
-		$this->orderBy = $this->pk_field;
-		$this->orderMode = "DESC";
-		$where = $this->globalWhereQuery("",array());
-		$table = $this->tabela;
-		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} ".$where[0]." LIMIT $n",$where[1]);
-		$this->plural = $resultados[0];
-		$this->arrayToObject();
-		$this->last_query = "SELECT {$this->fieldsStr} ".$where[0]." LIMIT $n ORDER BY {$this->pk_field} DESC";
-		$this->last_query_array = array();
+		$select = clone $this->dbSelect;
+		$select->reverseOrder();
+		$this->runSelect($select);
 		return $this->info();
 	}
-	public function get_by_ids($ids=array(), $keep_order=false,$page=1){
+	public function get_by_ids($ids=array(), $keep_order=false){
 		if(is_array($ids)){
-			$i = 0;
-			$values = array();
-			$ids_temp = array();
-			$ini = ($page-1)*$this->qtnbypage;
-			$fim = $page + $this->qtnbypage - 1;
-			$this->nowinpage = $page;
-			$this->total = count($ids);
-			foreach($ids as $k=>$v){
-				if($i >= $ini){
-					$param = "id".$v;
-					$ids_temp[$v] = "{$this->pk_field} = :$param";
-					$values[":$param"] = $v;	
-					if($i == $fim){
-						break;
-					}
-				}
-				
-				$i++;
+			$select = clone $this->dbSelect;
+			foreach ($ids as $key => $id) {
+				$select->addWhere($this->single->getPkField()." = :id".$key,array("id".$key=>$id),"or");
 			}
-			$query = implode(" or ",$ids_temp);
-
-			$this->where($query,$values);
+			$this->runSelect($select);
 			if($keep_order){
 				$temp = array();
 				$jaFoi = array();
@@ -253,47 +79,29 @@ class dbModelPlural {
 			
 		}
 	}
-	public function listar($before="",$template="",$after=""){
-		echo $before;
-		foreach($this->plural as $single){
-		$single->exibir($template);
-		}
-		echo $after;
-	}
 	
 	public function destroy(){
+		$dbDelete = clone $this->dbDelete;
+		$o = 0;
 		foreach($this->plural as $obj){
-			$obj->destroy();
+			$o++;
+			$key = "id".$o;
+			$dbDelete->addWhere($this->single->getPkField()." = :$key",array($key=>$obj->getId()),"or");
 		}
+		return $dbDelete->run();
 	}
 
 
-	public function where($query,$array=array(),$page=1){
-		$where = $this->globalWhereQuery($query,$array);
-		$this->plural = array();
-		$ini = ($page-1)*$this->qtnbypage;
-		$fim = $this->qtnbypage;
-		$resultados = $this->dbmanager->query("SELECT {$this->fieldsStr} ".$where[0]. " LIMIT $ini,$fim",$where[1]);
-		$qtntotal = $this->dbmanager->query("SELECT COUNT(*) ".$this->get_from().$where[0], $where[1]);
-		if (isset($qtntotal[0][0])) {
-			$qtntotal = $qtntotal[0][0]["COUNT(*)"];
-		} else {
-			$qtntotal = 0;
-		}
-		
-		$this->nowinpage = $page;
-		$this->total = $qtntotal;
-		
-		$this->last_query = "SELECT {$this->fieldsStr} WHERE ".$where[0];
-		$this->last_query_array=$array;
-		$this->plural = $resultados[0];
-		$this->arrayToObject();
+	public function where($query,$array=array()){
+		$select = clone $this->dbSelect;
+		$select->addWhere($query,$array);
+		$this->runSelect($select);
 		return $this->info();
 	}
 	public function info(){
 		$info = array();
 		foreach($this->plural as $obj){
-			$info[$obj->id] = $obj->info();
+			$info[$obj->getId()] = $obj->info();
 		}
 		return $info;
 	}
@@ -322,9 +130,6 @@ class dbModelPlural {
 			$novoArray[$key] = $this->plural[$arrayPos[$key]];
 		}
 		$this->plural = $novoArray;
-	}
-	public function __set($name,$value){
-		$this->$name = $value;
 	}
 
 

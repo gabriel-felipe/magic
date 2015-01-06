@@ -10,6 +10,6 @@ namespace Magic\Engine\Document\Link\Css;
  */
 final class CacheCss extends CssAbstract
 {
-	protected $rootPath = "/cache/document/asset/style/";
+	protected $rootPath = "/Cache/document/asset/style/";
 }
 ?>

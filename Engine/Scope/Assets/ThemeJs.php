@@ -15,7 +15,7 @@ final class ThemeJs extends ScriptAbstract {
 		$c = 0;
 		foreach ($scope->getThemes() as $theme) {
 			$c++;
-			$this->rootPath = "/scopes/".$scope->getName()."/views/".$theme."/js/";
+			$this->rootPath = "/Scopes/".$scope->getName()."/views/".$theme."/js/";
 			parent::__construct($file);
 			if ($this->doExist()) {
 				break;

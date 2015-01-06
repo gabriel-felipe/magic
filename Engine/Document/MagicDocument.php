@@ -18,7 +18,7 @@ namespace Magic\Engine\Document;
  */
  class MagicDocument
  {
- 	protected $registry,$data=array(),$layout="/common/templates/layout.html";
+ 	protected $registry,$data=array(),$layout="/Common/templates/layout.html";
  	protected $responseCode = 200;
  	/**
  	 * @param $registry sets MagicDocument::registry = $registry

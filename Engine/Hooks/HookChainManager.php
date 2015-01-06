@@ -6,8 +6,15 @@ namespace Magic\Engine\Hooks;
 class HookChainManager
 {
     protected $HookChains=array();
+    protected $globalParams=array();
     public function registerChain($name,HookChain $chain){
         $this->HookChains[$name] = $chain;
+    }
+    public function setGlobalParams(array $params=array()){
+        $this->globalParams = $params;
+    }
+    public function getGlobalParams(){
+        return $this->globalParams;
     }
     public function getChain($name){
         return (isset($this->HookChains[$name])) ? $this->HookChains[$name] : false;
@@ -22,11 +29,12 @@ class HookChainManager
         return $this;
     }
     public function callChain($name,$params=array()){
+        $params = array_merge($this->globalParams,$params);
         $chain = $this->getChain($name);
         if ($chain) {
-            $chain->call($params);
+            return $chain->call($params);
         }
-        return $this;
+        return false;
     }
 
 }

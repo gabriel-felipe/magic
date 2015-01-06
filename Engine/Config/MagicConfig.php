@@ -1,5 +1,7 @@
 <?php 
 namespace Magic\Engine\Config;
+use \UnexpectedValueException;
+use \Exception;
 /**
 * Classe responsável por ler arquivos json e parsea-los em configurações acessíveis através de um objeto.
 */

@@ -1,11 +1,11 @@
 <?php
 namespace Magic\Engine\Datamgr;
 use \Exception;
+use \PDO;
 
 	//Default class for code generating
 	class DbManager {
 		//defines attributes
-		public $table;
 		protected $cnx; //variable for the connection with db
 		protected $cols; //must be an array that follow the shape $cols = array([0]=>["name" => $nome, "type" => $tipo, "lenght" => "lenght"]);
 		protected $logExecTimeFile=false;
@@ -16,10 +16,9 @@ use \Exception;
 		protected $cache = array();
 		public $lastQuery = "";
 		//primary function
-		public function __construct($table = false){
+		public function __construct(DbConnect $cnx){
 			// $this->logExecTimeFile = path_root."/logs/queryexectime.log";
 			$this->cacheQueryResults = false;
-			$cnx = new DbConnect;
 			$this->cnx = $cnx->connect();
 			if(!$this->cnx){
 				throw new Exception("Erro ao conectar com o banco de dados", 1);
@@ -35,7 +34,7 @@ use \Exception;
 			foreach($resultados as $res){
 				$table = array_pop($res);
 				if ($fetchColumns) {
-					$columns = $this->fetch_columns($table);
+					$columns = $this->fetchColumns($table);
 					$tables[$table] = $columns;
 				} else {
 					$tables[] = $table;
@@ -45,8 +44,9 @@ use \Exception;
 			return $tables;
 		}
 
-		public function has_table($table){
-			
+		public function hasTable($table){
+			$table = trim($table,"`");
+			$table="`".$table."`";
 			$query = $this->cnx->query("SELECT * FROM $table");
 		    if($query)
 		    {
@@ -57,40 +57,48 @@ use \Exception;
 				if($erro[1] == 1146){
 					return false;
 				} else {
-					die ("A query possui algum problema, mais detalhes técnicos em: ".($this->cnx->errorInfo()));
+					die ("A query possui algum problema, mais detalhes técnicos em: ".(print_r($this->cnx->errorInfo(),1)));
 				}
 		    }
 			
 		}
-		public function duplicate_table($antiga, $nova){
-			$has_table = $this->has_table($antiga);
-			if($has_table){
+		public function duplicateTable($antiga, $nova){
+			$table = trim($table,"`");
+			$table="`".$table."`";
+			$hasTable = $this->hasTable($antiga);
+			if($hasTable){
 				$this->cnx->query("SELECT * INTO $nova FROM $antiga WHERE 1=0");
 			}else {
 				echo "Can't duplicate something that doesn't exists";
 			}
 		}
-		public function create_table($table){
-			$has_table = $this->has_table($table);
-			if(!$has_table){
+		public function createTable($table){
+			$table = trim($table,"`");
+			$table="`".$table."`";
+			$hasTable = $this->hasTable($table);
+			if(!$hasTable){
 				$this->cnx->query("create table $table (id int not null auto_increment,  primary key(id) )");
 			}else {
 				echo "Table already exists $table";
 			}
 		}
-		public function drop_table($table){
-			$has_table = $this->has_table($table);
-			if($has_table){
+		public function dropTable($table){
+			$table = trim($table,"`");
+			$table="`".$table."`";
+			$hasTable = $this->hasTable($table);
+			if($hasTable){
 				$this->cnx->query("DROP TABLE $table");
 			}else {
 				echo "Table don't  exists";
 			}
 		}
-		public function add_column($table, $name, $type="varchar(255)", $null=true, $default=false){
-			$has_table = $this->has_table($table);
+		public function addColumn($table, $name, $type="varchar(255)", $null=true, $default=false){
+			$table = trim($table,"`");
+			$table="`".$table."`";
+			$hasTable = $this->hasTable($table);
 			$null = ($null) ? "NULL" : "NOT NULL";
 			$default = ($default) ? "DEFAULT \"$default\"" : "";
-			if($has_table and !$this->has_column($table,$name)) {
+			if($hasTable and !$this->hasColumn($table,$name)) {
 				$query = "ALTER TABLE $table ADD $name $type $null $default";
 				if(!$this->cnx->query($query)) {
 					echo "<br />Error trying to add column($query) - ".print_r($this->cnx->errorInfo())."<br />";
@@ -100,13 +108,17 @@ use \Exception;
 				echo "Table doesn't exists";
 			}
 		}
-		public function add_foreign_key($table, $column,$tableref, $columnref){
-			if($this->has_table($table) and $this->has_table($tableref)){
+		public function addForeignKey($table, $column,$tableref, $columnref){
+			$table = trim($table,"`");
+			$table="`".$table."`";
+			if($this->hasTable($table) and $this->hasTable($tableref)){
 				$this->cnx->query("ALTER TABLE '{$table}' ADD FOREIGN KEY ('{$column}') REFERENCES '{$tableref}' ('{$columnref}' )");
 			}
 		}
-		public function add_columns($names = false, $types = false, $table){
-			$has_table = $this->has_table($table);
+		public function addColumns($names = false, $types = false, $table){
+			$table = trim($table,"`");
+			$table="`".$table."`";
+			$hasTable = $this->hasTable($table);
 			if(is_array($names)){
 				if(!is_array($types) and $types){
 					foreach($names as $name){
@@ -121,8 +133,8 @@ use \Exception;
 					echo "Type wasn't defined";
 				}
 			}
-			$has_table = $this->has_table($table);
-			if($has_table){
+			$hasTable = $this->hasTable($table);
+			if($hasTable){
 				$this->cnx->query("ALTER TABLE $table ADD $name $type");
 			}else {
 				echo "Table doesn't exists";
@@ -184,7 +196,7 @@ use \Exception;
 				return false;
 			}
 		}
-		public function query_group($query,$values=array()){
+		public function queryGroup($query,$values=array()){
 			$cnxQuery = $this->cnx->prepare($query);
 			if($cnxQuery->execute($values)){
 			$qtnLinhas = $cnxQuery->rowCount();
@@ -196,24 +208,30 @@ use \Exception;
 				return false;
 			}
 		}
-		public function update_column_type($table, $column, $newtype){
-			$has_table = $this->has_table($table);
-			if($has_table){
+		public function updateColumnType($table, $column, $newtype){
+			$table = trim($table,"`");
+			$table="`".$table."`";
+			$hasTable = $this->hasTable($table);
+			if($hasTable){
 				$this->cnx->query("ALTER TABLE $table ALTER COLUMN $column $newtype");
 			}else {
 				echo "Table doesn't exists";
 			}
 		}
-		public function drop_column($name, $table){
-			$has_table = $this->has_table($table);
-			if($has_table){
+		public function dropColumn($name, $table){
+			$table = trim($table,"`");
+			$table="`".$table."`";
+			$hasTable = $this->hasTable($table);
+			if($hasTable){
 				$this->cnx->query("ALTER TABLE $table DROP $name");
 			}else {
 				echo "Table doesn't exists";
 			}
 		}
-		public function has_column($table,$column){
-			if($this->has_table($table)){
+		public function hasColumn($table,$column){
+			$table = trim($table,"`");
+			$table="`".$table."`";
+			if($this->hasTable($table)){
 			$q = $this->cnx->prepare("DESCRIBE $table");
 			$q->execute();
 			$table_fields = $q->fetchAll();
@@ -230,11 +248,14 @@ use \Exception;
 				
 			}
 		}
-		public function fetch_columns($table){
-			if($this->has_table($table)){
+		public function fetchColumns($table){
+			$table = trim($table,"`");
+			$table="`".$table."`";
+			if($this->hasTable($table)){
 			$q = $this->cnx->prepare("DESCRIBE $table");
 			$q->execute();
 			$table_fields = $q->fetchAll();
+			$fields = array();
 			foreach($table_fields as $field){
 				$fields[] = array("name"=>$field[0],"type"=>$field[1],"key"=>$field[3]);
 			}

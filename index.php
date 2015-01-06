@@ -2,8 +2,14 @@
 	namespace Magic;
 	use Magic\Engine\Config\MagicConfig;
 	use Magic\Engine\Registry;	
-
-	require("root_paths.php");
+	if(session_id() == ""){
+		session_start();
+	}
+	$root = str_replace("/",DIRECTORY_SEPARATOR,$_SERVER["DOCUMENT_ROOT"]);
+	$path = str_replace($root, "",dirname(__FILE__));
+	define("path_root",$root."$path");
+	define("base_url","http://".$_SERVER["SERVER_NAME"]."$path");
+	define("path_base","http://".$_SERVER["SERVER_NAME"]."$path");
 
 	spl_autoload_register(function ($class) {
 		$d = DIRECTORY_SEPARATOR;
@@ -40,8 +46,8 @@
 
 	define('APPLICATION_ENV', getenv("APPLICATION_ENV"));
 	$globalConfig = new MagicConfig;
-	$globalConfig->addFolder(path_root."/config/defaults");
-	$globalConfig->addFolder(path_root."/config/".APPLICATION_ENV);
+	$globalConfig->addFolder(path_root."/Config/defaults");
+	$globalConfig->addFolder(path_root."/Config/".APPLICATION_ENV);
 	$globalConfig->loadInAllAs("db.json","database");
 	$globalConfig->loadInAllAs("routes.json","routes");
 	$globalConfig->loadInAllAs("themes.json","themes");
@@ -136,7 +142,24 @@
 	}
 
 	$scope = data::get('scope','url');
-	require_once('init.php');
+	//Quanto refatorar o banco de dados tornar isso desnecessário.
+	$jsonConfigs = array("database");
+	foreach($jsonConfigs as $fileConfig){
+
+	${$fileConfig} = $globalConfig->{$fileConfig}->getData();
+
+	}
+
+	foreach($database as $constant=>$value)
+	    define($constant,$value);
+
+	
+
+	if($scope === false){
+	    $error = $registry->get("htmlError");
+	    $error->trigger("404");
+	    die();
+	}
 
 	//Inicializando o escopo
 	use Magic\Engine\Scope\Scope;

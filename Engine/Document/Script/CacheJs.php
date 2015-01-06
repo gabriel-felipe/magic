@@ -11,6 +11,6 @@ namespace Magic\Engine\Document\Script;
  */
 final class CacheJs extends ScriptAbstract
 {
-	protected $rootPath = "/cache/document/asset/script/";
+	protected $rootPath = "/Cache/document/asset/script/";
 }
 ?>
