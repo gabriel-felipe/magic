@@ -5,12 +5,12 @@
 	use \PDOException;
 	//General class for connecting do a db
 	class DbConnect {
-		protected $dbtype;
-		protected $dbhost;
-		protected $dbname;
-		protected $dbuser;
-		protected $dbpass;
-		protected $cnx;
+		public $dbtype;
+		public $dbhost;
+		public $dbname;
+		public $dbuser;
+		public $dbpass;
+		public $cnx;
 		protected static $connected = false;
 		protected static $nConnections = 0;
 		public function __construct($dbname=false,$dbpass=false,$dbuser=false,$dbhost=false,$dbtype=false){
@@ -41,7 +41,6 @@
 		public function connect(){
 			try {
 				if(!self::$connected){
-					self::$nConnections++;
 					$this->cnx = new PDO($this->dbtype.':host='.$this->dbhost.';dbname='.$this->dbname.";charset=utf8",$this->dbuser,$this->dbpass, array(PDO::ATTR_PERSISTENT => true) );				
 					self::$connected  = $this->cnx;
 				} else {

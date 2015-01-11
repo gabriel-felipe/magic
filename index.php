@@ -68,6 +68,9 @@
 	use Magic\Engine\Hooks\HookChainManager;
 	$hooks = new HookChainManager;
 	$registry->set("hooks",$hooks);
+	use Magic\Engine\Datamgr\DbConnect;
+	$dbConnect = new DbConnect();
+	$registry->set("DbConnect",$dbConnect);
 	
 	//Registering Document
 	use Magic\Engine\Document\Link\LinkManager;

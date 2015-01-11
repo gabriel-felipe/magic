@@ -1,0 +1,1 @@
+<input name="<?php echo $this->element->getName(); ?>" value="<?php echo $this->element->getValue(); ?>" <?php echo $this->element->getParsedAttrs(); ?> />

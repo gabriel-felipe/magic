@@ -1,0 +1,1 @@
+<textarea name="<?php echo $this->element->getName(); ?>" <?php echo $this->element->getParsedAttrs() ?>><?php echo $this->element->getValue(); ?></textarea>

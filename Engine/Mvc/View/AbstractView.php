@@ -51,8 +51,8 @@ Abstract class AbstractView
         return $this->compilador;
     }
 
-    public function addCompiladorDecorator(AbstractCompiladorViewDecorator $decorator){
-        $decorator->setCompilador($this->compilador);
+    public function addCompiladorDecorator(InterfaceViewCompilador $decorator){
+        $decorator->setCompilador($this->getCompilador());
         return $this->setCompilador($decorator);
     }
 

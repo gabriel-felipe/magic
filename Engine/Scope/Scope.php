@@ -196,6 +196,20 @@ class Scope
     public function getImageBase($theme=false){
         return $this->getThemeBase($theme)."/image";
     }
+    public function getThemeImg($img){
+        $c = 0;
+        foreach ($this->getThemes() as $theme) {
+            $c++;
+            $path = "/Scopes/".$this->getName()."/views/".$theme."/image/$img";
+            $file = path_root.$path;
+            
+            if (file_exists($file)) {
+                return path_base.$path;
+            } else if ($c == count($this->getThemes())) {
+                return false;
+            }
+        }
+    }
 
     function __get($name){
     	return $this->registry->get($name);

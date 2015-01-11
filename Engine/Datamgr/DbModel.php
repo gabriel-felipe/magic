@@ -28,12 +28,12 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 	protected $pkField=false;
 	protected $dbModelHooks;
 
-	public function __construct(DbManager $dbmanager,$table,$pkField=false,$fields="*",$driver=false) {
-		$dbSelect = DbDriverFactory::getDbSelect($dbmanager, "show_media",$fields);
+	public function __construct(AbstractDbManager $dbmanager,$table,$pkField=false,$fields="*",$driver=false) {
+		$dbSelect = DbDriverFactory::getDbSelect($dbmanager, $table,$fields);
 		$this->dbSelect = $dbSelect;
-		$this->dbInsert = DbDriverFactory::getDbInsert($dbmanager, "show_media",$fields,$driver);
-		$this->dbDelete = DbDriverFactory::getDbDelete($dbmanager, "show_media",$driver);
-		$this->dbUpdate = DbDriverFactory::getDbUpdate($dbmanager, "show_media",$fields,$driver);
+		$this->dbInsert = DbDriverFactory::getDbInsert($dbmanager, $table,$fields,$driver);
+		$this->dbDelete = DbDriverFactory::getDbDelete($dbmanager, $table,$driver);
+		$this->dbUpdate = DbDriverFactory::getDbUpdate($dbmanager, $table,$fields,$driver);
 		$this->dbSelect->setPage(1);
 		$this->dbSelect->setQtnByPage(1);
 
@@ -92,6 +92,7 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 	}
 
 	public function runSelect(AbstractDbSelect $select){
+
 		$this->dbModelHooks->callChain("beforeSelect");
 		$result = $select->run();
 		$this->dbModelHooks->callChain("afterSelect");

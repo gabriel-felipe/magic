@@ -1,6 +1,6 @@
 <?php 
 namespace Magic\Engine\Datamgr\Sql;
-use Magic\Engine\Datamgr\DbManager;
+use Magic\Engine\Datamgr\AbstractDbManager;
 use \UnexpectedValueException;
 abstract class AbstractDbDelete
 {
@@ -8,7 +8,7 @@ abstract class AbstractDbDelete
     protected $table;
     protected $history=array();
     protected $where = array();
-    function __construct(DbManager $db,$table)
+    function __construct(AbstractDbManager $db,$table)
     {
         $this->db = $db;
         $this->setTable($table);

@@ -1,6 +1,6 @@
 <?php 
 namespace Magic\Engine\Datamgr\Sql;
-use Magic\Engine\Datamgr\DbManager;
+use Magic\Engine\Datamgr\AbstractDbManager;
 use \UnexpectedValueException;
 abstract class AbstractDbQuery
 {
@@ -8,7 +8,7 @@ abstract class AbstractDbQuery
     protected $fields=array();
     protected $table;
     protected $history=array();
-	function __construct(DbManager $db,$table,$fields="*")
+	function __construct(AbstractDbManager $db,$table,$fields="*")
 	{
 		$this->db = $db;
 		$this->setTable($table);
@@ -66,8 +66,11 @@ abstract class AbstractDbQuery
     public function setFields($fields)
     {
         if ($fields=="*") {
-            $fields = $this->db->fetchColumns($this->getTable());
-            $fields = array_map(function($v){return $v['name'];},$fields);
+            $columns = $this->db->fetchColumns($this->getTable());
+            $fields = array();
+            foreach($columns as $column){
+                $fields[] = $column->getName();
+            }
         } elseif (is_string($fields)) {
             $fields = explode(",",$fields);
         }

@@ -25,7 +25,7 @@ class ViewHandler
         return $this->compilador;
     }
 
-    public function addCompiladorDecorator(AbstractViewCompiladorDecorator $decorator){
+    public function addCompiladorDecorator(InterfaceViewCompilador $decorator){
         $decorator->setCompilador($this->getCompilador());
         return $this->setCompilador($decorator);
     }

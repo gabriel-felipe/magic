@@ -1,6 +1,7 @@
 <?php 
 	namespace Magic\Engine\Datamgr\Driver;
-	use Magic\Engine\Datamgr\DbManager;
+	use Magic\Engine\Datamgr\AbstractDbManager;
+	use Magic\Engine\Datamgr\DbConnect;
 	class DbDriverFactory
 	{
 		protected $driver;
@@ -27,17 +28,24 @@
 			return $class;
 		}
 
-		static function getDbSelect(DbManager $db,$table,$fields="*",$driver=false){
+		static function getDbSelect(AbstractDbManager $db,$table,$fields="*",$driver=false){
 			return self::getClass("DbSelect",array($db,$table,$fields),$driver);
 		}
-		static function getDbInsert(DbManager $db,$table,$fields="*",$driver=false){
+		static function getDbInsert(AbstractDbManager $db,$table,$fields="*",$driver=false){
 			return self::getClass("DbInsert",array($db,$table,$fields),$driver);
 		}
-		static function getDbUpdate(DbManager $db,$table,$fields="*",$driver=false){
+		static function getDbUpdate(AbstractDbManager $db,$table,$fields="*",$driver=false){
 			return self::getClass("DbUpdate",array($db,$table,$fields),$driver);
 		}
-		static function getDbDelete(DbManager $db,$table,$driver=false){
+		static function getDbDelete(AbstractDbManager $db,$table,$driver=false){
 			return self::getClass("DbDelete",array($db,$table),$driver);
+		}
+		static function getDbManager(DbConnect $cnx=null,$driver=false){
+			if (!$cnx) {
+				global $registry;
+				$cnx = $registry->get("DbConnect");
+			}
+			return self::getClass("DbManager",array($cnx),$driver);
 		}
 	}
 ?>
