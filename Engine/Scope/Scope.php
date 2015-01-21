@@ -72,12 +72,12 @@ class Scope
 	function init(){
         foreach ($this->themes as $theme) {
             if(!is_dir($this->getThemeFolder($theme))){
-                throw new LogicException("Theme $theme Does not exist: ".$this->getThemeFolder($theme), 1);
+                throw new \LogicException("Theme $theme Does not exist: ".$this->getThemeFolder($theme), 1);
             }
         }
         
-		if (is_file($this->folder."/init.php")) {
-			require_once($this->folder."/init.php");
+		if (is_file($this->getFolder()."/init.php")) {
+			require_once($this->getFolder()."/init.php");
 		}  
         $this->initLanguage();
 
@@ -112,14 +112,14 @@ class Scope
      */
     public function setName($name)
     {
-    	$folder = path_root.$this->scopesFolder."/$name";
-    	if (is_dir($folder)) {
+    	$folder = $this->scopesFolder."/$name";
+    	if (is_dir(path_root.$folder)) {
     		$this->name = $name;
     		$this->setFolder($folder);
             $this->setBase(path_base.$this->scopesFolder."/$name");
         	return $this;
     	} else {
-    		throw new UnexpectedValueException("Escopo $name não foi encontrado dentro da pasta scopes, cheque sua existência.", 1);
+    		throw new \UnexpectedValueException("Escopo $name não foi encontrado dentro da pasta scopes, cheque sua existência.", 1);
     	}
         
     }
@@ -135,22 +135,23 @@ class Scope
      *
      * @return mixed
      */
-    public function getFolder()
+    public function getFolder($pathRoot=true)
     {
-        return $this->folder;
+        $pathRoot = ($pathRoot) ? $pathRoot : "";
+        return path_root.$this->folder;
     }
 
     public function getModelFolder(){
-        return $this->folder."/model";   
+        return $this->getFolder()."/model";   
     }
 
     public function getControllerFolder()
     {
-        return $this->folder."/controller";
+        return $this->getFolder()."/controller";
     }
 
     public function getViewFolder(){
-        return $this->folder."/views";
+        return $this->getFolder()."/views";
     }
 
     public function getViewBase(){
@@ -158,7 +159,7 @@ class Scope
     }
 
     public function getLanguageFolder(){
-        return $this->folder."/language";
+        return $this->getFolder()."/language";
     }
 
     /**

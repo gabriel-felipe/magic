@@ -28,6 +28,9 @@ abstract class AbstractElement {
 		$this->attrs = $attrs;
 		return $this;
 	}
+	public function getAttr($name){
+		return (array_key_exists($name, $this->attrs)) ? $this->attrs[$name] : null;
+	}
 	public function getAttrs(){
 		return $this->attrs;
 	}

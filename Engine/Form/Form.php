@@ -15,12 +15,19 @@ class Form
 	protected $view = false;
 	protected $attrs = array();
 	protected $id = false;
+	protected $displayGroupClass="Magic\Engine\Form\DisplayGroup";
+	protected $displayGroups = array();
+	protected $replaceIds = true;
 	final public function __construct($id,array $attrs=array()){
 		global $registry;
 		$this->id = $id;
-		$this->view = $registry->ViewHandler->prepare(new FormView("form",$this));
+		$this->setAttr("id",$id);
+		$this->view = $registry->ViewHandler->prepare($this->getNewView());
 		$this->attrs = $attrs;
 		$this->setUp();
+	}
+	public function getNewView(){
+		return new FormView("form",$this);
 	}
 	public function getId(){
 		return $this->id;
@@ -43,6 +50,9 @@ class Form
 	public function getAttrs(){
 		return $this->attrs;
 	}
+	public function getAttr($name){
+		return (array_key_exists($name, $this->attrs)) ? $this->attrs[$name] : null;
+	}
 	public function getParsedAttrs(){
 		$attrs = "";
 		foreach ($this->attrs as $key => $value) {
@@ -63,9 +73,18 @@ class Form
     }
 
 	function addElement(AbstractElement $element){
-		$name = $element->getName();
-		$element->setAttr("id",$this->getId()."-".$name);
-		$this->elements[$name] = $element;
+		$this->prepare($element);
+		$name = $element->getId();
+		if ($this->replaceIds) {
+			$element->setAttr("id",$this->getId()."-".$name);
+		}
+		$this->elements[$element->getName()] = $element;
+	}
+	function removeElement($element){
+		if (isset($this->elements[$element])) {
+			unset($this->elements[$element]);
+		}
+		return $this;
 	}
 	function getElement($name){
 		return (isset($this->elements[$name])) ? $this->elements[$name] : false;
@@ -73,8 +92,39 @@ class Form
 	function getElements(){
 		return $this->elements;
 	}
-	function setElements(){
-		return $this->elements;
+	function setElements($elements){
+		$this->elements = $elements;
+	}
+	function addFormDecorator(AbstractFormDecorator $decorator){
+		$decorator->setElement($this);
+		$this->view->addCompiladorDecorator($decorator);
+		return $this;
+	}
+	function groupElements(array $elements,$dgName,$displayGroupClass=false){
+		$displayGroupClass = (!$displayGroupClass) ? $this->displayGroupClass : $displayGroupClass;
+		$dg = new $displayGroupClass($dgName);
+		foreach ($elements as $name) {
+			$el = $this->getElement($name);
+			if($el){
+				$dg->addElement($el);
+			}
+		}
+		$this->displayGroups[$dgName] = $dg;
+		return $this;
+	}
+	function inDisplayGroup($element){
+		foreach($this->getDisplayGroups() as $dg){
+			if ($dg->getElement($element)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	function getDisplayGroups(){
+		return $this->displayGroups;
+	}
+	function getDisplayGroup($name){
+		return (array_key_exists($name,$this->displayGroups)) ? $this->displayGroups[$name] : null;
 	}
 	function populate(Array $data){
 		foreach($data as $key => $value){

@@ -7,7 +7,7 @@ class MAjaxJson
 {
     protected $data=array();
     protected $msg;
-    protected $statusCode="200";
+    protected $statusCode=200;
     /**
      * Gets the value of data.
      *
@@ -95,6 +95,10 @@ class MAjaxJson
 
     public function set($key,$value){
         $this->data[$key] = $value;
+    }
+
+    public function __set($key,$value){
+        $this->set($key,$value);
     }
 
     public function render($dieAfter=1){

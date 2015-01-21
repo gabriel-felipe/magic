@@ -3,6 +3,9 @@
         "" : {"route":"home"},
         "about" : {"route":"about"}
     },
+    "wireframes" : {
+        "wireframe" : {"route":"home"}
+    },
     "manager" : {
         "testeb/{^[0-9]+$}/{^[a-z]+$}" : {
             "route":"common_home",

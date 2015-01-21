@@ -27,7 +27,6 @@ class TableToForm
 		$elements = $this->getElements($table);
 		$form = ($this->form) ? $this->form : new Form\Form("frm".$table);
 		foreach ($elements as $el) {
-			$form->prepare($el);
 			$form->addElement($el);
 		}		
 		return $form;

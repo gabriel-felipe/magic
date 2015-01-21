@@ -1,5 +1,5 @@
 <?php 
-namespace Magic\Plugins\CssAutoLoad;
+namespace Magic\Plugins\CSSAutoLoad;
 use Magic\Engine\Plugin\AbstractPlugin;
 /**
 * Plugin para recarregar o css automaticamente ao salvar. Sem recarregar a página.

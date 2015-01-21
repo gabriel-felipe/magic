@@ -101,8 +101,11 @@ class AbstractPlugin
 
     public function registerHooks(){
     	$hooks = glob($this->folder."/Hooks/*");
+    	$currentClass = get_class($this);
+        $refl = new \ReflectionClass($currentClass);
+        $namespace = $refl->getNamespaceName();
 		foreach ($hooks as $hook) {
-			$class = "Magic\\Plugins\\".$this->getName()."\\Hooks\\".str_replace(".php","",basename($hook));
+			$class = $namespace."\\Hooks\\".str_replace(".php","",basename($hook));
 			$hook = new $class($this->registry);	
 			$hook->register();
 		}

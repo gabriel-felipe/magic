@@ -6,11 +6,9 @@ use Magic\Engine\Compilador\AbstractCompiladorDecorator;
 */
 class MagicDefaultJsCompiladorMinificacaoDecorator extends AbstractCompiladorDecorator
 {
-	
 	public function compilar($content)
 	{
-		return $content;
-		//return \JShrink\Minifier::minify($content);
+		return Minifier::minify($content);
 	}
 }
 ?>

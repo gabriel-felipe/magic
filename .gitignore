@@ -1,5 +1,7 @@
 cache/common.css
 cache/*
+Cache/*
 !cache/*.gitkeep
+!Cache/*.gitkeep
 logs/errors.txt
 docs/*
