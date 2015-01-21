@@ -5,12 +5,12 @@
 	if(session_id() == ""){
 		session_start();
 	}
-	$root = str_replace("/",DIRECTORY_SEPARATOR,$_SERVER["DOCUMENT_ROOT"]);
+	$root = str_replace("/",DIRECTORY_SEPARATOR,$_SERVER['CONTEXT_DOCUMENT_ROOT']);
 	$path = str_replace($root, "",dirname(__FILE__));
 	define("path_root",$root."$path");
-	define("base_url","http://".$_SERVER["SERVER_NAME"]."$path");
-	define("path_base","http://".$_SERVER["SERVER_NAME"]."$path");
-
+	define("base_url","http://".$_SERVER["SERVER_NAME"].$_SERVER["CONTEXT_PREFIX"]."$path");
+	define("path_base","http://".$_SERVER["SERVER_NAME"].$_SERVER["CONTEXT_PREFIX"]."$path");
+	
 	spl_autoload_register(function ($class) {
 		$d = DIRECTORY_SEPARATOR;
 	    // project-specific namespace prefix
