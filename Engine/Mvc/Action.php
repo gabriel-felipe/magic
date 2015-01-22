@@ -103,9 +103,9 @@ final class Action {
 		} else {
 			$obj = new $class($this->registry,$this->scope);
 			try {
-				$obj->setViewPath($this->view,0);	
+				$obj->setView($this->registry->get("scope")->getView($this->view));	
 			} catch (Exception $e) {
-				throw $e;
+				//Do nothing.
 			}
 			
 			return $obj;

@@ -49,6 +49,10 @@
 			
 		}
 
+		public function setView($view){
+			$this->view = $view;
+        }
+
 		public function addChildren($children){
 			$this->children[] = $children;
 		}

@@ -19,7 +19,7 @@ final class ThemeView extends AbstractView {
 			if ($checkExistence) {
 				
 				if (!$this->doExist() and $c == count($this->scope->getThemes())) {
-					throw new Exception("View $path não foi encontrada em nenhum dos temas (".implode(",",$this->scope->getThemes()).") do escopo {$this->scope->getName()}", 1);
+					throw new \Exception("View $path não foi encontrada em nenhum dos temas (".implode(",",$this->scope->getThemes()).") do escopo {$this->scope->getName()}", 1);
 					
 				}
 				# code...
