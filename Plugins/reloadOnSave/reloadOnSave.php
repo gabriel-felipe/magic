@@ -2,7 +2,7 @@
 namespace Magic\Plugins\reloadOnSave;
 use Magic\Engine\Plugin\AbstractPlugin;
 /**
-* Plugin para recarregar a página quando templates ou php's que interferem naquela página forem salvos
+* Plugin para recarregar a página quando Templates ou php's que interferem naquela página forem salvos
 */
 class reloadOnSave extends AbstractPlugin
 {
