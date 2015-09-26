@@ -15,13 +15,14 @@ abstract class AbstractElement {
 	protected $rawValue;
 	protected $name;
 	protected $required=false;
+	protected $decorators = array();
 	public $attrs=array();
 
 	public function setRequired($required){
 		$this->required = $required;
 		return $this;
 	}
-	public function getRequired($required){
+	public function getRequired(){
 		return $this->required;
 	}
 	public function setAttrs(array $attrs){
@@ -48,6 +49,9 @@ abstract class AbstractElement {
 	public function getName(){
 		return $this->name;
 	}
+	public function setId($id){
+		$this->setAttr("id",$id);
+	}
 	public function getId(){
 		return (isset($this->attrs['id'])) ? $this->attrs['id'] : $this->getName();
 	}
@@ -70,6 +74,10 @@ abstract class AbstractElement {
 
 	public function setName($name){
 		$this->name = $name;
+		if (!isset($this->attrs['id'])) {
+			$this->setId($name);
+		}
+		$this->attrs['name'] = $name;
 	}
 	public function setValue($value){
 		$this->rawValue = $value;
@@ -94,12 +102,14 @@ abstract class AbstractElement {
 		return $this->validateErrors;
 	}
 	public function isValid(){
+		$errors = array();
 		if (!$this->getValue() and !$this->getRequired()) {
 			return true; //Return true if empty and not required.
 		} elseif($this->getRequired() and !$this->getValue()){
-			return false; //Return false if empty and required;
+			$errors['emptyField'] = "Este campo é obrigatório e não pode ser vazio.";
+			$this->validateErrors = $errors;
+			return false;
 		}
-		$errors = array();
 		foreach($this->validators as $validator){
 			if ($validator->isValid($this->value)) {
 				continue;
@@ -122,14 +132,33 @@ abstract class AbstractElement {
 		$this->value = $value;
 	}
 
-	public function addDecorator(AbstractFormDecorator $decorator){
+	public function addDecorator(AbstractFormDecorator $decorator,$name=false){
 		$decorator->setElement($this);
-		$this->view->addCompiladorDecorator($decorator);
+		$name = (!$name) ? get_class($decorator) : $name;
+		$this->decorators[$name] = $decorator;
+		return $this;
+	}
+	public function getDecorators(){
+		return $this->decorators;
+	}
+
+	public function setDecorators($dec){
+		$this->decorators = $dec;
 		return $this;
 	}
 
+	public function getDecorator($name){
+		if (!isset($this->decorators[$name])) {
+			return false;
+		}
+		return $this->decorators[$name];
+	}
 	public function render(){
-		return $this->view->render();
+		$view = clone $this->view;
+		foreach ($this->getDecorators() as $key => $value) {
+			$view->addCompiladorDecorator($value);
+		}
+		return $view->render();
 	}
 
 
@@ -141,7 +170,7 @@ abstract class AbstractElement {
      */
     public function getLabel()
     {
-        return ($this->label) ? $this->label : $this->name;
+        return ($this->label) ? $this->label : ucfirst($this->name);
     }
 
 
@@ -159,5 +188,6 @@ abstract class AbstractElement {
 
         return $this;
     }
+
 }
 ?>

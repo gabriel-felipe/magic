@@ -41,9 +41,10 @@
 			return self::getClass("DbDelete",array($db,$table),$driver);
 		}
 		static function getDbManager(DbConnect $cnx=null,$driver=false){
+
 			if (!$cnx) {
-				global $registry;
-				$cnx = $registry->get("DbConnect");
+
+				$cnx = new DbConnect();
 			}
 			return self::getClass("DbManager",array($cnx),$driver);
 		}

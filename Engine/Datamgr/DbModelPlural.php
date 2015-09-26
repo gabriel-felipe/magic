@@ -31,8 +31,8 @@ class dbModelPlural {
 		if($resultados[0]){
 			foreach ($resultados[0] as $key=>$atributos){
 				$single = clone $this->single;
-				$single->setData($atributos);
-				$this->plural[] = $single;
+				$single->setData($atributos,1);
+				$this->plural[$single->getId()] = $single;
 			}
 		}
 	}

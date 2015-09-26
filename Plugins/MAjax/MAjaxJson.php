@@ -53,7 +53,7 @@ class MAjaxJson
      *
      * @return self
      */
-    public function setMsg(string $msg)
+    public function setMsg($msg)
     {
         $this->msg = $msg;
 
@@ -90,7 +90,7 @@ class MAjaxJson
      * @return mixed
      */
     public function responseCode($code = NULL) {
-        return Response::code($code);
+        return \Magic\Engine\Document\Response::code($code);
     }
 
     public function set($key,$value){
@@ -101,15 +101,18 @@ class MAjaxJson
         $this->set($key,$value);
     }
 
-    public function render($dieAfter=1){
+    public function render($echoNDie=1){
         header("content-type: application/json");
         $data = array();
         $data['statusCode'] = $this->getStatusCode();
         $data['msg'] = $this->getMsg();
         $data['data'] = $this->getData();
-        echo json_encode($data,1);
-        if ($dieAfter) {
+        $result = json_encode($data,JSON_HEX_QUOT | JSON_HEX_TAG);
+        if ($echoNDie) {
+            echo $result;
             die();
+        } else {
+            return $result;
         }
     }
 

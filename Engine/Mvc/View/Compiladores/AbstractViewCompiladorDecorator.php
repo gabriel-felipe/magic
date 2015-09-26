@@ -11,6 +11,7 @@
 		protected $view;
 		public function setView(AbstractView $view){
 			$this->view = $view;
+			$this->compilador->setView($view);
 		}
 		public function getView(){
 			return $this->view;

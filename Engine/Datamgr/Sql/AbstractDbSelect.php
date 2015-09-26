@@ -24,6 +24,10 @@ abstract class AbstractDbSelect extends AbstractDbQuery
         
     }
 
+    public function getTable(){
+        return $this->table;
+    }
+
     abstract public function setRandOrder();
     public function getParams(){
         $params = array();

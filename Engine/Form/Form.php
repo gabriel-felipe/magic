@@ -17,11 +17,13 @@ class Form
 	protected $id = false;
 	protected $displayGroupClass="Magic\Engine\Form\DisplayGroup";
 	protected $displayGroups = array();
-	protected $replaceIds = true;
-	final public function __construct($id,array $attrs=array()){
+	final public function __construct($id=false,array $attrs=array()){
 		global $registry;
-		$this->id = $id;
-		$this->setAttr("id",$id);
+		if ($id) {
+			$this->id = $id;
+			$this->setAttr("id",$id);
+		}
+		
 		$this->view = $registry->ViewHandler->prepare($this->getNewView());
 		$this->attrs = $attrs;
 		$this->setUp();
@@ -58,33 +60,36 @@ class Form
 		foreach ($this->attrs as $key => $value) {
 			$attrs .= " $key = '".$value."'";
 		}
+		return $attrs;
 	}
-    public function addDecorator(AbstractFormDecorator $decorator){
-       $this->decorators[] = $decorator;
+    public function addDecorator($name,AbstractFormDecorator $decorator){
+       $this->decorators[$name] = $decorator;
        return $this;
     }
 
     public function prepare(AbstractElement $element){
-    	foreach ($this->decorators as $decorator) {
+    	foreach ($this->decorators as $name=>$decorator) {
     		$dec = clone $decorator;
-    		$element->addDecorator($dec);
+    		$element->addDecorator($dec,$name);
     	}
     	return $element;
     }
 
-	function addElement(AbstractElement $element){
-		$this->prepare($element);
-		$name = $element->getId();
-		if ($this->replaceIds) {
-			$element->setAttr("id",$this->getId()."-".$name);
+	function addElement(AbstractElement $element,$prepareElement=true){
+		if ($prepareElement) {
+			$this->prepare($element);
 		}
-		$this->elements[$element->getName()] = $element;
+		
+		$name = $element->getId();
+		$this->elements[$name] = $element;
 	}
 	function removeElement($element){
 		if (isset($this->elements[$element])) {
+			$obj = $this->elements[$element];
 			unset($this->elements[$element]);
+			return $obj;
 		}
-		return $this;
+		return false;
 	}
 	function getElement($name){
 		return (isset($this->elements[$name])) ? $this->elements[$name] : false;
@@ -103,6 +108,7 @@ class Form
 	function groupElements(array $elements,$dgName,$displayGroupClass=false){
 		$displayGroupClass = (!$displayGroupClass) ? $this->displayGroupClass : $displayGroupClass;
 		$dg = new $displayGroupClass($dgName);
+		$dg->setParentForm($this);
 		foreach ($elements as $name) {
 			$el = $this->getElement($name);
 			if($el){
@@ -111,6 +117,10 @@ class Form
 		}
 		$this->displayGroups[$dgName] = $dg;
 		return $this;
+	}
+	function addDisplayGroup(DisplayGroup $group,$label){
+		$group->setParentForm($this);
+		$this->displayGroups[$label] = $group;
 	}
 	function inDisplayGroup($element){
 		foreach($this->getDisplayGroups() as $dg){
@@ -166,7 +176,7 @@ class Form
 		foreach($this->elements as $key => $element){
 			if (array_key_exists($key, $data)) {
 				$obj = clone $element;
-				$obj->setValue[$data[$key]];
+				$obj->setValue($data[$key]);
 				if (!$obj->isValid()) {
 					$errors[$key] = $obj->getValidateErrors();
 				}

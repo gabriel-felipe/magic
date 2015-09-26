@@ -16,6 +16,7 @@ use \PDO;
 		protected $minExecTimeToCache = 0.0016;
 		protected $cache = array();
 		public $lastQuery = "";
+		public $lastError = false;
 		//primary function
 		public function __construct(DbConnect $cnx){
 			$this->dbConnect = $cnx;
@@ -92,9 +93,8 @@ use \PDO;
 			}
 			return array($resultados, $qtnLinhas);
 			} else {
-				echo $query;
-				die(print_r($cnxQuery->errorInfo()));
-				return false;
+				$this->lastError = $query;
+				throw new DbException("Error executing query.", 1);
 			}
 		}
 		public function queryGroup($query,$values=array()){

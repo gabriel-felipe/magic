@@ -1,20 +1,20 @@
 <?php 
 namespace Magic\Engine\Form\Decorators;
-class TagWrapperDecorator extends AbstractFormDecorator
+class AttrDecorator extends AbstractFormDecorator
 {
-	protected $tag;
 	protected $attributes;
-	function __construct($tag, array $attributes=array()){
-		$this->tag = $tag;
+	function __construct(array $attributes=array()){
 		$this->attributes = $attributes;
+	}
+	function compilar($content){		
+		
+		
+		return $content;
 
 	}
-	function setAttrs($attrs){
-		$this->attributes = $attrs;
-		return $this;
-	}
-	function compilar($conteudo){
-		$attributes = "";
+	function setElement($element){
+		parent::setElement($element);
+		$element = $this->getElement();
 		foreach ($this->attributes as $key => $value) {
 			if (preg_match_all("/\[([^]]+)\]/", $value,$matches)) {
 				if (array_key_exists(1, $matches)) {
@@ -23,10 +23,9 @@ class TagWrapperDecorator extends AbstractFormDecorator
 					}
 				}
 			}
-			$attributes .= "$key = '".$value."' ";
+			$element->setAttr($key,$value);
 			
 		}
-		return "<".$this->tag." $attributes>".$conteudo."</".$this->tag.">";
 
 	}
 }

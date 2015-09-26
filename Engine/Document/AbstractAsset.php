@@ -187,7 +187,13 @@ Abstract class AbstractAsset
      */
     
     public function getModDate(){
-        return ($this->getIsLocal()) ? filemtime($this->getAbsPath()) : 0;
+        if ($this->getIsLocal()) {
+            $m = filemtime($this->getAbsPath());
+            $c = filectime($this->getAbsPath());
+            return ($m > $c) ? $m : $c;
+        } else {
+            return false;
+        }
     }
 }
 ?>

@@ -17,5 +17,9 @@ abstract class AbstractFormDecorator extends AbstractViewCompiladorDecorator
 	public function getElement(){
 		return $this->element;
 	}
+	public function getNewView($view){
+		global $registry;
+		return $registry->ViewHandler->prepare(new DecoratorView($view,$this));
+	}
 }
 ?>

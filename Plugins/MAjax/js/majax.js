@@ -4,6 +4,7 @@ function majax(){
     self.msgKey    = "msg";
     self.dataKey   = "data";
     self.events    = {};
+    self.async = true;
     self.on = function(code,callback){
         self.events[code] = callback;
     }
@@ -21,7 +22,7 @@ function majax(){
             $.extend(dataParams,params);
         }
         if(typeof(async) == 'undefined'){
-            async = true;
+            async = self.async;
         }
         $.ajax({
             url: path_base+"/index.php",
@@ -34,7 +35,7 @@ function majax(){
                 if(typeof(callback) == "function") {
                     return callback(d[self.msgKey],d[self.dataKey]);
                 } else {
-                    alert(d[self.msgKey]);
+                    self.defaultCallback(d[self.msgKey],d[self.dataKey]);
                 }       
             },
             error: function(d,m,o){
@@ -54,8 +55,11 @@ function majax(){
     }
     self.onError = function(d,m,o){
         console.log(o);
-                console.log(m);
-                console.log(d);
+        console.log(m);
+        console.log(d);
+    }
+    self.defaultCallback = function(msg,data){
+        alert(msg);
     }
     self.onComplete = function(){
 

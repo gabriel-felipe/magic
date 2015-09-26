@@ -11,7 +11,6 @@ class reloadOnSave extends AbstractPlugin
 	protected $compatibleWith = array("1");
 	function init()
 	{
-		ini_set('xdebug.max_nesting_level', 0);
 		$this->registerHooks();
 	}
 	function appendJS(){

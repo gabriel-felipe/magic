@@ -5,6 +5,8 @@ use Magic\Engine\Datamgr\Driver\DbDriverFactory;
 use Magic\Engine\Datamgr\DbManager;
 use Magic\Engine\Hooks\HookChainManager;
 use Magic\Engine\Hooks\AbstractHook;
+use Magic\Engine\Datamgr\Hooks\DbModelHook;
+
 
 use \Exception;
 use \sanitize;
@@ -51,12 +53,21 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 
 	}
 
+	public function getDefaultData(){
+		return $this->defaultData;
+	}
+
 	public function getDefaultPkField(){
 		return $this->dbSelect->getTable().".".$this->dbSelect->getTable()."_id";
 	}
 
-	public function getPkField(){
-		return $this->pkField;
+	public function getPkField($columnOnly=0){
+		if ($columnOnly) {
+			$pk = explode(".",$this->pkField);
+			return end($pk);
+		} else {
+			return $this->pkField;	
+		}
 	}
 
 
@@ -97,7 +108,7 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 		$result = $select->run();
 		$this->dbModelHooks->callChain("afterSelect");
 		if ($result[1] > 0) {
-			$this->setData($result[0][0]);
+			$this->setData($result[0][0],1);
 			return true;
 		} else {
 			return false;
@@ -112,9 +123,12 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 		return $this->data;
 	}
 
-	public function setData(array $array){
+	public function setData(array $array,$updateDefaultData=0){
 		$this->data = $array;
-		$this->defaultData = $array;
+		if ($updateDefaultData) {
+			$this->defaultData = $array;
+		}
+		
 		return true;
 	}
 
@@ -128,7 +142,7 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 					$this->dbModelHooks->callChain("beforeUpdate");
 					$dbUpdate = clone $this->dbUpdate;
 					$dbUpdate->setFields(array_keys($updated));
-					$dbUpdate->setData($updated);
+					$dbUpdate->setData($updated,1);
 					$dbUpdate->addWhere($this->getPkField()." = :id",array("id"=>$this->getId()));
 					$result = $dbUpdate->run();
 					$this->dbModelHooks->callChain("afterUpdate");
@@ -143,8 +157,14 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 				$data = $this->getData();
 				$dbInsert = clone $this->dbInsert;
 				$dbInsert->setFields(array_keys($data));
-				$dbInsert->setData($data);
+				$dbInsert->setData($data,1);
 				$result = $dbInsert->run();
+				$dbSelect = clone $this->dbSelect;
+				$dbSelect->setFields($this->getPkField()." as dbModelPkField");
+				$dbSelect->setOrderBy(array(array("column"=>$this->getPkField(),"mode"=>"DESC")));
+				$dbSelect->setQtnByPage(1);
+				$result = $dbSelect->run();
+				$this->{$this->getPkField(1)} = $result[0][0]["dbModelPkField"];
 				$this->dbModelHooks->callChain("afterNew");
 				return $result;
 
@@ -156,15 +176,19 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 
 	}
 	public function destroy(){
+		$this->dbModelHooks->callChain("beforeDestroy");
 		$dbDelete = clone $this->dbDelete;
 		$dbDelete->addWhere($this->getPkField()." = :id",array("id"=>$this->getId()));
-		return $dbDelete->run();
+		$result = $dbDelete->run();
+		$this->dbModelHooks->callChain("afterDestroy");
+		return $result;
 	}
 	public function getId(){
-		return isset($this->data[$this->getPkField()]) ? $this->data[$this->getPkField()] : "";
+		return isset($this->data[$this->getPkField(1)]) ? $this->data[$this->getPkField(1)] : "";
 	}
 
-	public function registerHook(AbstractHook $hook, $chainName){
+	public function registerHook(DbModelHook $hook, $chainName){
+		$hook->setDbModel($this);
 		$this->dbModelHooks->registerHook($hook,$chainName);
 	}
 	

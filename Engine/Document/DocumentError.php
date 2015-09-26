@@ -55,10 +55,10 @@
 		function triggerDefault($code){
 			$this->html->responseCode($code);
 			$this->html->bodyClass = "error-$code";
-			if (is_file(path_root."/common/templates/errors/$code.html")) {
-				$this->html->setLayout("/common/templates/errors/$code.html");
+			if (is_file(path_root."/Common/templates/errors/$code.html")) {
+				$this->html->setLayout("/Common/templates/errors/$code.html");
 			} else {
-				$this->html->setLayout("/common/templates/errors/default.html");	
+				$this->html->setLayout("/Common/templates/errors/default.html");	
 			}
 			echo $this->html->render("ERROR $code");
 			die();

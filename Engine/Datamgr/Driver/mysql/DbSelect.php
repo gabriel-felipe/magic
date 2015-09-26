@@ -8,6 +8,9 @@ class DbSelect extends AbstractDbSelect
     public function getQuery(){
         $keys = $this->getFields();
         foreach($keys as &$key){
+            if (count(explode(".",$key)) >= 2) {
+                continue;
+            }
             $key = $this->getTable().".$key";
         }
         $keys = implode(", ",$keys);
@@ -66,8 +69,13 @@ class DbSelect extends AbstractDbSelect
         $orderBy = "";
         if ($order) {
             $orderBy = " ORDER BY ";
+            $o = 0;
             foreach ($order as $info) {
+                if ($o > 0) {
+                    $orderBy .= ", ";
+                }
                 $orderBy .= $info['column']." ".$info['mode']." ";
+                $o++;
             }
             
         }

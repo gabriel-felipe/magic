@@ -12,6 +12,7 @@ s/*TESTE RESET*/
 	 	-webkit-box-sizing: border-box;
 	 	-moz-box-sizing: border-box;
 	 	box-sizing: border-box;
+	 	-webkit-font-smoothing: antialiased;
 	 }
 
 
@@ -28,6 +29,13 @@ s/*TESTE RESET*/
 			-moz-transition: @arguments;
 			-webkit-transition: @arguments;
 			-o-transition: @arguments;
+		}
+
+		.transition-delay (@arguments){
+			transition-delay: @arguments;
+			-moz-transition-delay: @arguments;
+			-webkit-transition-delay: @arguments;
+			-o-transition-delay: @arguments;
 		}
 
 		.transform (@arguments){
@@ -232,5 +240,3 @@ s/*TESTE RESET*/
 	.talign-left   {text-align:left;}
 	.talign-right  {text-align:right;}
 	.valign-center {display: table-cell; vertical-align: middle;}
-	
-	

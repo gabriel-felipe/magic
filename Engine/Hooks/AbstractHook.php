@@ -7,7 +7,6 @@ namespace Magic\Engine\Hooks;
 abstract class AbstractHook
 {
 	abstract function action(Array &$params);
-	abstract function register();
 	public function run(Array $params){
 		$this->action($params);
 		return $params;

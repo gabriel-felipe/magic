@@ -51,6 +51,11 @@ Abstract class AbstractView
         return $this->compilador;
     }
 
+    public function resetCompilador(){
+        $this->setCompilador(new ViewCompilador());
+        return $this;
+    }
+
     public function addCompiladorDecorator(InterfaceViewCompilador $decorator){
         $decorator->setCompilador($this->getCompilador());
         return $this->setCompilador($decorator);
@@ -135,6 +140,7 @@ Abstract class AbstractView
     }
     public function setData(array $data){
         $this->data = $data;
+        return $this;
     }
     public function mergeData(array $data){
     	$this->data = array_merge($this->data,$data);
@@ -175,6 +181,11 @@ Abstract class AbstractView
         $this->ext = $ext;
 
         return $this;
+    }
+
+    function __clone(){
+        $this->compilador = clone $this->compilador;
+        $this->compilador->setView($this);
     }
 }
 ?>

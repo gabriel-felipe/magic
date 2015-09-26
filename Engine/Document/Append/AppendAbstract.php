@@ -45,7 +45,7 @@ class AppendAbstract
 	}
 
 	public function getContent(){
-		return $this->alias;
+		return $this->content;
 	}
 
 	public function setContent($content){
@@ -57,7 +57,7 @@ class AppendAbstract
 	 */
 	public function setPosition($position){
 		if (!in_array($position, $this->positions)) {
-			throw new Exception("Posição $position para append não existe", 1);	
+			throw new \Exception("Posição $position para append não existe", 1);	
 			return false;
 		} else {
 			$this->position = $position;

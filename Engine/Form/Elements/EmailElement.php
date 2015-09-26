@@ -6,7 +6,7 @@ use Magic\Engine\Form\ElementView;
 /**
 * 		
 */
-class TextElement extends AbstractElement
+class EmailElement extends AbstractElement
 {
 	public $attrs = array("type"=>"text");
 

@@ -8,7 +8,8 @@ class MagicDefaultJsCompiladorMinificacaoDecorator extends AbstractCompiladorDec
 {
 	public function compilar($content)
 	{
-		return Minifier::minify($content);
+		return $content;
+		// return Minifier::minify($content);
 	}
 }
 ?>

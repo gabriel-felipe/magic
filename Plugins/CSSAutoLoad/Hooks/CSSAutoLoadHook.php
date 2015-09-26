@@ -9,7 +9,6 @@ class cssAutoLoadHook extends AbstractHook
 		if ($this->html->responseCode() == 200) {
 		
 			if (isset($_POST['css_only'])) {
-				ini_set('xdebug.max_nesting_level', 0);
 				$this->CSSAutoLoad->getCss($html);
 			} else {
 				$this->CSSAutoLoad->appendJs($html);
