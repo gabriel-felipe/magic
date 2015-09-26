@@ -3,5 +3,5 @@ cache/*
 Cache/*
 !cache/*.gitkeep
 !Cache/*.gitkeep
-logs/errors.txt
+Logs/errors.txt
 docs/*

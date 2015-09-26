@@ -1,5 +1,4 @@
 <?php 
-	require_once(path_library."/data-cleaner.php");
 	class date {
 		static function timestamp($date=false,$if_null_then_time=true){
 			if($date){

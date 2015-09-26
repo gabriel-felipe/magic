@@ -30,9 +30,10 @@
 		function getAction($code){
 			$errorInfo = $this->config->errors->get("error-".$code);
 			if (is_array($errorInfo) and isset($errorInfo['scope']) and isset($errorInfo['route'])) {
+				
 				$scope = new Scope($errorInfo['scope'],$this->registry);
-				$scope->init();
 				$this->registry->set("scope",$scope);
+				$scope->init();
 				$this->registry->set("route",$errorInfo['route']);
 				$action = new Action($errorInfo['route'], $scope,array(),$this->registry);
 				$this->registry->set("action",$action);

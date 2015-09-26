@@ -12,7 +12,7 @@ use Magic\Engine\Document\Script\ScriptAbstract;
  */
 final class ScopeJs extends ScriptAbstract {
 	public function __construct($file,$scope){
-		$this->rootPath = "/Scopes/".$scope->getName()."/views/js/";
+		$this->rootPath = "/Scopes/".$scope->getName()."/Views/Js/";
 		parent::__construct($file);
 	}
 }

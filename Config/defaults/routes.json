@@ -1,6 +1,7 @@
 {
-    "public" : {
-        "" : {"route":"home"},
+    "Publico" : {
+        "" : {"route":"Home"},
+        "test" : {"route":"Home_Test"},
         "about" : {"route":"about"}
     },
     "wireframes" : {

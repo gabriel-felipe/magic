@@ -7,7 +7,6 @@ class ActionException extends Exception
 	
 }
 final class Action {
-	protected $file = false;
 	protected $class = false;
 	protected $method = false;
 	protected $args = array();
@@ -22,17 +21,19 @@ final class Action {
 	protected $scope;
 	protected $view;
 	public function __construct($route,Scope $scope, $args = array(),$registry=array()) {
+
 		$this->route = $route;
 		$this->registry = $registry;
 		$this->scope = $scope;
 		$path = '';
 		$this->view = $route;
+
 		$parts = explode('/', str_replace('../', '', (string)$route));
 		
 		foreach ($parts as $part) { 
 			$path .= $part;
 
-			if (is_dir($scope->getFolder() . '/controller/' . $path)) {
+			if (is_dir($scope->getFolder() . '/Controller/' . $path)) {
 				$path .= '/';
 				
 				array_shift($parts);
@@ -41,9 +42,8 @@ final class Action {
 			}
 			
 			if (is_file($scope->getControllerFolder() . '/' . str_replace(array('../', '..\\', '..'), '', $path) . '.php')) {
-				$this->file = $scope->getControllerFolder() . '/' . str_replace(array('../', '..\\', '..'), '', $path) . '.php';
 				
-				$this->class = 'Controller' . preg_replace('/[^a-zA-Z0-9]/', '', $path);
+				$this->class = str_replace("/","\\",$scope->getName()."\\Controller\\".preg_replace('/[^\\a-zA-Z0-9]/', '', $path));
 
 				array_shift($parts);
 				
@@ -61,7 +61,7 @@ final class Action {
 		} else {
 			$this->method = 'index';
 		}
-		if($this->method and $this->file and $this->class){
+		if($this->method and $this->class){
 			$this->is_ok = true;
 		}
 	}
@@ -88,12 +88,9 @@ final class Action {
 
 	public function getController(){
 		$class = $this->class;			
+
 		$errors = array();
-		if(!$this->file or !file_exists($this->file)){
-			$errors[] = "Error with file: ".$this->file."; Please, check if the file exists.";
-		} else {
-			require_once($this->file);
-		}
+		
 		
 		if(!class_exists($class)){
 			$errors[] = "Error with class. Class ".$class." doesn't exist.";
@@ -140,6 +137,8 @@ final class Action {
 				throw new ActionException("Error Processing Action(route: \"{$this->route}\"), Pls Check.", 1);
 			}
 		} catch(ActionException $e) {
+			echo $this->route;
+			var_dump($this->class);
 			$this->htmlError->triggerDefault(404);
 			die();
 		} catch(Exception $e){

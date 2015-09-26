@@ -11,7 +11,7 @@ final class ThemeView extends AbstractView {
 		$c = 0;
 		foreach ($this->scope->getThemes() as $theme) {
 			$c++;
-			$this->rootPath = "/Scopes/".$this->scope->getName()."/views/".$theme."/template/";
+			$this->rootPath = "/Scopes/".$this->scope->getName()."/Views/".$theme."/Template/";
 			$this->path = $path;
 			if ($this->doExist()) {
 				break;

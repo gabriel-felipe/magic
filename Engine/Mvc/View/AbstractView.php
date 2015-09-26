@@ -29,6 +29,8 @@ Abstract class AbstractView
 
     function __construct($file=false){
         global $registry;
+        
+
         $this->registry = $registry;
         if ($file) {
             $this->setPath($file);

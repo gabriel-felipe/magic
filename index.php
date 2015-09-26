@@ -2,6 +2,7 @@
 	namespace Magic;
 	use Magic\Engine\Config\MagicConfig;
 	use Magic\Engine\Registry;	
+	use Magic\Engine\Autoloader\Manager as Autoloader;
 	if(session_id() == ""){
 		session_start();
 	}
@@ -10,38 +11,8 @@
 	define("path_root",$root."$path");
 	define("base_url","http://".$_SERVER["SERVER_NAME"].$_SERVER["CONTEXT_PREFIX"]."$path");
 	define("path_base","http://".$_SERVER["SERVER_NAME"].$_SERVER["CONTEXT_PREFIX"]."$path");
-	
-	spl_autoload_register(function ($class) {
-		$d = DIRECTORY_SEPARATOR;
-	    // project-specific namespace prefix
-	    $prefix = 'Magic'."\\";
-
-	    // base directory for the namespace prefix
-	    // does the class use the namespace prefix?
-	    $len = strlen($prefix);
-	    if (strncmp($prefix, $class, $len) !== 0) {
-	        // no, move to the next registered autoloader
-	        return;
-	    }
-
-	    // get the relative class name
-	    $relative_class = substr($class, $len);
-
-	    // replace the namespace prefix with the base directory, replace namespace
-	    // separators with directory separators in the relative class name, append
-	    // with .php
-	    $file = path_root . $d . str_replace('\\', $d, $relative_class) . '.php';
-	   
-	    // if the file exists, require it
-	    if (file_exists($file)) {
-	        require $file;
-	    } else {
-	    	print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
-	    	echo "Arquivo não existe: $file";
-	    	die();
-	    }
-	});
-	
+	require_once("Engine/Autoloader/Manager.php");
+	$loader = Autoloader::getInstance();
 
 
 	define('APPLICATION_ENV', getenv("APPLICATION_ENV"));
@@ -108,14 +79,6 @@
 	$ViewHandler = new ViewHandler($registry);
 	$registry->set("ViewHandler",$ViewHandler);
 
-	//Loading Plugin
-	
-
-	//Loading Loader.
-	use Magic\Engine\Loader;
-	$loader = new loader($registry);
-	$registry->set('load',$loader);
-
 	
 	//Loading Urls
 	use Magic\Engine\Mvc\Url;
@@ -171,7 +134,12 @@
 	$registry->set("scope",$scope);
 	$scope->init();
 
-	define("magic_language",$scope->language->getLang());
+	if ($scope->language) {
+		define("magic_language",$scope->language->getLang());
+	} else {
+		define("magic_language",null);
+	}
+	
 	
 	
 	if(array_key_exists("route", $_GET)){
