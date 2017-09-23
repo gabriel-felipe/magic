@@ -10,27 +10,37 @@ use Magic\Engine\Mvc\View\Compiladores\InterfaceViewCompilador;
 class DisplayGroup extends Form
 {
 	protected $parentForm=false;
+	protected $cascadePrepare=false;
 	public function getNewView(){
-		return new FormView("displayGroup",$this);
+		$view = new FormView("displayGroup");
+		$view->form = $this;
+		return $view;
 	}
 	public function setParentForm(Form $form){
 		$this->parentForm = $form;
 	}
-	public function addElemntsToParent(){
+	public function addElementsToParent(){
 		if ($this->parentForm) {
 			$elements = array_merge($this->parentsForm->getElements(),$this->getElements());
 			$this->parentForm->setElements($elements);
 		}
 	}
-	public function addElement(AbstractElement $element,$prepareElement=true,$addToParent=true){
+	public function setCascadePrepare($cascade){
+		$this->cascadePrepare = $cascade;
+		return $this;
+	}
+	public function addElement(AbstractElement $element,$prepareElement=true,$addToParent=true,$cascadePrepare=false){
 		if ($prepareElement) {
 			$this->prepare($element);
+		}
+		if (!$cascadePrepare) {
+			$cascadePrepare = $this->cascadePrepare;
 		}
 		
 		$name = $element->getId();
 		$this->elements[$name] = $element;
-		if ($this->parentForm) {
-			$this->parentForm->addElement($element,$prepareElement);
+		if ($this->parentForm and $addToParent) {
+			$this->parentForm->addElement($element,$cascadePrepare,$addToParent,$cascadePrepare);
 		}
 	}
 }

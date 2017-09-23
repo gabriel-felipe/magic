@@ -29,8 +29,6 @@ Abstract class AbstractView
 
     function __construct($file=false){
         global $registry;
-        
-
         $this->registry = $registry;
         if ($file) {
             $this->setPath($file);
@@ -188,6 +186,10 @@ Abstract class AbstractView
     function __clone(){
         $this->compilador = clone $this->compilador;
         $this->compilador->setView($this);
+    }
+
+    function __toString(){
+        return $this->render();
     }
 }
 ?>

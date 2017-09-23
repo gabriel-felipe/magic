@@ -11,7 +11,6 @@ class Language
     protected $languages = array();
     protected $language = false;
     public $data = array();
-    protected $loadedFiles = array();
     public function __construct($registry=array(),$languageFolder)
     {   
         $this->languageFolder = $languageFolder;
@@ -42,7 +41,7 @@ class Language
         $scs = $registry->url->getShortcuts(); //create URL Multi Language;
         $finalScs = array();
         foreach($scopes as $scope){
-            $languages = glob("Scopes"."/$scope/Language/*",GLOB_ONLYDIR);
+            $languages = glob("Scopes"."/$scope/language/*",GLOB_ONLYDIR);
             $languages = array_map("basename",$languages);
             foreach($languages as $lang){
                 foreach($scs as $k=>$sc){
@@ -55,7 +54,7 @@ class Language
                     }
                     $sc_copy['defaults']['magic_language'] = $lang;
                     $sc_copy['route'] = rtrim($sc['route'],"/");
-                    $key = ltrim($lang."/".rtrim($k,"/"),"/");
+                    $key = ltrim(rtrim($k,"/")."/".$lang,"/");
                     $finalScs[$key] = $sc_copy;
                     $registry->url->addShortcut($key,$sc_copy);
                 }
@@ -69,11 +68,6 @@ class Language
             if(is_file($this->languageFolder."/".$this->language."/index.php")){
                 $this->load("index");
             }
-            foreach ($this->loadedFiles as $file) {
-                if ($file !== "index") {
-                    $this->load($file);
-                }
-            }
             return $this->data;
         } else {
             throw new Exception("Language not found.", 1);
@@ -81,7 +75,6 @@ class Language
     }
 
     public function load($file){
-        $this->loadedFiles[] = $file;
         $file = $this->languageFolder."/".$this->language."/".$file.".php";
         if(is_file($file)){
             $_ = array();

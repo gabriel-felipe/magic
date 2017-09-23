@@ -2,7 +2,7 @@
 namespace Magic\Engine\Form;
 use Magic\Engine\Mvc\View\AbstractView;
 final class ElementView extends AbstractView {
-	protected $rootPath = "/Common/Templates/Form/";
+	protected $rootPath = "/Common/templates/form/";
 	public function __construct($path,AbstractElement $element){
 		parent::__construct($path);
 		$this->setElement($element);

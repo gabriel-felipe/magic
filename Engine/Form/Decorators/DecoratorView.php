@@ -2,7 +2,7 @@
 namespace Magic\Engine\Form\Decorators;
 use Magic\Engine\Mvc\View\AbstractView;
 final class DecoratorView extends AbstractView {
-	protected $rootPath = "/Common/Templates/Form/Decorators/";
+	protected $rootPath = "/Common/templates/form/decorators/";
 	public function __construct($path,AbstractFormDecorator $decorator){
 		parent::__construct($path);
 		$this->setDecorator($decorator);

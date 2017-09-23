@@ -60,10 +60,9 @@
 			$data = array();
 
 			foreach ($this->children as $child) {
-				$name = str_replace("/","\\",$child);
-				$name = explode("\\",$name);
+				$name = explode("/",$child);
 				$name = end($name);
-				$name = lcfirst($name);
+				$name = $name;
 				$content = $this->getChild($child);				
 				$data[$name] = $content;
 			}

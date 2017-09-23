@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace Magic\Engine\Document\Link;
 use Magic\Engine\Document\AbstractAsset;
 /**
@@ -87,7 +87,8 @@ Abstract class LinkAbstract extends AbstractAsset
     }
 
     function toString(){
-        return "<link href='".$this->getRelPath()."' type='".$this->getType()."' rel='".$this->getRel()."' media='".$this->getMedia()."' >";
+		$modDate = ($this->getModDate()) ? $this->getModDate() : 1;
+        return "<link href='".$this->getRelPath()."?v=".$modDate."' type='".$this->getType()."' rel='".$this->getRel()."' media='".$this->getMedia()."' >";
     }
     function __toString(){
         return $this->toString();
