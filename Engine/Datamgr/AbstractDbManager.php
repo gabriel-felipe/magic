@@ -93,8 +93,10 @@ use \PDO;
 			}
 			return array($resultados, $qtnLinhas);
 			} else {
+				//var_dump($values);
 				$this->lastError = $query;
-				throw new DbException("Error executing query.", 1);
+				throw new DbException("Error executing query. $query <br /> \n<br />\n".print_r($this->cnx->errorInfo(),1)."<br />\n<br />\n".print_r($values,1)
+, 1);
 			}
 		}
 		public function queryGroup($query,$values=array()){

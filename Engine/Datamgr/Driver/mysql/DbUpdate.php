@@ -1,7 +1,6 @@
 <?php 
 namespace Magic\Engine\Datamgr\Driver\mysql;
 use Magic\Engine\Datamgr\Sql\AbstractDbUpdate;
-
 class DbUpdate extends AbstractDbUpdate
 {
     
