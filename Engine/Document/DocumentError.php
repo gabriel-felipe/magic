@@ -30,9 +30,10 @@
 		function getAction($code){
 			$errorInfo = $this->config->errors->get("error-".$code);
 			if (is_array($errorInfo) and isset($errorInfo['scope']) and isset($errorInfo['route'])) {
+				
 				$scope = new Scope($errorInfo['scope'],$this->registry);
-				$scope->init();
 				$this->registry->set("scope",$scope);
+				$scope->init();
 				$this->registry->set("route",$errorInfo['route']);
 				$action = new Action($errorInfo['route'], $scope,array(),$this->registry);
 				$this->registry->set("action",$action);
@@ -55,10 +56,10 @@
 		function triggerDefault($code){
 			$this->html->responseCode($code);
 			$this->html->bodyClass = "error-$code";
-			if (is_file(path_root."/Common/templates/errors/$code.html")) {
-				$this->html->setLayout("/Common/templates/errors/$code.html");
+			if (is_file(path_root."/Common/Templates/Errors/$code.html")) {
+				$this->html->setLayout("/Common/Templates/Errors/$code.html");
 			} else {
-				$this->html->setLayout("/Common/templates/errors/default.html");	
+				$this->html->setLayout("/Common/Templates/Errors/default.html");	
 			}
 			echo $this->html->render("ERROR $code");
 			die();

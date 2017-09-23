@@ -1,4 +1,4 @@
-<?php
+<?php 
 namespace Magic\Engine\Document\Script;
 use Magic\Engine\Document\AbstractAsset;
 /**
@@ -19,7 +19,7 @@ Abstract class ScriptAbstract extends AbstractAsset
 	function __construct($file,$position="bottom"){
 		parent::__construct($file);
 		$this->setPosition($position);
-
+		
 	}
 
 	/**
@@ -27,21 +27,20 @@ Abstract class ScriptAbstract extends AbstractAsset
 	 */
 	public function setPosition($position){
 		if (!in_array($position, $this->positions)) {
-			throw new Exception("Posição para script não encontrada", 1);
+			throw new Exception("Posição para script não encontrada", 1);	
 			return false;
 		} else {
 			$this->position = $position;
-			return true;
+			return true;	
 		}
-
+		
 	}
 
 	public function getPosition(){
 		return $this->position;
 	}
 	function toString(){
-		$modDate = ($this->getModDate()) ? $this->getModDate() : 1;
-        return "<script src='".$this->getRelPath()."?v=".$modDate."'></script>";
+        return "<script src='".$this->getRelPath()."'></script>";
     }
     function __toString(){
         return $this->toString();

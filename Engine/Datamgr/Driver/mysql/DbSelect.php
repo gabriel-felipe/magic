@@ -23,8 +23,6 @@ class DbSelect extends AbstractDbSelect
                 $keys .= ", $table.$field as `$name` ";
             }
         }
-        
-
         foreach($this->customFields as $info){
             $field = $info['name'];
             $query = $info['query'];
@@ -34,8 +32,6 @@ class DbSelect extends AbstractDbSelect
                 $keys .= "as `$field` ";
             }
         }
-        $keys = trim($keys);
-        $keys = trim($keys,",");
 
         $where = $this->getWhere();
         $whereQuery = "";
@@ -87,15 +83,12 @@ class DbSelect extends AbstractDbSelect
         $limit = "";
         $page = $this->getPage();
         $qtnByPage = $this->getQtnByPage();
-        if ($page and $qtnByPage) {
+        if ($page or $qtnByPage) {
             $limit = " LIMIT ";
             if ($page) {
                 $limit .= (($page - 1)*$qtnByPage).", ";
             }
             $limit .= $qtnByPage." ";
-        } else if(($page and !$qtnByPage) or ($qtnByPage and !$page)){
-            throw new \LogicException("Set both DbSelect::page and DbSelect::qtnByPage or none of them", 1);
-            
         }
 
         

@@ -15,7 +15,6 @@ abstract class AbstractElement {
 	protected $rawValue;
 	protected $name;
 	protected $required=false;
-	protected $sanitizeRecursively=1;
 	protected $decorators = array();
 	public $attrs=array();
 
@@ -90,27 +89,14 @@ abstract class AbstractElement {
 	public function getRawValue(){
 		return $this->rawValue;
 	}
-	public function addValidator(AbstractValidator $validator,$name=false){
-		if ($name) {
-			$this->validators[$name] = $validator;
-		} else {
-			$this->validators[] = $validator;
-		}
+	public function addValidator(AbstractValidator $validator){
+		$this->validators[] = $validator;
 		return $this;
-	}
-	public function getValidators(){
-		return $this->validators;
-	}
-	public function getValidator($name){
-		return $this->validators[$name];
 	}
 	public function addSanitizer(AbstractSanitizer $sanitizer){
 		$this->sanitizers[] = $sanitizer;
 		$this->sanitize();
 		return $this;
-	}
-	public function getSanitizers(){
-		return $this->sanitizers;
 	}
 	public function getValidateErrors(){
 		return $this->validateErrors;
@@ -120,32 +106,17 @@ abstract class AbstractElement {
 		if (!$this->getValue() and !$this->getRequired()) {
 			return true; //Return true if empty and not required.
 		} elseif($this->getRequired() and !$this->getValue()){
-			$errors['emptyField'] = "Campo obrigatório";
+			$errors['emptyField'] = "Este campo é obrigatório e não pode ser vazio.";
 			$this->validateErrors = $errors;
 			return false;
 		}
-		$value = $this->getValue();
-		if (is_array($value)) {
-			foreach ($value as $k=>$v) {
-				foreach($this->validators as $validator){
-					if ($validator->isValid($v)) {
-						continue;
-					} else {
-						$errors[] = $validator->getError();
-					}
-				}
-			}
-			
-		} else {
-			foreach($this->validators as $validator){
-				if ($validator->isValid($value)) {
-					continue;
-				} else {
-					$errors[] = $validator->getError();
-				}
+		foreach($this->validators as $validator){
+			if ($validator->isValid($this->value)) {
+				continue;
+			} else {
+				$errors[] = $validator->getError();
 			}
 		}
-		
 		$this->validateErrors = $errors;
 		if (count($errors) === 0) {
 			return true;
@@ -155,13 +126,8 @@ abstract class AbstractElement {
 	}
 	public function sanitize(){
 		$value = $this->rawValue;
-
 		foreach($this->sanitizers as $sanitize){
-			if (is_array($value) && $this->sanitizeRecursively) {
-				$retorno = array_walk_recursive($value, array($sanitize,"sanitize"));
-			} else {
-				$value = $sanitize->sanitize($value);	
-			}
+			$value = $sanitize->sanitize($value);
 		}
 		$this->value = $value;
 	}
@@ -195,24 +161,6 @@ abstract class AbstractElement {
 		return $view->render();
 	}
 
-	function __clone(){
-		$newDecorators = array();
-		foreach ($this->decorators as $k => $v) {
-		    $newDecorators[$k] = clone $v;
-		    $newDecorators[$k]->setElement($this);
-		}
-		$this->decorators = $newDecorators;
-
-		$newSanitizers = array();
-		foreach ($this->sanitizers as $k => $v) {
-		    $newSanitizers[$k] = clone $v;
-		}
-		$this->sanitizers = $newSanitizers;
-
-		$this->view->element = $this;
-
-
-	}
 
 
     /**
@@ -222,13 +170,7 @@ abstract class AbstractElement {
      */
     public function getLabel()
     {
-    	if ($this->label) {
-    		return $this->label;
-    	} else {
-    		$label = ucfirst($this->name);
-    		$label = str_replace("_"," ",$label);
-    		return $label;
-    	}
+        return ($this->label) ? $this->label : ucfirst($this->name);
     }
 
 

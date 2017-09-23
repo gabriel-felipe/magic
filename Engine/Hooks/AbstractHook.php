@@ -9,18 +9,11 @@ abstract class AbstractHook
 	abstract function action(Array &$params);
 	public function run(Array $params){
 		$this->action($params);
-		return $params;	
-		
-		
+		return $params;
 	}
 	public function getName(){
-		if (!$this->name) {
-			$class = get_class($this);
-			return $class;
-		} else {
-			return $this->name;
-		}
-		
+		$class = get_class($this);
+		return $class;
 	}
 	public function setName($name){
 		$this->name = $name;

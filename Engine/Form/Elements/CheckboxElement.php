@@ -9,28 +9,32 @@ use Magic\Engine\Form\ElementView;
 class CheckboxElement extends TextElement
 {
 	public $attrs = array("type"=>"checkbox");
-	protected $inputValue=0;
 	function setUp(){
 		global $registry;
 		$this->view = $registry->ViewHandler->prepare(new ElementView("checkbox",$this));
 	}
 	protected $checked = false;
-
 	public function getChecked(){
-		return $this->value == $this->inputValue;
+		return $this->checked;
 	}
 	public function setInputValue($value){
-		$this->inputValue = $value;
+		$this->rawValue = $value;
+		$this->sanitize();
 	}
-	public function getInputValue(){
-		return $this->inputValue;
+
+	public function setValue($value){
+		if ($value == $this->rawValue) {
+			$this->checked = true;
+		} else {
+			$this->checked = false;
+		}
 	}
 
 	public function getValue(){
 		if ($this->getChecked()) {
-			return $this->value;
-		} else {
 			return 0;
+		} else {
+			return $this->value;
 		}
 	}
 

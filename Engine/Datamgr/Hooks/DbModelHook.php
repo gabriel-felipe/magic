@@ -5,7 +5,7 @@ use Magic\Engine\Datamgr\DbModel;
 class DbModelHook extends AbstractHook
 {
 	protected $dbModel;
-	public function setDbModel(DbModel &$dbModel){
+	public function setDbModel(DbModel $dbModel){
 		$this->dbModel = $dbModel;
 	}
 	public function getDbModel(){

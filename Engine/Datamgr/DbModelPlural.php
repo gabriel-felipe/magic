@@ -1,38 +1,31 @@
 <?php
 namespace Magic\Engine\Datamgr;
 use Magic\Engine\Datamgr\Sql\AbstractDbSelect;
-use Magic\Engine\Hooks\HookChainManager;
-use Magic\Engine\Hooks\AbstractHook;
+
 class dbModelPlural {
 	
 	public $dbSelect;
 	public $dbDelete;
 	protected $single;
 	public $plural = array();
-	protected $dbModelHooks;
-	public $lastSelect;
+
 
 	public function __construct(DbModel $dbModel,$qtnByPage=999999999999) {
 		$dbSelect = $dbModel->dbSelect;
 		$this->dbSelect = $dbSelect;
-		$this->lastSelect = $dbSelect;
 		$this->dbDelete = $dbModel->dbDelete;
 
 		$this->dbSelect->setPage(1);
 		$this->dbSelect->setQtnByPage($qtnByPage);
 
 		$this->single = $dbModel;
-		$this->dbModelHooks = new HookChainManager;
-		$this->dbModelHooks->setGlobalParams(array($this));
+		
 	}
 	public function setPage($page=false){
 		$this->dbSelect->setPage($page);
 	}
-	public function registerHook(AbstractHook $hook, $chainName){
-		$this->dbModelHooks->registerHook($hook,$chainName);
-	}
+	
 	protected function runSelect(AbstractDbSelect $select){
-		$this->dbModelHooks->callChain("beforeSelect");
 		$this->plural = array();
 		$resultados = $select->run();
 		if($resultados[0]){
@@ -40,13 +33,8 @@ class dbModelPlural {
 				$single = clone $this->single;
 				$single->setData($atributos,1);
 				$this->plural[$single->getId()] = $single;
-
 			}
-
 		}
-		$this->lastSelect = $select;
-		$this->dbModelHooks->callChain("afterSelect");
-
 	}
 
 
@@ -61,7 +49,7 @@ class dbModelPlural {
 		$this->runSelect($select);
 		return $this->info();
 	}
-	public function getByIds($ids=array(), $keep_order=false){
+	public function get_by_ids($ids=array(), $keep_order=false){
 		if(is_array($ids)){
 			$select = clone $this->dbSelect;
 			foreach ($ids as $key => $id) {
@@ -93,20 +81,14 @@ class dbModelPlural {
 	}
 	
 	public function destroy(){
-		if ($this->plural) {
-		
-			$dbDelete = clone $this->dbDelete;
-			$o = 0;
-			foreach($this->plural as $obj){
-				$key = "id".$o;
-				$dbDelete->addWhere($this->single->getPkField()." = :$key",array($key=>$obj->getId()),"or");
-				$o++;
-			}
-			return $dbDelete->run();
-			# code...
-		} else {
-			return null;
+		$dbDelete = clone $this->dbDelete;
+		$o = 0;
+		foreach($this->plural as $obj){
+			$o++;
+			$key = "id".$o;
+			$dbDelete->addWhere($this->single->getPkField()." = :$key",array($key=>$obj->getId()),"or");
 		}
+		return $dbDelete->run();
 	}
 
 

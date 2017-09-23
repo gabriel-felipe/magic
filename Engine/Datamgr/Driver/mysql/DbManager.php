@@ -7,8 +7,8 @@ use \PDO;
 
 	//Default class for code generating
 	class DbManager extends AbstractDbManager {
-
-
+		
+		
 		public function getTables($fetchColumns=false){
 			$cnxQuery = $this->cnx->prepare("SHOW TABLES");
 			$cnxQuery->execute();
@@ -23,7 +23,7 @@ use \PDO;
 				} else {
 					$tables[] = $table;
 				}
-
+				
 			}
 			return $tables;
 		}
@@ -31,7 +31,7 @@ use \PDO;
 		public function hasTable($table){
 			$table = trim($table,"`");
 			$table="`".$table."`";
-			$query = $this->cnx->query("describe $table");
+			$query = $this->cnx->query("SELECT * FROM $table");
 		    if($query)
 		    {
 		        return true;
@@ -44,7 +44,7 @@ use \PDO;
 					die ("A query possui algum problema, mais detalhes técnicos em: ".(print_r($this->cnx->errorInfo(),1)));
 				}
 		    }
-
+			
 		}
 		public function duplicateTable($antiga, $nova){
 			$table = trim($table,"`");
@@ -87,7 +87,7 @@ use \PDO;
 				if(!$this->cnx->query($query)) {
 					echo "<br />Error trying to add column($query) - ".print_r($this->cnx->errorInfo())."<br />";
 				}
-
+				
 			}else {
 				echo "Table doesn't exists";
 			}
@@ -124,7 +124,7 @@ use \PDO;
 				echo "Table doesn't exists";
 			}
 		}
-
+		
 		public function updateColumnType($table, $column, $newtype){
 			$table = trim($table,"`");
 			$table="`".$table."`";
@@ -162,7 +162,7 @@ use \PDO;
 			return $tem;
 			} else {
 				throw new Exception("Error Processing Request, table $table doesnt exist", 1);
-
+				
 			}
 		}
 		public function fetchColumns($table){
@@ -212,7 +212,7 @@ use \PDO;
 			return $fields;
 			} else {
 				throw new Exception("Error Processing Request, table $table doesnt exist", 1);
-
+				
 			}
 		}
 	}

@@ -113,7 +113,7 @@ abstract class AbstractDbQuery
     }
 
     public function registerHistory($query,$params){
-        $this->history[] = array("query"=>$query,"params"=>$params,"time"=>time());
+        $this->history = array("query"=>$query,"params"=>$params,"time"=>time());
         return $this;
     }
 

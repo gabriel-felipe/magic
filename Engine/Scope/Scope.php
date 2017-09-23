@@ -1,4 +1,4 @@
-<?php
+<?php 
 namespace Magic\Engine\Scope;
 use Magic\Engine\Scope\Assets\ThemeView;
 use Magic\Engine\Scope\Assets\ThemeJs;
@@ -27,18 +27,22 @@ class Scope
         $this->setThemes($this->config->themes->get($this->getName()));
 	}
     function initLanguage(){
-        $language = new Language($this->registry,$this->getLanguageFolder());
-        $language->init("br"); //If exist language br, that will be the default one, else it will select the first in alphabetical order.
-        $magic_language = data::get("magic_language");
-        if($magic_language){
-            $language->select($magic_language);
+        if (is_dir($this->getFolder()."/Language")) {
+        
+            $language = new Language($this->registry,$this->getLanguageFolder());
+            $language->init("br"); //If exist language br, that will be the default one, else it will select the first in alphabetical order.
+            $magic_language = data::get("magic_language");
+            if($magic_language){
+                $language->select($magic_language);
+            }
+            $this->language = $language;
+            # code...
         }
-        $this->language = $language;
-
+        
     }
     function setThemes($themes=false){
         if (!$themes) {
-            $themes = array("default");
+            $themes = array("Default");
         } elseif (is_string($themes)) {
             $themes = array($themes);
         }
@@ -70,16 +74,18 @@ class Scope
 	 * @return $this;
 	 */
 	function init(){
+        $this->initLanguage();
         foreach ($this->themes as $theme) {
             if(!is_dir($this->getThemeFolder($theme))){
                 throw new \LogicException("Theme $theme Does not exist: ".$this->getThemeFolder($theme), 1);
             }
         }
-
-		if (is_file($this->getFolder()."/init.php")) {
-			require_once($this->getFolder()."/init.php");
-		}
-        $this->initLanguage();
+        
+		if (class_exists($this->getName()."\\Init")) {
+            $class = $this->getName()."\\Init";
+            $class::run($this);
+        }
+        
 
 
 	}
@@ -121,7 +127,7 @@ class Scope
     	} else {
     		throw new \UnexpectedValueException("Escopo $name não foi encontrado dentro da pasta scopes, cheque sua existência.", 1);
     	}
-
+        
     }
     public function setBase($base){
         $this->base = $base;
@@ -142,24 +148,24 @@ class Scope
     }
 
     public function getModelFolder(){
-        return $this->getFolder()."/model";
+        return $this->getFolder()."/Model";   
     }
 
     public function getControllerFolder()
     {
-        return $this->getFolder()."/controller";
+        return $this->getFolder()."/Controller";
     }
 
     public function getViewFolder(){
-        return $this->getFolder()."/views";
+        return $this->getFolder()."/Views";
     }
 
     public function getViewBase(){
-        return  $this->getBase()."/views";
+        return  $this->getBase()."/Views";
     }
 
     public function getLanguageFolder(){
-        return $this->getFolder()."/language";
+        return $this->getFolder()."/Language";
     }
 
     /**
@@ -203,6 +209,7 @@ class Scope
             $c++;
             $path = "/Scopes/".$this->getName()."/views/".$theme."/image/$img";
             $file = path_root.$path;
+            
             if (file_exists($file)) {
                 return path_base.$path;
             } else if ($c == count($this->getThemes())) {

@@ -2,10 +2,10 @@
 namespace Magic\Engine\Validator;
 class EmailValidator extends AbstractValidator
 {
-	protected $errorMsg="Insira um e-mail válido.";
+	protected $errorMsg="O e-mail fornecido (:email) não é um e-mail válido.";
 	function validate($email)
 	{
-		return filter_var($email, FILTER_VALIDATE_EMAIL);
+		return preg_match("/^.+@.+\..+/",$email) ? $email : false;
 	}
 
 	function getErrorParams($email){

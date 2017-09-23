@@ -116,26 +116,15 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 	}
 
 	public function info(){
-		$info = $this->data;
-		$this->dbModelHooks->setGlobalParams(array(0=>$this));
-		$params = $this->dbModelHooks->callChain("parseInfo",array("info"=>$info));
-		if ($params) {
-			return $params["info"];
-		}
-		return $info;
+		$parsedData = $this->dbModelHooks->callChain("parseInfo");
+		return $this->data;
 	}
 	public function getData(){
 		return $this->data;
 	}
 
 	public function setData(array $array,$updateDefaultData=0){
-		foreach ($array as $key => $value) {
-			if ($value==="") {
-				$value=null;
-			}
-			$this->{$key} = $value;
-			
-		}
+		$this->data = $array;
 		if ($updateDefaultData) {
 			$this->defaultData = $array;
 		}
@@ -147,20 +136,18 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 		try {
 			$this->dbModelHooks->callChain("beforeSave");
 			if ($this->getId()) {
-				$this->dbModelHooks->callChain("beforeUpdate");
 				// UPDATE
 				$updated = array_diff_assoc($this->data, $this->defaultData);
 				if ($updated) {
+					$this->dbModelHooks->callChain("beforeUpdate");
 					$dbUpdate = clone $this->dbUpdate;
 					$dbUpdate->setFields(array_keys($updated));
 					$dbUpdate->setData($updated,1);
 					$dbUpdate->addWhere($this->getPkField()." = :id",array("id"=>$this->getId()));
 					$result = $dbUpdate->run();
-					$this->dbModelHooks->callChain("afterUpdate",array("updated"=>$updated));
-					$this->dbModelHooks->callChain("afterSave");
+					$this->dbModelHooks->callChain("afterUpdate");
 					return $result;
 				} else {
-					$this->dbModelHooks->callChain("afterSave");	
 					return true; //Nothing to update
 				}
 				
@@ -179,11 +166,10 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 				$result = $dbSelect->run();
 				$this->{$this->getPkField(1)} = $result[0][0]["dbModelPkField"];
 				$this->dbModelHooks->callChain("afterNew");
-				$this->dbModelHooks->callChain("afterSave");
-
 				return $result;
 
 			}
+			$this->dbModelHooks->callChain("afterSave");
 		} catch (Exception $e){ 
 			throw $e;	
 		}
@@ -210,16 +196,7 @@ Essa classe pode ser utilizada para uso comercial ou pessoal, desde que esses co
 Funções de pesquisa
 */
 
-	public function __clone(){
-		$this->dbModelHooks = clone $this->dbModelHooks;
-		foreach ($this->dbModelHooks->getHookChains() as $chain) {
-			foreach ($chain->getHooks() as $hook) {
-				$hook->setDbModel($this);
-			}
-		}
-		
-	}
-
+	
 	///MAGIC METHODS
 	public function __set($name, $value)
     {

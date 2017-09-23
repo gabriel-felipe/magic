@@ -1,4 +1,4 @@
-<?php
+<?php 
 namespace Magic\Engine\Plugin;
 use \LogicException;
 use Magic\Engine\Registry;
@@ -9,19 +9,19 @@ use Magic\Engine\Plugin\Assets\PluginCss;
 * Classe abstrata para plugins
 *
 * @property string $name Nome do plugin
-*
+* 
 * @property string $folter Pasta onde o plugin está localizado
-*
+* 
 * @property Registry $registry Referencia Objeto Registry Global
-*
+* 
 * @property Config $config Objeto config responsável por armazenar as configurações do Plugin
-*
+* 
 * @property string $configFile Caminho da pasta do plugin até o arquivo de configuração
-*
-* @property float $version Indica a versão do plugin. Utilize um padrão de versões de forma que a versão principal sempre indique compatibilidade.
+* 
+* @property float $version Indica a versão do plugin. Utilize um padrão de versões de forma que a versão principal sempre indique compatibilidade. 
 * Portanto a versão 1.1 deve ser compatível com a versão 1.9.2. Sempre que houver uma quebra de compatibilidade incremente a versão principal.
 * Por exemplo a versão 1.9 não é compatível com a versão 2.0.
-*
+* 
 * @property array $compatibleWith Indica um array de versões do Magic que este plugin é compatível.
 */
 class AbstractPlugin
@@ -30,7 +30,7 @@ class AbstractPlugin
 	protected $folder;
 	protected $registry;
 	protected $config;
-	protected $configFolder="Config";
+	protected $configFile="config.json";
 	protected $version=false;
 	protected $compatibleWith=false;
 	final function __construct($name,$folder,Registry $registry)
@@ -54,24 +54,19 @@ class AbstractPlugin
 		return $this->compatibleWith;
 	}
 	public function loadConfig(){
-		$configFolder = $this->getFolder()."/".$this->getConfigFolder();
+		$configFile = $this->getFolder()."/".$this->getConfigFile();
 		$config = new Config();
-		$config->loadIfExists($configFolder."/defaults.json");
-		if (defined("APPLICATION_ENV")) {
-			$config->loadIfExists($configFolder."/".APPLICATION_ENV.".json");
+		if (file_exists($configFile)) {
+			$config->load($configFile);
 		}
-		$this->config = $config;
+		$this->config = $config; 
 		return $this->config;
 	}
-
-	public function getConfig(){
-		return $this->config;
+	public function getConfigFile(){
+		return $this->configFile;
 	}
-	public function getConfigFolder(){
-		return $this->configFolder;
-	}
-	public function setConfigFolder($folder){
-		$this->configFolder = $folder;
+	public function setConfigFile($file){
+		$this->configFile = $file;
 	}
 	public function init(){
 
@@ -111,7 +106,7 @@ class AbstractPlugin
         $namespace = $refl->getNamespaceName();
 		foreach ($hooks as $hook) {
 			$class = $namespace."\\Hooks\\".str_replace(".php","",basename($hook));
-			$hook = new $class($this->registry);
+			$hook = new $class($this->registry);	
 			$hook->register();
 		}
     }

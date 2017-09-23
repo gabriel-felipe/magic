@@ -12,7 +12,7 @@ abstract class AbstractDbSelect extends AbstractDbQuery
 	protected $history=array();
 	protected $qtnByPage=99999999999999;
 	protected $orderBy=array();
-	protected $page=1;
+	protected $page=false;
 	protected $groupBy = array();
 	
     public function run(){
