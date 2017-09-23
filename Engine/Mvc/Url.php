@@ -2,16 +2,25 @@
 	namespace Magic\Engine\Mvc;
 	use \data;
 	final class Url {
+		static protected $instance=false;
 		public $scope = "";
 		private $params = array(
 			'scope' => array(''),
 			'route' => array('regex'=>'/^[A-z0-9\/%_-]+$/')
 		);
 		private $shortcuts = array();
-		public function __construct($scope=false){
+		protected function __construct($scope=false){
 			if ($scope) {
 				$this->setScope($scope);
 			}
+		}
+
+		static function getInstance(){
+			if (!self::$instance) {
+				$c = __CLASS__;
+				self::$instance = new $c();
+			}
+			return self::$instance;
 		}
 		public function addShortcut($route,$params){
 			$this->shortcuts[$route] = $params;
@@ -19,7 +28,9 @@
 		public function setScope($scope){
 			$this->scope = $scope;
 			$this->params['scope'] = $scope;
-
+		}
+		public function getScope(){
+			return $this->scope;
 		}
 		private $final_url = array();
 		function analyze($url){
@@ -279,8 +290,7 @@
 			}
 		}
 		function redirect($link,$params=false,$scope=false){
-			require_once(path_engine_library."/data-cleaner.php");
-			if(!validate::absolute_url($link)){
+			if(!\validate::absolute_url($link)){
 				$link = $this->get($link,$params,$scope);
 			}
 			echo "<meta http-equiv=\"refresh\" content=\"0; url=$link\">";

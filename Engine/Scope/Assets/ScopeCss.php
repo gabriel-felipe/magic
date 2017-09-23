@@ -11,7 +11,7 @@ use Magic\Engine\Document\Link\Css\CssAbstract;
  */
 final class ScopeCSS extends CssAbstract {
 	public function __construct($file,$scope){
-		$this->rootPath = "/Scopes/".$scope->getName()."/Views/Css/";
+		$this->rootPath = "/Scopes/".$scope->getName()."/views/css/";
 		parent::__construct($file);
 	}
 }

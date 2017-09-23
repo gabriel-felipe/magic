@@ -22,7 +22,7 @@ abstract class AbstractAssetManager {
 	protected $hooks = false;
 	public function __construct(){
 		global $registry;
-		$this->cacheFolder = path_root."/Cache/Document/Asset/".ucfirst($this->assetType)."/";
+		$this->cacheFolder = path_root."/Cache/document/asset/".$this->assetType."/";
 		$this->compiladorUnidade = new Compilador;
 		$this->compiladorGrupo = new Compilador;
 		$this->compiladorMinificacao = new Compilador;

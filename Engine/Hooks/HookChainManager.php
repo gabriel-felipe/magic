@@ -28,6 +28,9 @@ class HookChainManager
         $this->registerChain($chainName,$chain);
         return $this;
     }
+    public function getHookChains(){
+        return $this->HookChains;
+    }
     public function callChain($name,$params=array()){
         $params = array_merge($this->globalParams,$params);
         $chain = $this->getChain($name);
@@ -35,6 +38,13 @@ class HookChainManager
             return $chain->call($params);
         }
         return false;
+    }
+    function __clone(){
+        $array = array();
+        foreach ($this->HookChains as $key => $value) {
+            $array[$key] = clone $value;
+        }
+        $this->HookChains = $array;
     }
 
 }

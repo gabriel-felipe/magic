@@ -2,7 +2,7 @@
 namespace Magic\Engine\Form;
 abstract class AbstractMultiElement extends AbstractElement {
 	protected $options=array();
-
+	protected $strictOptionCompare = false;
 	public function setOptions(array $options){
 		$this->options = $options;
 		return $this;
@@ -23,11 +23,10 @@ abstract class AbstractMultiElement extends AbstractElement {
 
 	public function checkValue($value){
 		if (is_array($this->value)) {
-			return in_array($value, $this->value);
+			return in_array($value, $this->value,$this->strictOptionCompare);
 		} else{
 			return $value == $this->value;
 		}
 	}
-
 }
 ?>

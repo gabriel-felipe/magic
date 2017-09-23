@@ -3,6 +3,7 @@ namespace Magic\Engine\Form;
 use Magic\Engine\Form\Decorators\AbstractFormDecorator;
 use Magic\Engine\Mvc\View\Compiladores\ViewCompilador;
 use Magic\Engine\Mvc\View\Compiladores\InterfaceViewCompilador;
+use Magic\Engine\Mvc\View\AbstractView;
 
 /**
 * Classe para lidar com forms no backend. Validação / Limpeza de dados.
@@ -28,8 +29,18 @@ class Form
 		$this->attrs = $attrs;
 		$this->setUp();
 	}
+	public function setView(AbstractView $view){
+		$this->view = $view;
+		$this->view->form = $this;
+		return $this;
+	}
+	public function getView(){
+		return $this->view;
+	}
 	public function getNewView(){
-		return new FormView("form",$this);
+		$view = new FormView("form");
+		$view->form = $this;
+		return $view;
 	}
 	public function getId(){
 		return $this->id;
@@ -87,6 +98,10 @@ class Form
 		if (isset($this->elements[$element])) {
 			$obj = $this->elements[$element];
 			unset($this->elements[$element]);
+			foreach ($this->getDisplayGroups() as $dg) {
+				$dg->removeElement($element);
+			}
+			
 			return $obj;
 		}
 		return false;
@@ -105,6 +120,10 @@ class Form
 		$this->view->addCompiladorDecorator($decorator);
 		return $this;
 	}
+	function setFormDecorators(array $dec){
+       $this->decorators[$name] = $decorator;
+       return $this;
+    }
 	function groupElements(array $elements,$dgName,$displayGroupClass=false){
 		$displayGroupClass = (!$displayGroupClass) ? $this->displayGroupClass : $displayGroupClass;
 		$dg = new $displayGroupClass($dgName);
@@ -116,11 +135,17 @@ class Form
 			}
 		}
 		$this->displayGroups[$dgName] = $dg;
-		return $this;
+		return $dg;
 	}
 	function addDisplayGroup(DisplayGroup $group,$label){
 		$group->setParentForm($this);
 		$this->displayGroups[$label] = $group;
+	}
+	function removeDisplayGroup($label){
+		if (isset($this->displayGroups[$label])) {
+			unset($this->displayGroups[$label]);
+		}
+		return $this;
 	}
 	function inDisplayGroup($element){
 		foreach($this->getDisplayGroups() as $dg){
@@ -161,7 +186,7 @@ class Form
 		$errors = array();
 		foreach($this->elements as $key => $element){
 			if (!$element->isValid()) {
-				$errors[$key] = $element->getValidateErrors();
+				$errors[$element->getId()] = $element->getValidateErrors();
 			}
 		}
 		$this->validateErrors = $errors;
@@ -194,7 +219,12 @@ class Form
 	}
 
 	function render(){
-		return $this->view->render();
+		if ($this->getElements()) {
+			return $this->view->render();
+		} else {
+			return "";
+		}
+		
 	}
 
 }
