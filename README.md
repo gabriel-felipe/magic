@@ -1,6 +1,5 @@
 magic
 =====
-<a href='http://slid.es/gabrielfelipe/magic'> Link para apresentação introdutória (incompleta)</a><br />
 <a href='http://www.youtube.com/watch?v=oi_OXxOU7UM'> Vídeo de eu fazendo um app nele. Da para ter noção da arquitetura dele pelo vídeo.</a><br />
 <a href='http://www.youtube.com/watch?v=vXbZ-WFZCF0'> Vídeo tutorial para o primeiro app com ele.</a>
 
